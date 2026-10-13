@@ -1,44 +1,36 @@
-# MuskyP2V AI Studio — Free Prototype v0.2
+# MuskyP2V AI Studio — Free Prototype v0.3
 
-This is a browser-only prototype for the first build stage.
+## What changed in v0.3
+- Added a choice between **Face Only** and **Full Appearance**.
+- Added reference-photo and source-video previews.
+- Added an original-versus-transformed comparison layout.
+- Added a setup check and an honest placeholder explaining that the AI engine is not connected.
+- Kept camera preview, original-video download, and browser text-to-speech demo.
+- Mobile-friendly layout.
 
-## What's included
-- Dark navy/gold mobile-first layout
-- Demo display-name sign-in (NOT real authentication)
-- Free browser text-to-speech using voices available on the device/browser
-- Voice choice, speech speed and pitch controls, pause/resume/stop
-- Audio upload/preview and microphone sample recording/download
-- Camera preview, reference photo preview and normal video recording/download
-- Proposed coin package display
-- Local draft saving
+## Important: what this version does NOT do
+This is still a front-end prototype. It does **not** transform faces or skin tone, change hairstyles, generate an AI video, or create a transformed preview. It does not have secure accounts, real coins, or payment processing. The transformed preview area is intentionally a placeholder rather than a fake result.
 
-## Important limitations
-- No real AI face/appearance transformation is connected.
-- No AI voice cloning is connected.
-- Browser text-to-speech voices differ by phone/browser and may sound robotic.
-- Browser speech playback generally does not create a downloadable MP3/WAV file.
-- Demo sign-in and demo coins are not secure and must not be used for real customers or money.
-- No payment processing, secure coin ledger, backend, or admin dashboard exists yet.
+GitHub Pages hosts static files; it does not run a server-side AI model. A separate AI-processing engine/API or suitable computer is needed to generate transformed videos. Real-time camera transformation is more demanding and may require specialized local or server hardware.
 
-## Test on an Android phone
-1. Extract this ZIP.
-2. Upload `index.html`, `style.css`, `script.js`, and `README.md` to the root of a GitHub repository.
-3. In GitHub, open **Settings → Pages**.
-4. Choose **Deploy from a branch**, select `main` and `/(root)`, then save.
-5. Open the HTTPS website in an updated Chrome browser.
-6. Enter a display name, open Voice Studio, and try the available voices.
-7. If the voice list is empty, check Android text-to-speech settings and install/enable a speech engine such as Speech Services by Google if available.
+## Update the live GitHub Pages site
+1. Download and extract this ZIP on your phone or computer.
+2. Open your repository: https://github.com/muskysocial/MuskyP2V-AI-Studio
+3. Open the repository's file list.
+4. For each of these three files — `index.html`, `style.css`, and `script.js` — open the file, choose the pencil/Edit option, replace all its contents with the matching file from this ZIP, and commit the changes. (You can also upload all three using Add file → Upload files and commit the changes.)
+5. Do not delete the repository or change its Pages settings.
+6. Wait a few minutes, then reload the live site. On phone, if the old version remains, try refreshing or opening the link in a private/incognito tab.
 
-## Next development stages
-1. Connect real user registration and login (e.g. Supabase Auth) and secure database rules.
-2. Add a server-side coin ledger and safe 30-coin starter grant.
-3. Connect a Nigerian payment provider using server-side payment verification and idempotent webhook handling.
-4. Test free/open AI model hosting for image/video transformation.
-5. Test a downloadable natural TTS model such as Kokoro in a suitable free environment, after checking its licence and hosting terms.
-6. Add production security, consent notices, abuse prevention, usage limits, and privacy/deletion controls.
+## Test checklist
+- Choose Face Only, then Full Appearance; confirm the selected card changes.
+- Upload a reference image and check its preview.
+- Upload a video and check playback in Original.
+- Try the camera permission prompt.
+- Check that the AI preview says the engine is not connected yet.
+- Test browser text-to-speech.
 
-## Security rules
-- Never put payment secret keys or AI service secrets in these public files or a public GitHub repository.
-- Do not store customer passwords yourself.
-- Do not credit coins based only on a screenshot or a button saying "I paid"; verify payment server-side.
-- Only process face images and voice samples with permission. Be transparent when content is AI-generated.
+## Privacy and safety
+- Use only photos and videos you have permission to use.
+- Do not upload private customer media to public repositories.
+- Never put payment-provider secrets, AI API keys, passwords, or other private credentials in public files.
+- Do not use demo interface coins or a “paid” button as proof of payment. Coin balances and payment verification must be handled securely on a backend.
