@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>MuskyP2V AI Studio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-mark">M2V</div>
+    <div><h1>MuskyP2V <span>AI Studio</span></h1><p>Camera • Voice • Creator tools</p></div>
+  </header>
+
+  <main>
+    <section id="loginPanel" class="card login-card">
+      <p class="eyebrow">WELCOME TO YOUR STUDIO</p>
+      <h2>Enter MuskyP2V</h2>
+      <p class="muted">This is a private prototype preview. Enter a display name to explore the free demo.</p>
+      <form id="loginForm">
+        <label for="userName">Display name</label>
+        <input id="userName" autocomplete="nickname" placeholder="Enter a display name" required>
+        <button class="primary" type="submit">Enter Studio</button>
+      </form>
+      <p class="tiny">Demo sign-in only — it is not a real account system. We will connect secure registration and login in a later setup step.</p>
+    </section>
+
+    <div id="studio" hidden>
+      <section class="welcome-row">
+        <div><p class="eyebrow">YOUR WORKSPACE</p><h2>Welcome, <span id="welcomeName">Creator</span> 👋</h2></div>
+        <div class="welcome-actions"><div class="coin-pill">🪙 <strong id="coinBalance">30</strong> demo coins</div><button id="signOut" class="ghost small">Sign out</button></div>
+      </section>
+      <div class="notice"><strong>Free prototype:</strong> Coins shown here are only a local demo. No real payments, secure accounts, or AI video transformation are connected yet.</div>
+
+      <nav class="tabs" aria-label="Studio sections">
+        <button class="tab active" data-target="voiceSection">🎙️ Voice Studio</button>
+        <button class="tab" data-target="cameraSection">📷 Camera Studio</button>
+        <button class="tab" data-target="plansSection">🪙 Coins & Plans</button>
+        <button class="tab" data-target="privacySection">🛡️ Privacy</button>
+      </nav>
+
+      <section id="voiceSection" class="card pane">
+        <p class="eyebrow">FREE VOICE STUDIO • PHASE 1</p>
+        <h2>Turn text into speech</h2>
+        <p class="muted">Try voices already available in your browser or device. The sound and available voices vary by phone and browser. This demo does not clone anyone's voice.</p>
+        <label for="speechText">What should the voice say?</label>
+        <textarea id="speechText" rows="5" maxlength="3000" placeholder="Type a sentence to hear it spoken…">Hello! Welcome to MuskyP2V AI Studio. Let's create something amazing.</textarea>
+        <div class="form-grid">
+          <div>
+            <label for="voiceSelect">Choose a voice</label>
+            <select id="voiceSelect"><option value="">Loading available voices…</option></select>
+          </div>
+          <div>
+            <label for="voiceStyle">Voice preference</label>
+            <select id="voiceStyle">
+              <option value="all">Show all voices</option>
+              <option value="female">Prefer likely female voices</option>
+              <option value="english">English voices first</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div>
+            <label for="speechRate">Speaking speed: <span id="rateValue">1.0×</span></label>
+            <input id="speechRate" type="range" min="0.65" max="1.35" value="1" step="0.05">
+          </div>
+          <div>
+            <label for="speechPitch">Pitch: <span id="pitchValue">1.0</span></label>
+            <input id="speechPitch" type="range" min="0.75" max="1.35" value="1" step="0.05">
+          </div>
+        </div>
+        <div class="button-row">
+          <button id="speakButton" class="primary">▶ Generate / Play Voice</button>
+          <button id="pauseSpeech" class="secondary">⏸ Pause</button>
+          <button id="resumeSpeech" class="secondary">▶ Resume</button>
+          <button id="stopSpeech" class="ghost">■ Stop</button>
+        </div>
+        <p id="speechStatus" class="status" role="status">Checking the voices available on this device…</p>
+        <p class="tiny">Browser-generated speech may not offer an audio download button. If you need downloadable MP3/WAV files with consistent, highly realistic voices, we'll test a free open model in a later phase.</p>
+        <hr>
+        <h3>Voice sample recorder</h3>
+        <p class="muted">Record your own voice or upload audio for local preview. This does not create a voice clone.</p>
+        <label for="audioUpload">Upload an audio sample</label>
+        <input id="audioUpload" type="file" accept="audio/*">
+        <audio id="audioPreview" controls hidden></audio>
+        <div class="button-row">
+          <button id="startAudioRecord" class="primary">🎤 Record sample</button>
+          <button id="stopAudioRecord" class="secondary" disabled>Stop recording</button>
+        </div>
+        <p id="audioStatus" class="status" role="status">No recording yet.</p>
+        <a id="audioDownload" class="download-link" hidden>Download voice sample</a>
+        <button id="saveText" class="secondary">Save text on this device</button>
+        <p id="textStatus" class="status" role="status"></p>
+      </section>
+
+      <section id="cameraSection" class="card pane" hidden>
+        <p class="eyebrow">CAMERA STUDIO • PHASE 1</p>
+        <h2>Reference image & camera</h2>
+        <p class="muted">This version previews your camera and reference photo and records a normal video. Realistic AI face/appearance transformation is not connected yet.</p>
+        <label for="referenceImage">Choose reference photo</label>
+        <input id="referenceImage" type="file" accept="image/*">
+        <div class="preview-grid">
+          <div class="preview-box">
+            <div class="preview-title">Live camera</div>
+            <video id="cameraVideo" autoplay playsinline muted></video>
+            <div class="button-row">
+              <button id="startCamera" class="primary">Open camera</button>
+              <button id="switchCamera" class="secondary">Switch camera</button>
+            </div>
+          </div>
+          <div class="preview-box">
+            <div class="preview-title">Reference photo</div>
+            <img id="referencePreview" alt="Selected reference photo preview">
+          </div>
+        </div>
+        <p id="cameraStatus" class="status" role="status">Camera is off.</p>
+        <div class="button-row">
+          <button id="startVideoRecord" class="primary" disabled>Start recording</button>
+          <button id="stopVideoRecord" class="secondary" disabled>Stop & save</button>
+        </div>
+        <a id="videoDownload" class="download-link" hidden>Download recorded video</a>
+      </section>
+
+      <section id="plansSection" class="card pane" hidden>
+        <p class="eyebrow">COINS & PLANS • PREVIEW ONLY</p>
+        <h2>Coin packages</h2>
+        <p class="muted">These are proposed package displays, not live offers. Payments and coin crediting are not connected yet.</p>
+        <div class="plan-grid">
+          <article class="plan"><h3>Starter</h3><p class="price">₦1,500</p><p>200 coins</p><p class="tiny">Up to 20 video generations at 10 coins each, once video AI is connected.</p></article>
+          <article class="plan"><h3>Creator</h3><p class="price">₦3,000</p><p>420 coins</p><p class="tiny">Suggested bonus package — not final.</p></article>
+          <article class="plan"><h3>Pro Creator</h3><p class="price">₦5,000</p><p>750 coins</p><p class="tiny">Suggested bonus package — not final.</p></article>
+        </div>
+        <div class="notice">Next payment step: create a payment-provider account, configure secure server-side verification, then connect it to a database. Never put secret payment keys in these public website files.</div>
+      </section>
+
+      <section id="privacySection" class="card pane" hidden>
+        <p class="eyebrow">PRIVACY FIRST</p>
+        <h2>Privacy & account safety</h2>
+        <ul class="privacy-list">
+          <li>Camera and microphone are used only after you tap a button and grant browser permission.</li>
+          <li>In this prototype, selected media is previewed locally in your browser; this code does not upload it to a server.</li>
+          <li>This demo sign-in and demo coin balance are not secure and must not be used for real customer accounts or payments.</li>
+          <li>Before public launch, add real authentication, database access rules, protected payment verification, and admin controls.</li>
+          <li>Only use photos and voices you own or have permission to use. Disclose synthetic media when appropriate.</li>
+        </ul>
+      </section>
+      <footer><span>MuskyP2V AI Studio</span><span>Free prototype • v0.2</span></footer>
+    </div>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
