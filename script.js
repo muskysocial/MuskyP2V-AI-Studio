@@ -341,7 +341,7 @@ wanGenerateButton?.addEventListener("click", async () => {
       quality: 1,
       scheduler: "FlowMatchEulerDiscrete",
       flow_shift: 0.5,
-      frame_multiplier: "16",
+      frame_multiplier: 16,
       video_component: true,
       safe_mode: true
     });
