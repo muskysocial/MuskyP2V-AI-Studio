@@ -1,6 +1,5 @@
-// MuskyP2V AI Studio — free browser prototype.
-// Demo sign-in and coins are NOT secure. No AI face transformation, payment processing,
-// or voice cloning is implemented in this version.
+// MuskyP2V AI Studio — browser prototype with a community Wan777 API connection.
+// Demo sign-in and coins are NOT secure. Face swap, payments and voice cloning are not connected.
 const $ = (id) => document.getElementById(id);
 const loginPanel = $("loginPanel");
 const studio = $("studio");
@@ -262,4 +261,109 @@ window.addEventListener("beforeunload", () => {
   if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
   if (activeAudioStream) activeAudioStream.getTracks().forEach(track => track.stop());
   cleanupUrls();
+});
+
+
+// Photo-to-video API connection to the public Gradio Space.
+// No private Hugging Face token is embedded in this public website.
+const wanImageInput = $("wanImage");
+const wanPromptInput = $("wanPrompt");
+const wanGenerateButton = $("wanGenerate");
+const wanStatus = $("wanStatus");
+const wanPreview = $("wanImagePreview");
+const wanResultVideo = $("wanResultVideo");
+const wanDownload = $("wanDownload");
+let wanPreviewUrl = null;
+let wanOutputUrl = null;
+
+wanImageInput?.addEventListener("change", () => {
+  const file = wanImageInput.files?.[0];
+  if (!file) return;
+  if (!file.type.startsWith("image/")) {
+    wanStatus.textContent = "Please choose an image file.";
+    wanImageInput.value = "";
+    return;
+  }
+  if (wanPreviewUrl) URL.revokeObjectURL(wanPreviewUrl);
+  wanPreviewUrl = URL.createObjectURL(file);
+  wanPreview.src = wanPreviewUrl;
+  wanPreview.hidden = false;
+  wanStatus.textContent = "Photo ready. Add a motion description, then generate.";
+});
+
+function findVideoUrl(value, depth = 0) {
+  if (!value || depth > 6) return null;
+  if (typeof value === "string") {
+    if (/^https?:\/\//i.test(value) && /\.(mp4|webm|mov)(\?|$)/i.test(value)) return value;
+    return null;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) { const found = findVideoUrl(item, depth + 1); if (found) return found; }
+    return null;
+  }
+  if (typeof value === "object") {
+    // Prefer fields that commonly contain a Gradio file URL.
+    for (const key of ["url", "video", "path", "value", "data"]) {
+      if (key in value) { const found = findVideoUrl(value[key], depth + 1); if (found) return found; }
+    }
+    for (const item of Object.values(value)) { const found = findVideoUrl(item, depth + 1); if (found) return found; }
+  }
+  return null;
+}
+
+wanGenerateButton?.addEventListener("click", async () => {
+  const imageFile = wanImageInput.files?.[0];
+  const prompt = wanPromptInput.value.trim();
+  if (!imageFile) { wanStatus.textContent = "Choose a photo first."; wanImageInput.focus(); return; }
+  if (!prompt) { wanStatus.textContent = "Describe the motion first."; wanPromptInput.focus(); return; }
+
+  wanGenerateButton.disabled = true;
+  wanGenerateButton.textContent = "Connecting to Wan777…";
+  wanResultVideo.hidden = true;
+  wanDownload.hidden = true;
+  wanStatus.textContent = "Connecting to the public AI Space. It may take several minutes or fail if the Space is busy.";
+
+  try {
+    const { Client } = await import("https://esm.sh/@gradio/client?bundle");
+    const client = await Client.connect("kulkas2pintu/wan777");
+    wanStatus.textContent = "Uploading your photo and generating video… Please keep this page open.";
+    const result = await client.predict("/generate_video", {
+      input_image: imageFile,
+      last_image: imageFile,
+      prompt,
+      steps: Number($("wanSteps").value),
+      negative_prompt: "blurry, distorted, flickering, deformed",
+      duration_seconds: Number($("wanDuration").value),
+      guidance_scale: 5,
+      guidance_scale_2: 5,
+      seed: 0,
+      randomize_seed: true,
+      quality: 1,
+      scheduler: "FlowMatchEulerDiscrete",
+      flow_shift: 0.5,
+      frame_multiplier: "16",
+      video_component: true,
+      safe_mode: true
+    });
+    const outputUrl = findVideoUrl(result?.data);
+    if (!outputUrl) {
+      console.error("Wan777 response did not include a recognizable video URL:", result?.data);
+      throw new Error("The AI returned a result, but this website could not identify the video link. Try the direct Wan777 demo below.");
+    }
+    wanOutputUrl = outputUrl;
+    wanResultVideo.src = outputUrl;
+    wanResultVideo.hidden = false;
+    wanDownload.href = outputUrl;
+    wanDownload.download = "muskyp2v-generated-video.mp4";
+    wanDownload.textContent = "Download generated video ↧";
+    wanDownload.hidden = false;
+    wanStatus.textContent = "Generation finished! Preview the video below. If playback or download fails, open the direct demo.";
+  } catch (error) {
+    console.error("Wan777 generation failed:", error);
+    const message = error?.message || String(error);
+    wanStatus.textContent = "Could not generate video: " + message + " — the public Space may be busy or its API may have changed. Try again later or use the direct Wan777 demo.";
+  } finally {
+    wanGenerateButton.disabled = false;
+    wanGenerateButton.textContent = "✦ Generate video";
+  }
 });
