@@ -4,6 +4,27 @@
 import { Client, handle_file } from "https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js";
 
 const SPACE = "hugging-apps/bfs-best-face-swap";
+
+// ---- Simple event log (Supabase). The publishable key is public by design:
+// the table only allows adding rows, never reading or deleting them.
+const SB_URL = "https://jnsbttwyiwcqhuhveikq.supabase.co";
+const SB_KEY = "sb_publishable_LB_HC5TVIdKf7FX3c0q8Hg__81wa5F2";
+function log(event, item_id = null, order_ref = null, detail = null) {
+  try {
+    fetch(SB_URL + "/rest/v1/site_events", {
+      method: "POST",
+      headers: { apikey: SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({
+        event: String(event).slice(0, 40),
+        item_id: item_id && String(item_id).slice(0, 40),
+        order_ref: order_ref && String(order_ref).slice(0, 40),
+        detail: detail && String(detail).slice(0, 200),
+      }),
+      keepalive: true,
+    }).catch(() => {});
+  } catch {}
+}
+
 const MAX_SIDE = 1536; // shrink big phone photos before upload (faster, fewer errors)
 
 const css = `
@@ -129,6 +150,7 @@ $("hsGo").addEventListener("click", async () => {
   btn.disabled = true;
   $("hsOut").style.display = "none";
   try {
+    log("headswap_start");
     setStatus("Connecting to the AI Space…");
     const app = await Client.connect(SPACE);
     setStatus("Generating… this can take 30–90 seconds.");
@@ -144,9 +166,11 @@ $("hsGo").addEventListener("click", async () => {
     if (!resultUrl) throw new Error("The Space returned no image.");
     $("hsImg").src = resultUrl;
     $("hsOut").style.display = "block";
+    log("headswap_done");
     setStatus("Done. Check the result, then download it.");
   } catch (err) {
     console.error(err);
+    log("headswap_fail", null, null, (err && (err.message || err.detail)) || err);
     setStatus(friendlyError(err), true);
   } finally {
     refresh();

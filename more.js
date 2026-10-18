@@ -15,6 +15,27 @@ const LISTINGS = [
   { id: "TG-01", platform: "Telegram", name: "Telegram · Channel", price: 8500, status: "Sold" },
 ];
 
+
+// ---- Simple event log (Supabase). The publishable key is public by design:
+// the table only allows adding rows, never reading or deleting them.
+const SB_URL = "https://jnsbttwyiwcqhuhveikq.supabase.co";
+const SB_KEY = "sb_publishable_LB_HC5TVIdKf7FX3c0q8Hg__81wa5F2";
+function log(event, item_id = null, order_ref = null, detail = null) {
+  try {
+    fetch(SB_URL + "/rest/v1/site_events", {
+      method: "POST",
+      headers: { apikey: SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({
+        event: String(event).slice(0, 40),
+        item_id: item_id && String(item_id).slice(0, 40),
+        order_ref: order_ref && String(order_ref).slice(0, 40),
+        detail: detail && String(detail).slice(0, 200),
+      }),
+      keepalive: true,
+    }).catch(() => {});
+  } catch {}
+}
+
 const studio = document.querySelector("#studio");
 const tabs = document.querySelector("nav.tabs");
 if (studio && tabs) init();
@@ -82,8 +103,10 @@ background:transparent;color:#e6ecff;font-size:15px;text-align:left}
   const creditPane = pane("creditSection",
     "<h2>Buy credit</h2><p>Credits are not open yet. Message us and we will tell you the moment they are.</p>" +
     '<button class="mx-btn" id="mxCredit">Ask about credit on WhatsApp</button>');
-  creditPane.querySelector("#mxCredit").addEventListener("click", () =>
-    openWa("Hello MuskySocials, I want to know when credit is available."));
+  creditPane.querySelector("#mxCredit").addEventListener("click", () => {
+    log("credit_tap");
+    openWa("Hello MuskySocials, I want to know when credit is available.");
+  });
 
   pane("aboutSection",
     "<h2>About us</h2>" +
@@ -94,6 +117,7 @@ background:transparent;color:#e6ecff;font-size:15px;text-align:left}
     "AI service, we say so on the screen, because those services can be slow or busy.</p>" +
     "<p>What we hold to:</p>" +
     "<p>• Use only photos and videos you own or have permission to use.<br>" +
+    "• We record basic taps, like which listing was opened, to improve the site. We do not store your photos.<br>" +
     "• Listings are described honestly, and we confirm every detail with you on WhatsApp before any payment.<br>" +
     "• You talk to a real person when you need help.</p>");
 
@@ -114,12 +138,15 @@ background:transparent;color:#e6ecff;font-size:15px;text-align:left}
     b.className = "mx-btn";
     b.textContent = it.status === "Available" ? "Buy on WhatsApp" : it.status;
     b.disabled = it.status !== "Available";
-    b.addEventListener("click", () =>
+    b.addEventListener("click", () => {
+      const r = ref();
+      log("buy_click", it.id, r, it.platform + " " + naira(it.price));
       openWa(
         "Hello MuskySocials 👋\nI want to buy this account:\n• Item: " + it.platform + " — " + it.name +
-        "\n• Listing ID: " + it.id + "\n• Price: " + naira(it.price) + "\n• Order ref: " + ref() +
+        "\n• Listing ID: " + it.id + "\n• Price: " + naira(it.price) + "\n• Order ref: " + r +
         "\nPlease confirm it is still available."
-      ));
+      );
+    });
     card.appendChild(b);
     grid.appendChild(card);
   });
@@ -127,8 +154,10 @@ background:transparent;color:#e6ecff;font-size:15px;text-align:left}
   const contact = pane("contactSection",
     "<h2>Contact us</h2><p>We answer on WhatsApp.</p><p><strong>" + WA_SHOW + "</strong></p>" +
     '<button class="mx-btn" id="mxChat">Chat on WhatsApp</button>');
-  contact.querySelector("#mxChat").addEventListener("click", () =>
-    openWa("Hello MuskySocials, I need help."));
+  contact.querySelector("#mxChat").addEventListener("click", () => {
+    log("contact_tap");
+    openWa("Hello MuskySocials, I need help.");
+  });
 
   // ---- Tab + dropdown menu
   const mine = ["videoSection", "headswapSection", "voiceCloneSection", "creditSection",
@@ -171,6 +200,7 @@ background:transparent;color:#e6ecff;font-size:15px;text-align:left}
   document.addEventListener("click", closeMenu);
 
   function show(id) {
+    log("menu_open", id);
     document.querySelectorAll("#studio .pane").forEach((p) => {
       const hide = p.id !== id;
       if (p.hidden !== hide) p.hidden = hide;
