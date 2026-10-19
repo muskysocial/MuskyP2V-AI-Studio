@@ -134,12 +134,10 @@ function init() {
   const home = mk("homeSection", "");
   const menu = mk("menuSection", "<h2>Menu</h2>" + '<div class="sh-grid">' + ITEMS.map(tile).join("") + "</div>");
   const CHAT_FN = "rapid-function"; // name of the Supabase function that runs the chat
-  const CHAT_COST = 2; // credits per message (same number as in the chat function)
   const chat = mk("chatSection",
     "<h2>AI chat</h2><div class='ch-log' id='chLog'></div>" +
     "<div class='ch-bar'><textarea id='chIn' rows='2' maxlength='1000' placeholder='Ask anything…'></textarea>" +
-    "<button class='ch-go' id='chGo'>Send</button></div><small>Each message costs " + CHAT_COST +
-    " credits. Messages go to Google's free AI service, so never share passwords or private details. AI can make mistakes; for tax, legal or money decisions, check the official source.</small>");
+    "<button class='ch-go' id='chGo'>Send</button></div><small>Free to use. Messages go to Google's free AI service, so never share passwords or private details. AI can make mistakes; for tax, legal or money decisions, check the official source.</small>");
   const hist = [];
   const chLog = chat.querySelector("#chLog");
   const chIn = chat.querySelector("#chIn");
