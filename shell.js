@@ -34,6 +34,14 @@ body{padding-bottom:84px}
 .sh-row button.on{background:var(--sh-blue);border-color:var(--sh-blue);color:#fff;font-weight:700}
 .sh-out{width:100%;margin-top:6px;color:#d93025;font-weight:600}
 .sh h3{margin:14px 0 4px;font-size:16px}
+.ch-log{display:flex;flex-direction:column;gap:8px;min-height:40vh;margin-bottom:10px}
+.ch-b{max-width:88%;padding:10px 12px;border-radius:16px;white-space:pre-wrap;line-height:1.4;font-size:16px}
+.ch-me{align-self:flex-end;background:var(--sh-blue);color:#fff}
+.ch-ai{align-self:flex-start;background:var(--sh-line);color:var(--sh-text)}
+.ch-bar{display:flex;gap:8px;align-items:flex-end}
+.ch-bar textarea{flex:1;padding:10px;border-radius:12px;border:1px solid var(--sh-line);background:var(--sh-card);color:var(--sh-text);font-size:16px;resize:none}
+.ch-go{padding:12px 16px;border:0;border-radius:12px;background:var(--sh-blue);color:#fff;font-weight:700;font-size:16px}
+.ch-go:disabled{opacity:.5}
 /* Light, Facebook-like look for the older parts of the site */
 html.mx-light body{background:#f0f2f5!important;color:#050505!important;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif!important}
 html.mx-light .topbar{background:#fff!important;border-bottom:1px solid #dadde1!important}
@@ -75,6 +83,9 @@ html.mx-light .mx-badge{color:#65676b!important;border-color:#ccd0d5!important}
 html.mx-light .mx-badge.ok{color:#0a7d33!important;border-color:#9bd7b2!important}
 html.mx-light .mx-badge.hold{color:#9a6700!important;border-color:#e6c77a!important}
 html.mx-light .mx-badge.no{color:#d93025!important;border-color:#f0a5a0!important}
+html.mx-light #studio .ch-me,html.mx-light #studio .ch-me *{color:#fff!important}
+html.mx-light #studio .ch-ai{background:#e4e6eb!important}
+html.mx-light #studio .ch-go{background:#1877f2!important;color:#fff!important}
 html.mx-light .mx-btn{background:#1877f2!important;color:#fff!important}
 html.mx-light .mx-btn:disabled{background:#e4e6eb!important;color:#8a8d91!important}
 `;
@@ -83,7 +94,7 @@ html.mx-light .mx-btn:disabled{background:#e4e6eb!important;color:#8a8d91!import
 const ITEMS = [
   ["videoSection", "🎬", "Photo to video", ""],
   ["headswapSection", "🪄", "HeadSwap", ""],
-  ["chatSection", "💬", "AI chat", "soon"],
+  ["chatSection", "💬", "AI chat", ""],
   ["voiceCloneSection", "🗣️", "Voice clone", "soon"],
   ["voiceSection", "🎙️", "Voice studio", ""],
   ["cameraSection", "📷", "Camera studio", ""],
@@ -122,7 +133,60 @@ function init() {
 
   const home = mk("homeSection", "");
   const menu = mk("menuSection", "<h2>Menu</h2>" + '<div class="sh-grid">' + ITEMS.map(tile).join("") + "</div>");
-  mk("chatSection", "<h2>AI chat</h2><p>Coming soon. You will be able to chat with an AI helper right here in the app.</p>");
+  const CHAT_FN = "rapid-function"; // name of the Supabase function that runs the chat
+  const CHAT_COST = 2; // credits per message (same number as in the chat function)
+  const chat = mk("chatSection",
+    "<h2>AI chat</h2><div class='ch-log' id='chLog'></div>" +
+    "<div class='ch-bar'><textarea id='chIn' rows='2' maxlength='1000' placeholder='Ask anything…'></textarea>" +
+    "<button class='ch-go' id='chGo'>Send</button></div><small>Each message costs " + CHAT_COST +
+    " credits. Messages go to Google's free AI service, so never share passwords or private details. AI can make mistakes; for tax, legal or money decisions, check the official source.</small>");
+  const hist = [];
+  const chLog = chat.querySelector("#chLog");
+  const chIn = chat.querySelector("#chIn");
+  const chGo = chat.querySelector("#chGo");
+  const bubble = (role, text) => {
+    const d = document.createElement("div");
+    d.className = "ch-b " + (role === "user" ? "ch-me" : "ch-ai");
+    d.textContent = text;
+    chLog.appendChild(d);
+    d.scrollIntoView({ block: "end" });
+    return d;
+  };
+  bubble("assistant", "Hi, I am Musky Assistant. Ask me about talking to clients, dating, life in the USA, or anything else.");
+  async function sendChat() {
+    const text = chIn.value.trim();
+    if (!text) return;
+    const M = window.musky;
+    if (!M || !(await M.session())) { bubble("assistant", "Please sign in to use the chat."); return; }
+    chIn.value = "";
+    chGo.disabled = true;
+    bubble("user", text);
+    hist.push({ role: "user", content: text });
+    const wait = bubble("assistant", "…");
+    try {
+      const { data, error } = await M.sb.functions.invoke(CHAT_FN, { body: { messages: hist.slice(-10) } });
+      if (error) {
+        let msg = "AI chat is not ready yet. Try again later.";
+        try {
+          const j = await error.context.json();
+          msg = j.error || msg;
+          if (typeof j.credits === "number") M.setBadge(j.credits);
+        } catch {}
+        wait.textContent = msg;
+        hist.pop();
+      } else {
+        wait.textContent = data.reply;
+        hist.push({ role: "assistant", content: data.reply });
+        if (typeof data.credits === "number") M.setBadge(data.credits);
+      }
+    } catch {
+      wait.textContent = "Could not reach the AI. Check your internet and try again.";
+      hist.pop();
+    }
+    chGo.disabled = false;
+    wait.scrollIntoView({ block: "end" });
+  }
+  chGo.addEventListener("click", sendChat);
   const settings = mk("settingsSection",
     "<h2>Settings</h2><h3>Account</h3><p id='shEmail'>Signed in</p><p id='shCred'></p>" +
     "<h3>Appearance</h3><div class='sh-row' id='shTheme'><button data-theme='light'>Light</button><button data-theme='dark'>Dark</button></div>" +

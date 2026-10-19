@@ -6,6 +6,39 @@ const SB_URL = "https://jnsbttwyiwcqhuhveikq.supabase.co";
 const SB_KEY = "sb_publishable_LB_HC5TVIdKf7FX3c0q8Hg__81wa5F2";
 const sb = createClient(SB_URL, SB_KEY);
 
+// ---- Credit balance badge + helpers shared with other scripts (window.musky)
+function setBadge(n) {
+  window.dispatchEvent(new CustomEvent("musky-credits", { detail: n }));
+  const bar = document.querySelector(".top-actions");
+  if (!bar) return;
+  let b = document.querySelector("#authCredits");
+  if (!b) {
+    b = document.createElement("span");
+    b.id = "authCredits";
+    b.style.cssText = "margin-left:10px;padding:3px 9px;border:1px solid #2c427f;border-radius:999px;font-size:12px;color:#cfe0ff";
+    bar.insertBefore(b, document.querySelector("#authOut"));
+  }
+  b.textContent = n + " credits";
+}
+window.musky = {
+  sb,
+  setBadge,
+  async session() {
+    return (await sb.auth.getSession()).data.session;
+  },
+  async credits() {
+    // get_credits also applies the daily refill (see Supabase SQL).
+    const { data, error } = await sb.rpc("get_credits");
+    return error || typeof data !== "number" ? null : data;
+  },
+  async spend(n) {
+    const { data, error } = await sb.rpc("spend_credits", { amount: n });
+    if (error) throw error;
+    setBadge(data);
+    return data;
+  },
+};
+
 const oldForm = document.querySelector("#loginForm");
 const nameInput = document.querySelector("#userName");
 if (oldForm && nameInput) init();
@@ -71,6 +104,7 @@ async function init() {
     const name = (u.user_metadata && u.user_metadata.display_name) || (u.email || "Creator").split("@")[0];
     nameInput.value = name.slice(0, 40);
     addSignOut();
+    window.musky.credits().then((n) => n !== null && setBadge(n));
     oldForm.requestSubmit();
   }
 
