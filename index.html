@@ -8,6 +8,7 @@
 <body>
   <header class="topbar">
     <a class="brand" href="#" aria-label="MuskyP2V home"><span class="brand-mark">M²</span><span><strong>MuskyP2V</strong><small>AI STUDIO</small></span></a>
+    <link rel="manifest" href="./manifest.json">
     <div class="top-actions"><span class="online-dot"></span><span>Creator workspace</span></div>
   </header>
   <main>
@@ -82,4 +83,15 @@
   <script type="module" src="headswap.js"></script>
   <script type="module" src="auth.js"></script>
   <script type="module" src="shell.js"></script>
-</body></html>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js")
+        .catch(error => console.error(
+          "Service worker registration failed:", error
+        ));
+    });
+  }
+</script>
+</body>
