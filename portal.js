@@ -196,4 +196,12 @@ html.mx-light #studio .pt p,html.mx-light #studio .pt .pt-msg{color:#65676b!impo
 
   // Shared helpers for the next pieces (photos, feed, shop).
   window.portal = { sb, esc, mkPane, addTile, onShow, openFile };
-  ["./photos.js", "./feed.js", "./shop.js", "./library.js", "./bubbles.js", "./listings.js", "./adminhub.js"].forEach((m) => import(m).catch(() => {}));
+  // Which extra pieces to load is listed in modules.json (a missing file is skipped quietly).
+  const DEFAULTS = ["./feed.js", "./shop.js", "./library.js", "./bubbles.js", "./listings.js", "./extras.js", "./askaza.js", "./adminhub.js"];
+  fetch("modules.json", { cache: "no-store" })
+    .then((r) => (r.ok ? r.json() : DEFAULTS))
+    .catch(() => DEFAULTS)
+    .then((list) => (Array.isArray(list) ? list : DEFAULTS)
+      .filter((m) => typeof m === "string" && /^\.\/[A-Za-z0-9_-]+\.js$/.test(m))
+      .forEach((m) => import(m).catch(() => {})));
+}
