@@ -1,0 +1,302 @@
+[
+{
+"name": "Tinder",
+"url": "https://tinder.com",
+"category": "Mainstream",
+"country": "Global",
+"description": "Swipe-based app with a very large user base. Free to start, with optional paid upgrades.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "Bumble",
+"url": "https://bumble.com",
+"category": "Mainstream",
+"country": "Global",
+"description": "Swipe-based app where, in matches between women and men, the woman sends the first message.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "Hinge",
+"url": "https://hinge.co",
+"category": "Serious relationships",
+"country": "Global",
+"description": "Profile-prompt app aimed at people who want relationships. Mobile app only.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "Badoo",
+"url": "https://badoo.com",
+"category": "Mainstream",
+"country": "Global",
+"description": "Social and dating app with a large international user base.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "Happn",
+"url": "https://www.happn.com",
+"category": "Mainstream",
+"country": "Global",
+"description": "App that shows people whose paths you have crossed in real life.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "Facebook Dating",
+"url": "https://www.facebook.com/dating",
+"category": "Mainstream",
+"country": "Global",
+"description": "A dating feature inside Facebook. Needs a Facebook account. Availability depends on your country.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "OkCupid",
+"url": "https://www.okcupid.com",
+"category": "Mainstream",
+"country": "Global",
+"description": "Question-based matching. Known for a usable free version.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "Plenty of Fish",
+"url": "https://www.pof.com",
+"category": "Mainstream",
+"country": "Global",
+"description": "Large dating site and app. Free to start, with optional paid features.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "Match",
+"url": "https://www.match.com",
+"category": "Serious relationships",
+"country": "Global",
+"description": "One of the oldest dating sites. Mainly a paid subscription service.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "Zoosk",
+"url": "https://www.zoosk.com",
+"category": "Mainstream",
+"country": "Global",
+"description": "Dating site and app with matching based on your activity.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "Coffee Meets Bagel",
+"url": "https://coffeemeetsbagel.com",
+"category": "Serious relationships",
+"country": "Global",
+"description": "App that offers a small number of curated matches each day.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "eHarmony",
+"url": "https://www.eharmony.com",
+"category": "Serious relationships",
+"country": "Global",
+"description": "Compatibility-based matching with a long questionnaire. Messaging requires a paid plan.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "EliteSingles",
+"url": "https://www.elitesingles.com",
+"category": "Serious relationships",
+"country": "Global",
+"description": "Subscription site for singles looking for a long-term relationship.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "The League",
+"url": "https://www.theleague.com",
+"category": "Serious relationships",
+"country": "Global",
+"description": "Curated app aimed at career-focused singles, with a review step before joining.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "OurTime",
+"url": "https://www.ourtime.com",
+"category": "Over 50",
+"country": "Global",
+"description": "Dating site for people aged 50 and over.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "SilverSingles",
+"url": "https://www.silversingles.com",
+"category": "Over 50",
+"country": "Global",
+"description": "Dating site for singles aged 50 and over, focused on long-term relationships.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "Christian Mingle",
+"url": "https://www.christianmingle.com",
+"category": "Faith-based",
+"country": "Global",
+"description": "Dating site for Christian singles.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "JDate",
+"url": "https://www.jdate.com",
+"category": "Faith-based",
+"country": "Global",
+"description": "Dating site for Jewish singles.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "Muzz",
+"url": "https://muzz.com",
+"category": "Faith-based",
+"country": "Global",
+"description": "Dating and marriage app for Muslim singles.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "Grindr",
+"url": "https://www.grindr.com",
+"category": "LGBTQ+",
+"country": "Global",
+"description": "Location-based social and dating app for gay, bi, trans and queer people.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "HER",
+"url": "https://www.weareher.com",
+"category": "LGBTQ+",
+"country": "Global",
+"description": "Dating and community app for LGBTQ+ women and non-binary people.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "Feeld",
+"url": "https://feeld.co",
+"category": "LGBTQ+",
+"country": "Global",
+"description": "App for open-minded singles and couples, with inclusive options.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "AfroIntroductions",
+"url": "https://www.afrointroductions.com",
+"category": "Africa and Black singles",
+"country": "Global",
+"description": "Dating site for people interested in meeting singles of African and Caribbean heritage.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "BlackPeopleMeet",
+"url": "https://www.blackpeoplemeet.com",
+"category": "Africa and Black singles",
+"country": "USA",
+"description": "Dating site for Black singles, mainly in the United States.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "Meetic",
+"url": "https://www.meetic.com",
+"category": "Europe",
+"country": "Europe",
+"description": "Dating site popular in several European countries, including France, Spain and Italy.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "Parship",
+"url": "https://www.parship.com",
+"category": "Europe",
+"country": "Europe",
+"description": "Compatibility-based matching, popular in Germany and other European countries.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "LOVOO",
+"url": "https://www.lovoo.com",
+"category": "Europe",
+"country": "Europe",
+"description": "Location-based dating and chat app, popular in Germany and nearby countries.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "Aisle",
+"url": "https://www.aisle.co",
+"category": "Asia",
+"country": "India",
+"description": "Dating app for Indian singles, including those living abroad.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "TrulyMadly",
+"url": "https://www.trulymadly.com",
+"category": "Asia",
+"country": "India",
+"description": "Dating app for Indian singles, with profile checks as a feature.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+},
+{
+"name": "Woo",
+"url": "https://www.getwooapp.com",
+"category": "Asia",
+"country": "India",
+"description": "Dating app popular with Indian singles.",
+"age_note": "18+ only. Check the site’s own rules.",
+"review_status": "Not reviewed",
+"last_checked": null
+}
+]

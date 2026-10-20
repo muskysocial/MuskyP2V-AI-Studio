@@ -307,7 +307,7 @@ html.mx-light .topbar #xAv{color:#fff!important}
 
   // ---------------- Search bars
   const MAP = {
-    homeSection: ".hm-post", exploreSection: ".ex-card, .ex-row", toolsHubSection: ".sh-tile",
+    homeSection: ".hm-post", exploreSection: ".ex-card, .ex-row", toolsHubSection: ".sh-tile", jobsSection: ".jb-card", datingSection: ".dt-card",
     feedSection: ".pt-card", shopSection: ".gs-card", docsSection: ".pt-card",
     socialsSection: ".mx-card", adminSection: ".ah-row", askazaSection: ".az-card",
   };
