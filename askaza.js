@@ -111,7 +111,7 @@ html.mx-light #studio .az-letter{color:#fff!important}
     "<select id='azKind' class='pt-in'><option>Bank</option><option>Wallet</option><option>Transfer</option></select>" +
     "<textarea id='azTime' class='pt-in' rows='2' maxlength='300' placeholder='How long money usually takes to land'></textarea>" +
     "<input id='azDesc' class='pt-in' maxlength='400' placeholder='Short note (optional)'>" +
-    "<button class='pt-btn' id='azGo'>Add</button><p class='pt-msg' id='azMsg'></p>" +
+    "<button class='pt-btn' id='azGo'>Add</button> <button class='pt-btn' id='azSeed'>Add the starter list</button><p class='pt-msg' id='azMsg'></p>" +
     "<strong>Your payment methods</strong><input id='azFilter' class='pt-in' placeholder='Search this list'>" +
     "<input id='azLogoIn' type='file' accept='image/*' hidden><div id='azAdminList'></div></div>");
   const admin = q("#adminSection");
@@ -160,6 +160,27 @@ html.mx-light #studio .az-letter{color:#fff!important}
     ["azName", "azCountry", "azTime", "azDesc"].forEach((id) => { $(id).value = ""; });
     say("Added.");
     loadAdmin();
+  });
+
+  // One tap adds the ready-made list (USA, Europe, UK, Nigeria, global). Methods you already have are skipped.
+  $("azSeed").addEventListener("click", async () => {
+    const btn = $("azSeed");
+    btn.disabled = true;
+    say("Adding the starter list…");
+    try {
+      const r = await fetch("askaza-list.json", { cache: "no-store" });
+      if (!r.ok) throw new Error("askaza-list.json was not found in your site files");
+      const all = await r.json();
+      for (let i = 0; i < all.length; i += 40) {
+        const { error } = await sb.from("pay_methods").upsert(all.slice(i, i + 40), { onConflict: "name,country", ignoreDuplicates: true });
+        if (error) throw error;
+      }
+      say("Done. " + all.length + " payment methods are in the list.");
+      loadAdmin();
+    } catch (err) {
+      say("Could not add the list: " + (err.message || err));
+    }
+    btn.disabled = false;
   });
 
   $("azLogoIn").addEventListener("change", async () => {
