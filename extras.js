@@ -41,7 +41,6 @@ function start() {
     "soon": { pid: "soon", fr: "bientôt", es: "pronto" },
     "for sale": { pid: "for sale", fr: "à vendre", es: "en venta" },
     "Gift shop": { pid: "Gift shop", fr: "Boutique cadeaux", es: "Tienda de regalos" },
-    "Account": { pid: "Account", fr: "Compte", es: "Cuenta" },
     "Appearance": { pid: "Appearance", fr: "Apparence", es: "Apariencia" },
     "Text size": { pid: "Text size", fr: "Taille du texte", es: "Tamaño del texto" },
     "Light": { pid: "Light", fr: "Clair", es: "Claro" },
@@ -58,6 +57,13 @@ function start() {
     "Search": { pid: "Search am", fr: "Rechercher", es: "Buscar" },
     "Profile": { pid: "Your profile", fr: "Profil", es: "Perfil" },
     "Display name": { pid: "Display name", fr: "Nom affiché", es: "Nombre visible" },
+    "Ask 4 Aza": { pid: "Ask 4 Aza", fr: "Ask 4 Aza", es: "Ask 4 Aza" },
+    "Account": { pid: "Account", fr: "Compte", es: "Cuenta" },
+    "Coming soon": { pid: "Coming soon", fr: "Bientôt disponible", es: "Próximamente" },
+    "Support": { pid: "Support", fr: "Assistance", es: "Soporte" },
+    "Soon": { pid: "Soon", fr: "Bientôt", es: "Pronto" },
+    "Change photo": { pid: "Change photo", fr: "Changer la photo", es: "Cambiar foto" },
+    "Ask for account on WhatsApp": { pid: "Ask for account for WhatsApp", fr: "Demander un compte sur WhatsApp", es: "Pedir cuenta por WhatsApp" },
     "Save name": { pid: "Save name", fr: "Enregistrer le nom", es: "Guardar nombre" },
     "Admin studio": { pid: "Admin studio", fr: "Studio admin", es: "Panel de administración" },
     "Posting": { pid: "Posting", fr: "Publications", es: "Publicaciones" },
@@ -136,8 +142,17 @@ function start() {
 #xLang{padding:5px 6px;border-radius:8px;border:1px solid var(--sh-line,#ccd0d5);background:var(--sh-card,#fff);color:var(--sh-text,#050505);font-size:13px}
 #xAv{width:34px;height:34px;border-radius:50%;border:0;background:var(--sh-blue,#1877f2);color:#fff;font-weight:700;font-size:15px}
 .xs{padding-bottom:10px}
+.pf-av{width:96px;height:96px;border-radius:50%;margin:0 auto 10px;background:var(--sh-blue,#1877f2) center/cover;color:#fff;font-size:40px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.pf-tag{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--sh-line,#dadde1);color:var(--sh-sub,#65676b)}
+.pf-group{margin:16px 0 4px;font-size:13px;font-weight:700;color:var(--sh-sub,#65676b);text-transform:uppercase;letter-spacing:.04em}
+.pf-row{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;padding:14px 4px;border:0;border-top:1px solid var(--sh-line,#dadde1);background:transparent;color:var(--sh-text,#050505);font-size:16px;text-align:left}
+.pf-row.off{opacity:.55}
+.pf-d{border-top:1px solid var(--sh-line,#dadde1);padding:4px}
+.pf-d summary{padding:12px 0;font-size:16px;cursor:pointer}
+#xAv{background-position:center;background-size:cover}
+html.mx-light #studio .pf-av,html.mx-light .topbar #xAv{color:#fff!important}
+html.mx-light #studio .pf-tag,html.mx-light #studio .pf-group{color:#65676b!important}
 html.mx-light .topbar #xAv{color:#fff!important}
-html.mx-light #studio #xpAv{color:#fff!important}
 `;
   document.head.appendChild(css);
   q(".top-actions").insertAdjacentHTML("beforeend",
@@ -148,56 +163,136 @@ html.mx-light #studio #xpAv{color:#fff!important}
   sel.addEventListener("change", () => setLang(sel.value));
   q("#xAv").addEventListener("click", () => window.shell.go("profileSection"));
 
-  // ---------------- Profile screen
+  // ---------------- Profile screen (Facebook-style settings list)
   const prof = mkPane("profileSection",
     "<h2>Profile</h2>" +
-    "<div class='pt-card' style='text-align:center'><div id='xpAv' style='width:72px;height:72px;border-radius:50%;margin:0 auto 8px;background:var(--sh-blue,#1877f2);color:#fff;font-size:30px;font-weight:700;display:flex;align-items:center;justify-content:center'>?</div>" +
-    "<strong id='xpName'></strong><p id='xpEmail'></p><p id='xpMeta'></p></div>" +
-    "<div class='pt-card'><strong>Display name</strong><input id='xpIn' class='pt-in' maxlength='40'>" +
-    "<button class='pt-btn' id='xpSave'>Save name</button><p class='pt-msg' id='xpMsg'></p></div>" +
-    "<button class='pt-btn del' id='xpOut' style='width:100%'>Sign out</button>");
+    "<div class='pt-card' style='text-align:center'><div id='pfAv' class='pf-av'>?</div>" +
+    "<button class='pt-btn' id='pfPhotoBtn'>Change photo</button><input id='pfPhoto' type='file' accept='image/*' hidden>" +
+    "<div style='margin-top:10px'><strong id='pfName'></strong> <span id='pfRole' class='pf-tag'></span></div>" +
+    "<p id='pfEmail' style='margin:2px 0'></p><p id='pfBio' style='margin:2px 0'></p><p id='pfMeta' style='margin:2px 0'></p>" +
+    "<p class='pt-msg' id='pfMsg'></p></div>" +
+    "<div class='pf-group'>Account</div>" +
+    "<details class='pf-d'><summary>✏️ Edit profile</summary>" +
+    "<input id='pfIn' class='pt-in' maxlength='40' placeholder='Display name'>" +
+    "<textarea id='pfBioIn' class='pt-in' rows='2' maxlength='160' placeholder='About you (optional)'></textarea>" +
+    "<input id='pfCountry' class='pt-in' maxlength='60' placeholder='Country (optional)'>" +
+    "<input id='pfWa' class='pt-in' maxlength='20' inputmode='tel' placeholder='WhatsApp number, e.g. +234... (optional)'>" +
+    "<button class='pt-btn' id='pfSave'>Save</button></details>" +
+    "<details class='pf-d'><summary>🔒 Change password</summary>" +
+    "<input id='pfP1' class='pt-in' type='password' autocomplete='new-password' placeholder='New password (8+ characters)'>" +
+    "<input id='pfP2' class='pt-in' type='password' autocomplete='new-password' placeholder='Type it again'>" +
+    "<button class='pt-btn' id='pfPass'>Change password</button></details>" +
+    "<button class='pf-row' data-go='settingsSection'><span>🎨 Appearance and text size</span><span>›</span></button>" +
+    "<div class='pf-group'>Coming soon</div>" +
+    ["🔔 Notifications", "🛡️ Two-factor sign-in", "📱 Devices and active sessions", "👁️ Who can see my profile", "🔖 Saved items",
+     "🧾 My orders and activity", "💳 Payment methods", "🎁 Invite friends, earn credits", "✅ Verified badge", "⬇️ Download my data"]
+      .map((t) => "<div class='pf-row off'><span>" + t + "</span><span class='pf-tag'>Soon</span></div>").join("") +
+    "<div class='pf-group'>Support</div>" +
+    "<button class='pf-row' id='pfHelp'><span>💬 Help and support on WhatsApp</span><span>›</span></button>" +
+    "<button class='pf-row' id='pfDel'><span>🗑️ Ask to delete my account</span><span>›</span></button>" +
+    "<button class='pt-btn del' id='pfOut' style='width:100%;margin-top:14px'>Sign out</button>");
   const $p = (id) => prof.querySelector("#" + id);
+  const WA = "2349041259863";
   let uid = null;
+  let stamp = Date.now();
+  const avUrl = (path) => sb.storage.from("avatars").getPublicUrl(path).data.publicUrl + "?t=" + stamp;
+  function paintAv(el, name, path) {
+    if (path) { el.style.backgroundImage = "url('" + avUrl(path) + "')"; el.textContent = ""; }
+    else { el.style.backgroundImage = ""; el.textContent = (name || "?").charAt(0).toUpperCase(); }
+  }
+  const pmsg = (t) => { $p("pfMsg").textContent = t; };
 
   async function loadProfile() {
     const s = await window.musky.session();
-    if (!s) { $p("xpName").textContent = "Not signed in"; return; }
+    if (!s) { $p("pfName").textContent = "Not signed in"; return; }
     uid = s.user.id;
-    const { data } = await sb.from("profiles").select("display_name,role").eq("id", uid).maybeSingle();
-    const name = (data && data.display_name) || s.user.email.split("@")[0];
+    const { data } = await sb.from("profiles").select("*").eq("id", uid).maybeSingle();
+    const d = data || {};
+    const name = d.display_name || s.user.email.split("@")[0];
     const credits = await window.musky.credits();
-    $p("xpName").textContent = name;
-    $p("xpEmail").textContent = s.user.email;
-    $p("xpMeta").textContent = (data && data.role === "admin" ? "Admin" : "Client") + " · Credits: " + (credits === null ? "…" : credits);
-    $p("xpIn").value = name;
-    $p("xpAv").textContent = name.charAt(0).toUpperCase();
-    q("#xAv").textContent = name.charAt(0).toUpperCase();
+    $p("pfName").textContent = name;
+    $p("pfRole").textContent = d.role === "admin" ? "Admin" : "Client";
+    $p("pfEmail").textContent = s.user.email;
+    $p("pfBio").textContent = d.bio || "";
+    $p("pfMeta").textContent = "Credits: " + (credits === null ? "…" : credits) +
+      (d.created_at ? " · Member since " + new Date(d.created_at).toLocaleDateString("en-NG", { month: "short", year: "numeric" }) : "");
+    $p("pfIn").value = name;
+    $p("pfBioIn").value = d.bio || "";
+    $p("pfCountry").value = d.country || "";
+    $p("pfWa").value = d.whatsapp || "";
+    paintAv($p("pfAv"), name, d.avatar_path);
+    paintAv(q("#xAv"), name, d.avatar_path);
     tAll(prof);
   }
   onShow(prof, loadProfile);
-  $p("xpSave").addEventListener("click", async () => {
-    const name = $p("xpIn").value.trim().slice(0, 40);
-    if (!name || !uid) return;
-    const { error } = await sb.from("profiles").update({ display_name: name }).eq("id", uid);
-    if (error) { $p("xpMsg").textContent = "Could not save: " + error.message; return; }
+
+  async function squarePhoto(file) {
+    const bmp = await createImageBitmap(file, { imageOrientation: "from-image" });
+    const side = Math.min(bmp.width, bmp.height);
+    const c = document.createElement("canvas");
+    c.width = c.height = 400;
+    c.getContext("2d").drawImage(bmp, (bmp.width - side) / 2, (bmp.height - side) / 2, side, side, 0, 0, 400, 400);
+    return new Promise((r) => c.toBlob(r, "image/jpeg", 0.85));
+  }
+  $p("pfPhotoBtn").addEventListener("click", () => $p("pfPhoto").click());
+  $p("pfPhoto").addEventListener("change", async () => {
+    const f = $p("pfPhoto").files[0];
+    $p("pfPhoto").value = "";
+    if (!f || !uid) return;
+    pmsg("Uploading photo…");
+    try {
+      const blob = await squarePhoto(f);
+      const path = uid + "/avatar.jpg";
+      const up = await sb.storage.from("avatars").upload(path, blob, { contentType: "image/jpeg", upsert: true });
+      if (up.error) throw up.error;
+      const { error } = await sb.from("profiles").update({ avatar_path: path }).eq("id", uid);
+      if (error) throw error;
+      stamp = Date.now();
+      pmsg("Photo updated.");
+      loadProfile();
+    } catch (err) {
+      pmsg("Could not save the photo: " + (err.message || err) + " (run the Ask 4 Aza and Profile database step first)");
+    }
+  });
+  $p("pfSave").addEventListener("click", async () => {
+    const name = $p("pfIn").value.trim().slice(0, 40);
+    if (!name || !uid) return pmsg("Type a display name.");
+    const wa = $p("pfWa").value.trim().replace(/[^0-9+]/g, "").slice(0, 20);
+    const { error } = await sb.from("profiles").update({
+      display_name: name, bio: $p("pfBioIn").value.trim() || null,
+      country: $p("pfCountry").value.trim() || null, whatsapp: wa || null,
+    }).eq("id", uid);
+    if (error) return pmsg("Could not save: " + error.message + " (run the Ask 4 Aza and Profile database step first)");
     try { await sb.auth.updateUser({ data: { display_name: name } }); } catch {}
     const w = q("#welcomeName");
     if (w) w.textContent = name;
-    $p("xpMsg").textContent = "Saved.";
+    pmsg("Saved.");
     loadProfile();
   });
-  $p("xpOut").addEventListener("click", async () => {
+  $p("pfPass").addEventListener("click", async () => {
+    const a = $p("pfP1").value, b = $p("pfP2").value;
+    if (a.length < 8) return pmsg("Use at least 8 characters.");
+    if (a !== b) return pmsg("The two passwords do not match.");
+    const { error } = await sb.auth.updateUser({ password: a });
+    if (error) return pmsg("Could not change it: " + error.message);
+    $p("pfP1").value = $p("pfP2").value = "";
+    pmsg("Password changed.");
+  });
+  const wa = (t) => window.open("https://wa.me/" + WA + "?text=" + encodeURIComponent(t), "_blank", "noopener");
+  $p("pfHelp").addEventListener("click", () => wa("Hello MuskySocials, I need help with my account."));
+  $p("pfDel").addEventListener("click", () => wa("Hello MuskySocials, please delete my account. My email: " + ($p("pfEmail").textContent || "")));
+  $p("pfOut").addEventListener("click", async () => {
     try { await sb.auth.signOut(); } catch {}
     location.reload();
   });
-  // Fill the avatar letter as soon as someone is signed in.
+  // Fill the top-right avatar as soon as someone is signed in.
   const initAv = async () => {
     try {
       const s = await window.musky.session();
       if (!s) return;
-      const { data } = await sb.from("profiles").select("display_name").eq("id", s.user.id).maybeSingle();
+      const { data } = await sb.from("profiles").select("display_name,avatar_path").eq("id", s.user.id).maybeSingle();
       const n = (data && data.display_name) || s.user.email.split("@")[0];
-      q("#xAv").textContent = n.charAt(0).toUpperCase();
+      paintAv(q("#xAv"), n, data && data.avatar_path);
     } catch {}
   };
   sb.auth.onAuthStateChange(() => setTimeout(initAv, 0));
