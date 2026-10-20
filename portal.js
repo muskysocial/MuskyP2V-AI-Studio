@@ -196,5 +196,5 @@ html.mx-light #studio .pt p,html.mx-light #studio .pt .pt-msg{color:#65676b!impo
 
   // Shared helpers for the next pieces (photos, feed, shop).
   window.portal = { sb, esc, mkPane, addTile, onShow, openFile };
-  ["./photos.js", "./feed.js", "./shop.js", "./library.js", "./adminhub.js"].forEach((m) => import(m).catch(() => {}));
+  ["./photos.js", "./feed.js", "./shop.js", "./library.js", "./bubbles.js", "./adminhub.js"].forEach((m) => import(m).catch(() => {}));
 }
