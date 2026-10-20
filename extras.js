@@ -137,7 +137,7 @@ function start() {
   // ---------------- Top bar: language + profile button
   const css = document.createElement("style");
   css.textContent = `
-.top-actions > span:not(.online-dot):not(#authCredits){display:none}
+.top-actions > span:not(.online-dot):not(#authCredits):not(#xTools){display:none}
 #xTools{display:flex;align-items:center;gap:8px;margin-left:8px}
 #xLang{padding:5px 6px;border-radius:8px;border:1px solid var(--sh-line,#ccd0d5);background:var(--sh-card,#fff);color:var(--sh-text,#050505);font-size:13px}
 #xAv{width:34px;height:34px;border-radius:50%;border:0;background:var(--sh-blue,#1877f2);color:#fff;font-weight:700;font-size:15px}
