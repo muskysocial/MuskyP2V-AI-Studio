@@ -22,6 +22,7 @@ function start() {
   const card = (sel) => { const e = q(sel); return e ? e.closest(".pt-card") : null; };
   const defs = [
     { ico: "📝", title: "Posting", sub: "Post to the feed, pin or delete posts", els: [card("#fpGo")] },
+    { ico: "📚", title: "Library", sub: "Upload documents anyone can read", els: [card("#lbGo")] },
     { ico: "🎁", title: "Gifts", sub: "Add gifts, prices and stock", els: [card("#gaGo")] },
     { ico: "🖼️", title: "Working photos", sub: "Photos for clients to approve", els: [card("#phGo")] },
     { ico: "📁", title: "Clients & files", sub: "Client folders and PDF documents", els: [card("#adMake"), card("#adUp"), q("#adMsg"), q("#adList")] },
