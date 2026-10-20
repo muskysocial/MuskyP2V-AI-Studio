@@ -192,6 +192,7 @@ function init() {
 
   const name = () => (document.querySelector("#welcomeName") || {}).textContent || "creator";
   function renderHome() {
+    if (window.shell && typeof window.shell.homeRenderer === "function") { window.shell.homeRenderer(home, { name: name(), credits }); return; }
     home.innerHTML = '<div class="sh"><h2>Hello, ' + name().replace(/</g, "&lt;") + " 👋</h2>" +
       '<div class="sh-bal"><div><small>Your credits</small><strong>' + (credits === null ? "…" : credits) +
       "</strong></div><small>Refills to 80 every day</small></div>" +
@@ -206,7 +207,7 @@ function init() {
   // Bottom bar
   const bar = document.createElement("nav");
   bar.id = "mxBar";
-  bar.innerHTML = [["homeSection", "🏠", "Home"], ["feedSection", "📰", "Feed"], ["shopSection", "🎁", "Gifts"], ["settingsSection", "⚙️", "Settings"]]
+  bar.innerHTML = [["homeSection", "🏠", "Home"], ["exploreSection", "🧭", "Explore"], ["jobsSection", "💼", "Jobs"], ["toolsHubSection", "✨", "Tools"], ["profileSection", "👤", "Profile"]]
     .map(([id, i, l]) => '<button data-go="' + id + '"><span>' + i + "</span>" + l + "</button>").join("");
   document.body.appendChild(bar);
 
@@ -218,7 +219,13 @@ function init() {
       const hide = p.id !== id;
       if (p.hidden !== hide) p.hidden = hide;
     });
-    const active = bar.querySelector('[data-go="' + id + '"]') ? id : "homeSection";
+    const GROUPS = {
+      exploreSection: ["exploreSection", "datingSection", "designSection", "aitoolsSection", "librarySection", "shopSection", "socialsSection", "askazaSection", "aboutSection", "contactSection", "privacySection", "docsSection"],
+      jobsSection: ["jobsSection"],
+      toolsHubSection: ["toolsHubSection", "videoSection", "headswapSection", "chatSection", "voiceCloneSection", "voiceSection", "cameraSection", "creditSection"],
+      profileSection: ["profileSection", "settingsSection", "adminSection"],
+    };
+    const active = Object.keys(GROUPS).find((k) => GROUPS[k].includes(id)) || "homeSection";
     bar.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.go === active));
     window.scrollTo({ top: 0 });
   }
@@ -269,7 +276,14 @@ function init() {
     addItem(item) {
       if (!ITEMS.some((i) => i[0] === item[0])) { ITEMS.push(item); if (!home.hidden) renderHome(); }
     },
+    isAdmin: false,
+    homeRenderer: null,
     addBar(id, ico, label) {
+      if (id === "adminSection") {
+        window.shell.isAdmin = true;
+        window.dispatchEvent(new CustomEvent("musky-admin", { detail: true }));
+        return;
+      }
       if (bar.querySelector('[data-go="' + id + '"]')) return;
       const b = document.createElement("button");
       b.dataset.go = id;
@@ -277,6 +291,10 @@ function init() {
       bar.appendChild(b);
     },
     removeBar(id) {
+      if (id === "adminSection") {
+        if (window.shell.isAdmin) { window.shell.isAdmin = false; window.dispatchEvent(new CustomEvent("musky-admin", { detail: false })); }
+        return;
+      }
       const b = bar.querySelector('[data-go="' + id + '"]');
       if (b) b.remove();
     },

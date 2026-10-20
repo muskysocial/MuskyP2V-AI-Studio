@@ -25,6 +25,13 @@ function start() {
   const D = {
     "Home": { pid: "Home", fr: "Accueil", es: "Inicio" },
     "Feed": { pid: "News", fr: "Actualités", es: "Novedades" },
+    "Explore": { pid: "Explore", fr: "Explorer", es: "Explorar" },
+    "Jobs": { pid: "Jobs", fr: "Emplois", es: "Empleos" },
+    "Tools": { pid: "Tools", fr: "Outils", es: "Herramientas" },
+    "Like": { pid: "Like", fr: "J'aime", es: "Me gusta" },
+    "Comment": { pid: "Comment", fr: "Commenter", es: "Comentar" },
+    "Share": { pid: "Share", fr: "Partager", es: "Compartir" },
+    "What would you like to share?": { pid: "Wetin you wan share?", fr: "Que souhaitez-vous partager ?", es: "¿Qué quieres compartir?" },
     "Gifts": { pid: "Gifts", fr: "Cadeaux", es: "Regalos" },
     "Settings": { pid: "Settings", fr: "Paramètres", es: "Ajustes" },
     "Photo to video": { pid: "Photo to video", fr: "Photo en vidéo", es: "Foto a vídeo" },
@@ -156,8 +163,8 @@ html.mx-light .topbar #xAv{color:#fff!important}
 `;
   document.head.appendChild(css);
   q(".top-actions").insertAdjacentHTML("beforeend",
-    "<span id='xTools'><select id='xLang' aria-label='Language'><option value='en'>English</option><option value='pid'>Pidgin</option>" +
-    "<option value='fr'>Français</option><option value='es'>Español</option></select><button id='xAv' aria-label='Profile'>?</button></span>");
+    "<span id='xTools'><select id='xLang' aria-label='Language'><option value='en'>EN</option><option value='pid'>PID</option>" +
+    "<option value='fr'>FR</option><option value='es'>ES</option></select><button id='xAv' aria-label='Profile'>?</button></span>");
   const sel = q("#xLang");
   sel.value = lang;
   sel.addEventListener("change", () => setLang(sel.value));
@@ -300,7 +307,8 @@ html.mx-light .topbar #xAv{color:#fff!important}
 
   // ---------------- Search bars
   const MAP = {
-    homeSection: ".sh-tile", feedSection: ".pt-card", shopSection: ".gs-card", docsSection: ".pt-card",
+    homeSection: ".hm-post", exploreSection: ".ex-card, .ex-row", toolsHubSection: ".sh-tile",
+    feedSection: ".pt-card", shopSection: ".gs-card", docsSection: ".pt-card",
     socialsSection: ".mx-card", adminSection: ".ah-row", askazaSection: ".az-card",
   };
   const terms = {};
