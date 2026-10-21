@@ -190,11 +190,11 @@ html.mx-light .topbar #xAv{color:#fff!important}
     "<input id='pfP2' class='pt-in' type='password' autocomplete='new-password' placeholder='Type it again'>" +
     "<button class='pt-btn' id='pfPass'>Change password</button></details>" +
     "<button class='pf-row' data-go='settingsSection'><span>🎨 Appearance and text size</span><span>›</span></button>" +
-    "<div class='pf-group'>Coming soon</div>" +
-    ["🔔 Notifications", "🛡️ Two-factor sign-in", "📱 Devices and active sessions", "👁️ Who can see my profile", "🔖 Saved items",
-     "🧾 My orders and activity", "💳 Payment methods", "🎁 Invite friends, earn credits", "✅ Verified badge", "⬇️ Download my data"]
-      .map((t) => "<div class='pf-row off'><span>" + t + "</span><span class='pf-tag'>Soon</span></div>").join("") +
-    "<div class='pf-group'>Support</div>" +
+    "<div class='pf-group'>Account features</div>" +
+"<button class='pf-row' data-go='notifSection'><span>🔔 Notifications</span><span>›</span></button>" +
+["🛡️ Two-factor sign-in", "📱 Devices and active sessions", "👁️ Who can see my profile", "🔖 Saved items",
+ "🧾 My orders and activity", "💳 Payment methods", "🎁 Invite friends, earn credits", "✅ Verified badge", "⬇️ Download my data"]
+  .map((t) => "<div class='pf-row off'><span>" + t + "</span><span class='pf-tag'>Soon</span></div>").join("") +
     "<button class='pf-row' id='pfHelp'><span>💬 Help and support on WhatsApp</span><span>›</span></button>" +
     "<button class='pf-row' id='pfDel'><span>🗑️ Ask to delete my account</span><span>›</span></button>" +
     "<button class='pt-btn del' id='pfOut' style='width:100%;margin-top:14px'>Sign out</button>");
