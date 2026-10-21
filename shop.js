@@ -94,6 +94,10 @@ html.mx-light #studio .gs-sub{color:#65676b!important}
     if (!it) return;
     const r = ref();
     log("gift_buy", it.id, r, it.name + " " + naira(it.price));
+    if (window.muskyCustomer) void window.muskyCustomer.recordOrderIntent({
+      order_ref: r, item_type: "gift", item_id: it.id, item_name: it.name,
+      amount: Number(it.price), details: { category: it.category }
+    });
     const msg = "Hello MuskySocials 👋\nI want to buy this gift:\n• Item: " + it.name + "\n• Price: " + naira(it.price) +
       "\n• Order ref: " + r + "\nPlease confirm it is available and tell me how delivery works.";
     window.open("https://wa.me/" + WA + "?text=" + encodeURIComponent(msg), "_blank", "noopener");
