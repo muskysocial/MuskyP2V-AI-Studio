@@ -200,7 +200,11 @@ html.mx-light .topbar #xAv{color:#fff!important}
       ? "<button class='pf-row' id='pfDevices'><span>" + t + "</span><span>›</span></button>"
       : t === "👁️ Who can see my profile"
         ? "<button class='pf-row' id='pfPrivacy'><span>" + t + "</span><span>›</span></button>"
-        : "<div class='pf-row off'><span>" + t + "</span><span class='pf-tag'>Soon</span></div>").join("") +
+        : t === "🔖 Saved items"
+          ? "<button class='pf-row' id='pfSaved'><span>" + t + "</span><span>›</span></button>"
+          : t === "🧾 My orders and activity"
+            ? "<button class='pf-row' id='pfOrders'><span>" + t + "</span><span>›</span></button>"
+            : "<div class='pf-row off'><span>" + t + "</span><span class='pf-tag'>Soon</span></div>").join("") +
     "<button class='pf-row' id='pfHelp'><span>💬 Help and support on WhatsApp</span><span>›</span></button>" +
     "<button class='pf-row' id='pfDel'><span>🗑️ Ask to delete my account</span><span>›</span></button>" +
     "<button class='pt-btn del' id='pfOut' style='width:100%;margin-top:14px'>Sign out</button>");
