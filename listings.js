@@ -65,6 +65,10 @@ function start() {
     if (!it) return;
     const r = ref();
     log("buy_click", it.code, r, it.platform + " " + naira(it.price));
+    if (window.muskyCustomer) void window.muskyCustomer.recordOrderIntent({
+      order_ref: r, item_type: "account", item_id: it.id, item_name: it.platform + " — " + it.name,
+      amount: Number(it.price), details: { listing_code: it.code, platform: it.platform }
+    });
     const msg = "Hello MuskySocials 👋\nI want to buy this account:\n• Item: " + it.platform + " — " + it.name +
       "\n• Listing ID: " + it.code + "\n• Price: " + naira(it.price) + "\n• Order ref: " + r +
       "\nPlease confirm it is still available.";
