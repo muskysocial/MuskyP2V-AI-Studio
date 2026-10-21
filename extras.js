@@ -196,7 +196,11 @@ html.mx-light .topbar #xAv{color:#fff!important}
  "🧾 My orders and activity", "💳 Payment methods", "🎁 Invite friends, earn credits", "✅ Verified badge", "⬇️ Download my data"]
   .map((t) => t === "🛡️ Two-factor sign-in"
     ? "<button class='pf-row' id='pfMfa'><span>" + t + "</span><span class='pf-tag'>Set up</span></button>"
-    : "<div class='pf-row off'><span>" + t + "</span><span class='pf-tag'>Soon</span></div>").join("") +
+    : t === "📱 Devices and active sessions"
+      ? "<button class='pf-row' id='pfDevices'><span>" + t + "</span><span>›</span></button>"
+      : t === "👁️ Who can see my profile"
+        ? "<button class='pf-row' id='pfPrivacy'><span>" + t + "</span><span>›</span></button>"
+        : "<div class='pf-row off'><span>" + t + "</span><span class='pf-tag'>Soon</span></div>").join("") +
     "<button class='pf-row' id='pfHelp'><span>💬 Help and support on WhatsApp</span><span>›</span></button>" +
     "<button class='pf-row' id='pfDel'><span>🗑️ Ask to delete my account</span><span>›</span></button>" +
     "<button class='pt-btn del' id='pfOut' style='width:100%;margin-top:14px'>Sign out</button>");
@@ -294,6 +298,83 @@ html.mx-light .topbar #xAv{color:#fff!important}
     try { await sb.auth.signOut(); } catch {}
     location.reload();
   });
+
+  // Device/session management: Supabase client APIs can revoke all sessions, but cannot
+  // enumerate and revoke individual sessions without a trusted server-side admin endpoint.
+  function settingsModal(id, title, body) {
+    const old = document.querySelector("#" + id);
+    if (old) old.remove();
+    const modal = document.createElement("div");
+    modal.id = id;
+    modal.style.cssText = "position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px";
+    modal.innerHTML = "<section role='dialog' aria-modal='true' style='box-sizing:border-box;width:min(100%,460px);max-height:90vh;overflow:auto;background:var(--sh-card,#fff);color:var(--sh-text,#111);border-radius:16px;padding:20px'>" +
+      "<button type='button' data-close style='float:right;border:0;background:none;color:inherit;font-size:24px'>×</button><h2>" + title + "</h2><div data-body></div></section>";
+    modal.querySelector("[data-body]").append(body);
+    modal.querySelector("[data-close]").addEventListener("click", () => modal.remove());
+    modal.addEventListener("click", e => { if (e.target === modal) modal.remove(); });
+    document.body.appendChild(modal);
+    return modal;
+  }
+  $p("pfDevices").addEventListener("click", async () => {
+    const body = document.createElement("div");
+    body.innerHTML = "<p>Review the account session active on this device. For security, sign out all devices if you suspect someone else has access.</p><div class='pt-card'><strong>Current session</strong><p>Signed in on this browser/device</p><p id='pfDeviceEmail'></p><p id='pfDeviceTime'></p></div><p id='pfDeviceMsg' role='status'></p>";
+    const all = document.createElement("button");
+    all.type = "button"; all.className = "pt-btn del"; all.style.width = "100%"; all.textContent = "Sign out all devices";
+    body.appendChild(all);
+    const modal = settingsModal("pfDevicesModal", "Devices and active sessions", body);
+    const sess = await sb.auth.getSession();
+    const session = sess.data && sess.data.session;
+    body.querySelector("#pfDeviceEmail").textContent = session && session.user ? session.user.email : "No active session found";
+    body.querySelector("#pfDeviceTime").textContent = session && session.created_at
+      ? "Session started: " + new Date(session.created_at * 1000).toLocaleString()
+      : "Session details are provided by Supabase.";
+    all.addEventListener("click", async () => {
+      if (!confirm("Sign out this account on all devices? You will need to sign in again.")) return;
+      all.disabled = true;
+      body.querySelector("#pfDeviceMsg").textContent = "Signing out all devices…";
+      const { error } = await sb.auth.signOut({ scope: "global" });
+      if (error) {
+        body.querySelector("#pfDeviceMsg").textContent = "Could not sign out all devices: " + error.message;
+        all.disabled = false;
+        return;
+      }
+      modal.remove();
+      location.reload();
+    });
+  });
+
+  // Profile visibility preferences are stored on the signed-in user's profile row.
+  $p("pfPrivacy").addEventListener("click", async () => {
+    const body = document.createElement("div");
+    body.innerHTML = "<p>Choose your preferred profile visibility.</p><label for='pfVisibility'>Who can see your profile?</label><select id='pfVisibility' class='pt-in'><option value='public'>Everyone</option><option value='members'>Signed-in members</option><option value='private'>Only me</option></select><p id='pfPrivacyMsg' class='pt-msg' role='status'></p><p style='font-size:12px;opacity:.8'>This saves your preference to your account. The existing site does not yet have a complete public-profile access layer, so this setting cannot hide profile details from every existing surface until that layer is connected.</p>";
+    const save = document.createElement("button");
+    save.type = "button"; save.className = "pt-btn"; save.style.width = "100%"; save.textContent = "Save privacy setting";
+    body.appendChild(save);
+    settingsModal("pfPrivacyModal", "Who can see my profile", body);
+    const sel = body.querySelector("#pfVisibility");
+    const msg = body.querySelector("#pfPrivacyMsg");
+    if (!uid) {
+      msg.textContent = "Sign in to manage profile visibility.";
+      sel.disabled = true; save.disabled = true; return;
+    }
+    const { data, error } = await sb.from("profiles").select("profile_visibility").eq("id", uid).maybeSingle();
+    if (error) {
+      msg.textContent = "Could not load your privacy setting: " + error.message;
+      save.disabled = true; return;
+    }
+    sel.value = (data && data.profile_visibility) || "public";
+    save.addEventListener("click", async () => {
+      save.disabled = true; msg.textContent = "Saving…";
+      const { error: saveError } = await sb.from("profiles").update({ profile_visibility: sel.value }).eq("id", uid);
+      if (saveError) {
+        msg.textContent = "Could not save: " + saveError.message + ". Make sure the profile privacy database migration has been applied.";
+        save.disabled = false; return;
+      }
+      msg.textContent = "Privacy preference saved.";
+      save.disabled = false;
+    });
+  });
+
   $p("pfMfa").addEventListener("click", () => {
     if (typeof window.musky.manageMFA === "function") window.musky.manageMFA();
     else pmsg("Two-factor settings are still loading. Refresh and try again.");
