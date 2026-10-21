@@ -274,6 +274,8 @@ async function init() {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    // Pressing Enter in the MFA code field should run MFA verification, not password sign-in.
+    if ($("authMfaCode")) { $("authMfaVerify").click(); return; }
     const go = $("authGo");
     const email = $("authEmail").value.trim();
     const password = $("authPass").value;
