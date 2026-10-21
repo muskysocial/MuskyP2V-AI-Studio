@@ -325,6 +325,7 @@ html.mx-light #studio .ex-card b{color:#050505!important}
     "notifSection",
     "<div id='notificationsLoading'>Loading notifications...</div>"
   );
+  const soon = (id, ic, title, intro, bullets, back) =>
     mkPane(id, "<h2>" + ic + " " + title + "</h2><div class='hm-badge'>Coming soon</div><p>" + intro + "</p>" +
       (bullets.length ? "<ul class='hm-ul'>" + bullets.map((b) => "<li>" + b + "</li>").join("") + "</ul>" : "") +
       "<button class='pt-btn' data-go='" + back + "'>‹ Back</button>");
