@@ -261,6 +261,7 @@ html.mx-light #studio .ex-card b{color:#050505!important}
   // ---------- Home screen (replaces the old tile grid)
   const STORIES = [
     ["profileSection", "🙂", "You", "linear-gradient(160deg,#1877f2,#6aa8ff)"],
+    ["notifSection", "🔔", "Notifications", "linear-gradient(160deg,#1877f2,#8a5cf6)"],
     ["datingSection", "❤️", "Dating Guide", "linear-gradient(160deg,#ff5f6d,#ffc371)"],
     ["jobsSection", "💼", "Job Updates", "linear-gradient(160deg,#11998e,#38ef7d)"],
     ["toolsHubSection", "✨", "AI Tools", "linear-gradient(160deg,#3a1c71,#6a82fb)"],
@@ -332,6 +333,5 @@ html.mx-light #studio .ex-card b{color:#050505!important}
     ["Every template is marked as a sample for learning", "Invented names and details only", "No ID cards, tickets, boarding passes or official documents"], "exploreSection");
   soon("aitoolsSection", "✨", "AI Tools Library", "A guide to AI tools for images, photo editing, video, voice, hairstyles and clothing, backgrounds and enhancement.",
     ["Official links only", "Free tier or paid, and limits, shown only when confirmed", "Meanwhile, try the tools on the Tools tab"], "toolsHubSection");
-  soon("notifSection", "🔔", "Notifications", "You have no notifications. Alerts for replies and new posts are not switched on yet.", [], "homeSection");
   if (!home.hidden) window.shell.renderHome(); // the old tile Home may already be showing
 }
