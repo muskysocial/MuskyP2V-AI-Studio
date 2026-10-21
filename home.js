@@ -319,8 +319,12 @@ html.mx-light #studio .ex-card b{color:#050505!important}
     "<h2>✨ Tools</h2><p>Your AI Studio. Everything here works as before.</p><div class='sh-grid'>" +
     TOOLS.map(([id, ic, t, n]) => "<button class='sh-tile' data-go='" + id + "'><span class='ico'>" + ic + "</span>" + t + (n ? "<small>" + n + "</small>" : "") + "</button>").join("") + "</div>");
 
-  // ---------- "Coming soon" pages (clearly marked, nothing pretends to work)
-  const soon = (id, ic, title, intro, bullets, back) =>
+  
+  // ---------- Notifications page
+  mkPane(
+    "notifSection",
+    "<div id='notificationsLoading'>Loading notifications...</div>"
+  );
     mkPane(id, "<h2>" + ic + " " + title + "</h2><div class='hm-badge'>Coming soon</div><p>" + intro + "</p>" +
       (bullets.length ? "<ul class='hm-ul'>" + bullets.map((b) => "<li>" + b + "</li>").join("") + "</ul>" : "") +
       "<button class='pt-btn' data-go='" + back + "'>‹ Back</button>");
