@@ -22,7 +22,12 @@ function start() {
     "<h2>🧾 My orders and activity</h2>" +
     "<div class='pt-card'><strong>Order requests</strong><p class='pt-msg'>WhatsApp requests appear here as awaiting confirmation. Payment is never assumed.</p><div id='csOrdersList'>Loading orders…</div></div>" +
     "<div class='pt-card'><strong>Recent activity</strong><div id='csActivityList'>Loading activity…</div></div>");
-  const $ = (root, id) => root.querySelector("#" + id);
+  // Support both $(element, "childId") and $("elementId") lookups.
+  const $ = (root, id) => {
+    if (id === undefined) { id = root; root = document; }
+    else if (typeof root === "string") root = document.getElementById(root);
+    return root ? root.querySelector("#" + id) : null;
+  };
   const saySaved = (text) => { $("csSavedMsg").textContent = text; };
   let savedKeys = new Set();
   let currentUserId = null;
