@@ -96,6 +96,155 @@ async function init() {
   }
   $("authSwap").addEventListener("click", () => setMode(mode === "signup" ? "signin" : "signup"));
 
+
+  // Require an authenticator code whenever Supabase says this account needs AAL2.
+  async function continueAfterAuth(session) {
+    const { data: levels, error: levelError } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (levelError) throw levelError;
+    if (levels.currentLevel === "aal1" && levels.nextLevel === "aal2") {
+      const { data: factors, error: factorsError } = await sb.auth.mfa.listFactors();
+      if (factorsError) throw factorsError;
+      const factor = (factors.totp || []).find((f) => f.status === "verified");
+      if (!factor) throw new Error("Two-factor sign-in is enabled but no verified authenticator was found. Contact support.");
+      const { data: challenge, error: challengeError } = await sb.auth.mfa.challenge({ factorId: factor.id });
+      if (challengeError) throw challengeError;
+      form.innerHTML = `
+        <h2 style="margin-top:0">Two-factor verification</h2>
+        <p>Open your authenticator app and enter the 6-digit code for MuskySocials.</p>
+        <label for="authMfaCode">Authenticator code</label>
+        <input id="authMfaCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="000000" required>
+        <button class="primary enter-button" id="authMfaVerify" type="button">Verify and sign in</button>
+        <button id="authMfaCancel" type="button" style="margin-top:10px;background:none;border:0;color:#9fb4f0;text-decoration:underline">Cancel and sign out</button>
+        <p id="authMsg" role="status" style="margin:10px 0 0;font-size:14px;color:#9fb4f0"></p>`;
+      $("authMfaCode").focus();
+      $("authMfaCancel").addEventListener("click", async () => { await sb.auth.signOut(); location.reload(); });
+      $("authMfaVerify").addEventListener("click", async () => {
+        const code = $("authMfaCode").value.trim();
+        if (!/^[0-9]{6}$/.test(code)) return say("Enter the 6-digit code from your authenticator app.", true);
+        $("authMfaVerify").disabled = true;
+        say("Checking your code…");
+        try {
+          const { data, error } = await sb.auth.mfa.verify({ factorId: factor.id, challengeId: challenge.id, code });
+          if (error) throw error;
+          const current = data.session || (await sb.auth.getSession()).data.session || session;
+          const { data: confirmed } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+          if (confirmed.currentLevel !== "aal2") throw new Error("The second step was not confirmed. Please try again.");
+          enter(current);
+        } catch (err) {
+          say(/invalid|code|challenge/i.test(String(err.message || err)) ? "That code was not accepted. Check your phone's clock and try the latest code." : friendly(err), true);
+          $("authMfaVerify").disabled = false;
+          $("authMfaCode").value = "";
+          $("authMfaCode").focus();
+        }
+      });
+      return;
+    }
+    enter(session);
+  }
+
+  // Authenticator-app setup and management, opened from Profile > Two-factor sign-in.
+  window.musky.manageMFA = async function () {
+    let modal = document.querySelector("#muskyMfaModal");
+    if (modal) modal.remove();
+    modal = document.createElement("div");
+    modal.id = "muskyMfaModal";
+    modal.style.cssText = "position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px";
+    modal.innerHTML = `<section role="dialog" aria-modal="true" aria-labelledby="muskyMfaTitle" style="box-sizing:border-box;width:min(100%,440px);max-height:90vh;overflow:auto;background:#fff;color:#111;border-radius:16px;padding:20px;font-family:system-ui,sans-serif">
+      <button id="muskyMfaClose" type="button" aria-label="Close" style="float:right;border:0;background:none;font-size:24px">×</button>
+      <h2 id="muskyMfaTitle">Two-factor sign-in</h2>
+      <p>Use an authenticator app such as Google Authenticator, Microsoft Authenticator, or 1Password. Your password alone will no longer be enough after setup.</p>
+      <p id="muskyMfaStatus" role="status">Checking your account…</p>
+      <div id="muskyMfaSetup"></div>
+    </section>`;
+    document.body.appendChild(modal);
+    const status = modal.querySelector("#muskyMfaStatus");
+    const setup = modal.querySelector("#muskyMfaSetup");
+    modal.querySelector("#muskyMfaClose").addEventListener("click", () => modal.remove());
+    modal.addEventListener("click", (e) => { if (e.target === modal) modal.remove(); });
+
+    const load = async () => {
+      status.textContent = "Checking your account…";
+      setup.replaceChildren();
+      try {
+        const { data, error } = await sb.auth.mfa.listFactors();
+        if (error) throw error;
+        const active = (data.totp || []).find((f) => f.status === "verified");
+        if (active) {
+          status.textContent = "Two-factor sign-in is enabled for this account.";
+          const off = document.createElement("button");
+          off.type = "button"; off.textContent = "Turn off two-factor sign-in";
+          off.style.cssText = "padding:12px;border:0;border-radius:8px;background:#b42318;color:#fff;width:100%";
+          off.addEventListener("click", async () => {
+            off.disabled = true; status.textContent = "Turning off two-factor sign-in…";
+            const { error: removeError } = await sb.auth.mfa.unenroll({ factorId: active.id });
+            if (removeError) { status.textContent = "Could not turn it off: " + removeError.message; off.disabled = false; return; }
+            await load();
+          });
+          setup.appendChild(off);
+          return;
+        }
+        status.textContent = "Two-factor sign-in is not enabled yet.";
+        const start = document.createElement("button");
+        start.type = "button"; start.textContent = "Set up authenticator app";
+        start.style.cssText = "padding:12px;border:0;border-radius:8px;background:#1877f2;color:#fff;width:100%";
+        start.addEventListener("click", async () => {
+          start.disabled = true; status.textContent = "Creating your secure setup…";
+          try {
+            const { data: enrolled, error: enrollError } = await sb.auth.mfa.enroll({ factorType: "totp", friendlyName: "MuskySocials authenticator" });
+            if (enrollError) throw enrollError;
+            status.textContent = "Scan this QR code with your authenticator app, then enter the 6-digit code it generates.";
+            const img = document.createElement("img");
+            img.alt = "Authenticator setup QR code";
+            img.style.cssText = "display:block;width:200px;height:200px;max-width:100%;margin:12px auto";
+            img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(enrolled.totp.qr_code);
+            const secretLabel = document.createElement("p");
+            secretLabel.textContent = "If you cannot scan the QR code, enter this setup key manually:";
+            const secret = document.createElement("code");
+            secret.style.cssText = "display:block;overflow-wrap:anywhere;padding:10px;background:#f2f4f7;border-radius:8px";
+            secret.textContent = enrolled.totp.secret;
+            const input = document.createElement("input");
+            input.type = "text"; input.inputMode = "numeric"; input.autocomplete = "one-time-code";
+            input.maxLength = 6; input.placeholder = "6-digit authenticator code";
+            input.setAttribute("aria-label", "6-digit authenticator code");
+            input.style.cssText = "box-sizing:border-box;width:100%;padding:12px;margin:10px 0;border:1px solid #bbb;border-radius:8px;font-size:18px";
+            const verify = document.createElement("button");
+            verify.type = "button"; verify.textContent = "Verify and enable";
+            verify.style.cssText = "padding:12px;border:0;border-radius:8px;background:#1877f2;color:#fff;width:100%";
+            setup.replaceChildren(img, secretLabel, secret, input, verify);
+            verify.addEventListener("click", async () => {
+              const code = input.value.trim();
+              if (!/^[0-9]{6}$/.test(code)) { status.textContent = "Enter the 6-digit code from your authenticator app."; return; }
+              verify.disabled = true; status.textContent = "Verifying your authenticator…";
+              try {
+                const { data: ch, error: chError } = await sb.auth.mfa.challenge({ factorId: enrolled.id });
+                if (chError) throw chError;
+                const { error: verifyError } = await sb.auth.mfa.verify({ factorId: enrolled.id, challengeId: ch.id, code });
+                if (verifyError) throw verifyError;
+                status.textContent = "Two-factor sign-in is now enabled.";
+                setup.replaceChildren();
+                const done = document.createElement("button");
+                done.type = "button"; done.textContent = "Done";
+                done.style.cssText = "padding:12px;border:0;border-radius:8px;background:#1877f2;color:#fff;width:100%";
+                done.addEventListener("click", () => modal.remove());
+                setup.appendChild(done);
+              } catch (err) {
+                status.textContent = "Could not verify that code: " + String(err.message || err);
+                verify.disabled = false;
+              }
+            });
+          } catch (err) {
+            status.textContent = "Could not start setup: " + String(err.message || err);
+            start.disabled = false;
+          }
+        });
+        setup.appendChild(start);
+      } catch (err) {
+        status.textContent = "Could not check two-factor settings: " + String(err.message || err);
+      }
+    };
+    await load();
+  };
+
   // Hand over to the site's own studio screen with the account's display name.
   function enter(session) {
     if (entered) return;
@@ -125,6 +274,8 @@ async function init() {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    // Pressing Enter in the MFA code field should run MFA verification, not password sign-in.
+    if ($("authMfaCode")) { $("authMfaVerify").click(); return; }
     const go = $("authGo");
     const email = $("authEmail").value.trim();
     const password = $("authPass").value;
@@ -136,12 +287,12 @@ async function init() {
         const display_name = ($("authName").value.trim() || email.split("@")[0]).slice(0, 40);
         const { data, error } = await sb.auth.signUp({ email, password, options: { data: { display_name } } });
         if (error) throw error;
-        if (data.session) enter(data.session);
+        if (data.session) await continueAfterAuth(data.session);
         else say("Account created. Check your email to confirm it, then sign in.");
       } else {
         const { data, error } = await sb.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        enter(data.session);
+        await continueAfterAuth(data.session);
       }
     } catch (err) {
       say(friendly(err), true);
@@ -152,5 +303,5 @@ async function init() {
 
   // Returning visitor with a saved session: go straight in.
   const { data } = await sb.auth.getSession();
-  if (data && data.session) enter(data.session);
+  if (data && data.session) await continueAfterAuth(data.session);
 }
