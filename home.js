@@ -296,7 +296,7 @@ html.mx-light #studio .ex-card b{color:#050505!important}
   const CARDS = [
     ["datingSection", "❤️", "Dating Site First With Love Log", "Directory of dating websites, with safety tips.", "Open", "255,95,109"],
     ["jobsSection", "💼", "Apply for Jobs", "Admin-posted job openings.", "Open", "17,153,142"],
-    ["designSection", "🎓", "Educational Design Studio", "Practice templates for design learning.", "Coming soon", "106,90,205"],
+    ["designSection", "🎓", "Educational Design Studio", "Practice templates for design learning.", "Open", "106,90,205"],
     ["aitoolsSection", "✨", "AI Tools Library", "Image, video and voice tools for creators.", "Coming soon", "24,119,242"],
     ["librarySection", "📚", "Community Library", "Guides, tutorials and downloads.", "Open", "15,155,142"],
   ];

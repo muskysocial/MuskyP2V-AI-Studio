@@ -24,6 +24,7 @@ function start() {
     { ico: "📝", title: "Posting", sub: "Post to the feed, pin or delete posts", els: [card("#fpGo")] },
     { ico: "💱", title: "Ask 4 Aza", sub: "Payment methods, timings and logos", els: [card("#azGo")] },
     { ico: "📚", title: "Library", sub: "Upload documents anyone can read", els: [card("#lbGo")] },
+    { ico: "🎓", title: "Design Studio", sub: "Upload templates and set up the editor", els: [card("#dsUp")] },
     { ico: "💼", title: "Jobs", sub: "Post, edit and verify job listings", els: [card("#jbGo")] },
     { ico: "❤️", title: "Dating directory", sub: "Add sites, review status, links", els: [card("#dtGo")] },
     { ico: "🚩", title: "Reports", sub: "Review reports and remove content", els: [card("#rpRefresh")] },
