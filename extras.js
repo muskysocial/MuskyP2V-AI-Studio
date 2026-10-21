@@ -194,7 +194,9 @@ html.mx-light .topbar #xAv{color:#fff!important}
 "<button class='pf-row' data-go='notifSection'><span>🔔 Notifications</span><span>›</span></button>" +
 ["🛡️ Two-factor sign-in", "📱 Devices and active sessions", "👁️ Who can see my profile", "🔖 Saved items",
  "🧾 My orders and activity", "💳 Payment methods", "🎁 Invite friends, earn credits", "✅ Verified badge", "⬇️ Download my data"]
-  .map((t) => "<div class='pf-row off'><span>" + t + "</span><span class='pf-tag'>Soon</span></div>").join("") +
+  .map((t) => t === "🛡️ Two-factor sign-in"
+    ? "<button class='pf-row' id='pfMfa'><span>" + t + "</span><span class='pf-tag'>Set up</span></button>"
+    : "<div class='pf-row off'><span>" + t + "</span><span class='pf-tag'>Soon</span></div>").join("") +
     "<button class='pf-row' id='pfHelp'><span>💬 Help and support on WhatsApp</span><span>›</span></button>" +
     "<button class='pf-row' id='pfDel'><span>🗑️ Ask to delete my account</span><span>›</span></button>" +
     "<button class='pt-btn del' id='pfOut' style='width:100%;margin-top:14px'>Sign out</button>");
@@ -291,6 +293,10 @@ html.mx-light .topbar #xAv{color:#fff!important}
   $p("pfOut").addEventListener("click", async () => {
     try { await sb.auth.signOut(); } catch {}
     location.reload();
+  });
+  $p("pfMfa").addEventListener("click", () => {
+    if (typeof window.musky.manageMFA === "function") window.musky.manageMFA();
+    else pmsg("Two-factor settings are still loading. Refresh and try again.");
   });
   // Fill the top-right avatar as soon as someone is signed in.
   const initAv = async () => {
