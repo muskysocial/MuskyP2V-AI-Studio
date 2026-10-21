@@ -331,8 +331,8 @@ html.mx-light #studio .ex-card b{color:#050505!important}
   soon("datingSection", "❤️", "Dating Site First With Love Log", "A directory of dating websites with descriptions and links. Nothing is listed yet.",
     ["Relationship categories and country filters", "Age rule: adults 18+ only", "A review status and last-checked date on every listing", "A site is only called verified after checks are recorded",
      "A Report button on every listing", "We cannot guarantee that people or relationships on any site are genuine"], "exploreSection");
-  soon("jobsSection", "💼", "Jobs", "Job openings published by the MuskySocials team will appear here.",
-    ["Job title, employer, location, requirements and deadline", "How to apply: link or method", "Verified and unverified jobs clearly labelled", "Report a job that looks misleading"], "exploreSection");
+  // Create the Jobs pane before jobs.js starts; do not replace it with a Coming Soon screen.
+  mkPane("jobsSection", "<p>Loading job listings...</p>");
   soon("designSection", "🎓", "Educational Design Studio", "Practice templates for learning graphic design, such as CVs, business cards, flyers, invitations and social posts.",
     ["Every template is marked as a sample for learning", "Invented names and details only", "No ID cards, tickets, boarding passes or official documents"], "exploreSection");
   soon("aitoolsSection", "✨", "AI Tools Library", "A guide to AI tools for images, photo editing, video, voice, hairstyles and clothing, backgrounds and enhancement.",
