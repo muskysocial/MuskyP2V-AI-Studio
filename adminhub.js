@@ -11,7 +11,7 @@ const wait = (test, ms = 15000) =>
     })();
   });
 
-const ok = await wait(() => window.portal && q("#adminSection .pt #adStats") && q("#adMake"));
+const ok = await wait(() => window.portal && q("#adminSection .pt #adStats") && q("#adMake") && q("#jbGo"));
 if (ok) {
   await new Promise((r) => setTimeout(r, 2500)); // give feed.js, shop.js and photos.js time to add their boxes
   start();
