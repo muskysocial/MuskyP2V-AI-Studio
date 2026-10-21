@@ -1,4 +1,4 @@
-const CACHE_NAME = 'musky-p2v-v2';
+const CACHE_NAME = 'musky-p2v-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
