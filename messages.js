@@ -19,21 +19,45 @@ function initPrivateMessaging() {
   const $ = (selector) => document.querySelector(selector);
   const pane = $("#messagesSection") || mkPane("messagesSection",
     "<div class='mxmsg'><div class='mxmsg-head'><div><p class='mxmsg-kicker'>YOUR COMMUNITY</p><h2>Messages</h2><p class='mxmsg-sub'>Private conversations between you and another member.</p></div><button type='button' class='mxmsg-refresh' data-msg-refresh>↻</button></div><div id='mxmsg-status' role='status' aria-live='polite'>Loading your inbox…</div><div id='mxmsg-content'></div></div>");
+  // Keep a placeholder in the app shell, but portal an open conversation to <body>.
+  // This removes <main>/#studio sizing and animation from the fixed chat viewport.
+  const originalParent = pane.parentNode;
+  const panePlaceholder = document.createComment("MuskySocials messages pane");
+  let panePortaled = false;
+  function mountConversationViewport() {
+    if (!panePortaled && pane.parentNode) {
+      pane.parentNode.insertBefore(panePlaceholder, pane);
+      document.body.appendChild(pane);
+      panePortaled = true;
+    }
+    pane.hidden = false;
+    pane.classList.add("mx-messages-fullscreen");
+    document.body.classList.add("mx-messages-open");
+  }
+  function restoreMessagesPane() {
+    if (panePortaled) {
+      if (panePlaceholder.parentNode) panePlaceholder.replaceWith(pane);
+      else if (originalParent) originalParent.appendChild(pane);
+      panePortaled = false;
+    }
+    pane.classList.remove("mx-messages-fullscreen");
+    document.body.classList.remove("mx-messages-open");
+  }
   const root = pane.querySelector(".mxmsg");
   if (!root || pane.dataset.messagingReady === "true") return;
   pane.dataset.messagingReady = "true";
   const style = document.createElement("style");
   style.textContent = `
     #messagesSection .mxmsg{max-width:760px;margin:0 auto;padding:2px 0 24px;color:var(--sh-text,#172033)}
-    #messagesSection.mx-messages-fullscreen{position:fixed!important;inset:0!important;z-index:999!important;display:flex!important;flex-direction:column!important;width:100%!important;max-width:none!important;height:100vh!important;height:100dvh!important;min-height:0!important;margin:0!important;padding:calc(env(safe-area-inset-top,0px) + 10px) 14px calc(env(safe-area-inset-bottom,0px) + 10px)!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important;background:var(--sh-card,#fff)!important;color:var(--sh-text,#172033)!important}
-    #messagesSection.mx-messages-fullscreen .mxmsg{display:flex;flex-direction:column;width:100%;max-width:900px;flex:1;min-height:0;margin:0 auto;padding:0}
+    #messagesSection.mx-messages-fullscreen{position:fixed!important;inset:0!important;z-index:2147483000!important;display:flex!important;flex-direction:column!important;width:100vw!important;max-width:none!important;height:100vh!important;height:100dvh!important;min-height:0!important;margin:0!important;padding:calc(env(safe-area-inset-top,0px) + 8px) 12px calc(env(safe-area-inset-bottom,0px) + 8px)!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important;background:var(--sh-card,#fff)!important;color:var(--sh-text,#172033)!important;box-sizing:border-box!important}
+    #messagesSection.mx-messages-fullscreen .mxmsg{display:flex;flex-direction:column;width:100%;max-width:none;flex:1 1 auto;min-width:0;min-height:0;margin:0;padding:0}
     #messagesSection.mx-messages-fullscreen .mxmsg-head{flex:0 0 auto;padding:3px 0 12px;margin-bottom:6px}
     #messagesSection.mx-messages-fullscreen #mxmsg-status{flex:0 0 auto;margin:4px 1px 8px}
     #messagesSection.mx-messages-fullscreen #mxmsg-content{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
-    #messagesSection.mx-messages-fullscreen .mxmsg-thread{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
+    #messagesSection.mx-messages-fullscreen .mxmsg-thread{display:flex;flex-direction:column;flex:1 1 auto;width:100%;min-width:0;min-height:0;overflow:hidden}
     #messagesSection.mx-messages-fullscreen .mxmsg-thread-head{flex:0 0 auto;margin-bottom:8px}
     #messagesSection.mx-messages-fullscreen .mxmsg-bubbles{flex:1;min-height:0;max-height:none;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-    #messagesSection.mx-messages-fullscreen .mxmsg-compose{flex:0 0 auto;padding:8px 0 0;margin-top:0;background:var(--sh-card,#fff)}
+    #messagesSection.mx-messages-fullscreen .mxmsg-compose{position:relative;flex:0 0 auto;width:100%;padding:8px 0 0;margin-top:0;background:var(--sh-card,#fff)}
     #messagesSection.mx-messages-fullscreen .mxmsg-compose textarea{min-height:46px;max-height:120px;resize:none}
     #messagesSection.mx-messages-fullscreen .mxmsg-privacy{flex:0 0 auto;margin:5px 2px 0}
     #messagesSection.mx-messages-fullscreen .mxmsg-list{overflow-y:auto;min-height:0;padding-bottom:12px}
@@ -198,6 +222,7 @@ function initPrivateMessaging() {
       currentPeer = peer;
       currentConversationId = conversation.id;
       window.shell.go("messagesSection");
+      mountConversationViewport();
       await renderThread();
     } catch (error) {
       console.error("Could not open private conversation:", error);
@@ -215,6 +240,7 @@ function initPrivateMessaging() {
       currentPeer = peer || { id: peerId, display_name: "MuskySocials member" };
       currentConversationId = conversation.id;
       window.shell.go("messagesSection");
+      mountConversationViewport();
       await renderThread();
     } catch (error) {
       console.error("Could not open message thread:", error);
@@ -301,9 +327,9 @@ function initPrivateMessaging() {
 
   pane.addEventListener("click", async (event) => {
     const close = event.target.closest("[data-msg-close]");
-    if (close) { currentConversationId = null; currentPeer = null; return window.shell.go("homeSection"); }
+    if (close) { restoreMessagesPane(); currentConversationId = null; currentPeer = null; return window.shell.go("homeSection"); }
     const back = event.target.closest("[data-msg-back]");
-    if (back) { currentConversationId = null; currentPeer = null; return loadInbox(); }
+    if (back) { restoreMessagesPane(); currentConversationId = null; currentPeer = null; window.shell.go("messagesSection"); return loadInbox(); }
     const refresh = event.target.closest("[data-msg-refresh]");
     if (refresh) return currentConversationId ? renderThread() : loadInbox();
     const openThread = event.target.closest("[data-msg-open-conversation]");
@@ -342,7 +368,7 @@ function initPrivateMessaging() {
     if (!document.hidden && !pane.hidden && currentConversationId) renderThread({ silent: true });
   });
   window.muskyMessaging = {
-    inbox() { currentConversationId = null; currentPeer = null; window.shell.go("messagesSection"); return loadInbox(); },
+    inbox() { restoreMessagesPane(); currentConversationId = null; currentPeer = null; window.shell.go("messagesSection"); return loadInbox(); },
     open,
     openConversation
   };
