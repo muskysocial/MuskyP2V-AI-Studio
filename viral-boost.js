@@ -90,7 +90,7 @@ function startViralBoost() {
     #viralBoostSection .vb-preview-wrap img,#viralBoostSection .vb-preview-wrap video{display:block;width:100%;max-height:360px;object-fit:contain;background:#080e1c;border-radius:12px}
     #viralBoostSection .vb-small{font-size:12px;line-height:1.45;color:var(--sh-sub,#65676b);margin:8px 0 0}
     #viralBoostSection .vb-platforms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-    #viralBoostSection .vb-platform{display:flex!important;align-items:center;gap:9px;border:1px solid var(--sh-line,#dadde1);border-radius:10px;padding:10px!important;margin:0!important;min-width:0}
+    #viralBoostSection .vb-card .vb-platform{display:flex!important;align-items:center;gap:9px;border:1px solid var(--sh-line,#dadde1);border-radius:10px;padding:10px!important;margin:0!important;min-width:0}
     #viralBoostSection .vb-platform input{width:18px;height:18px;flex:none;accent-color:var(--sh-blue,#1877f2)}
     #viralBoostSection .vb-platform span{overflow-wrap:anywhere}
     #viralBoostSection .vb-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
@@ -236,7 +236,8 @@ function startViralBoost() {
       const userId = await getUserId();
       if (selectedFile) {
         const ext = (selectedFile.name.split(".").pop() || "bin").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 8) || "bin";
-        path = userId + "/" + new Date().toISOString().slice(0, 10) + "/" + crypto.randomUUID() + "." + ext;
+        const unique = window.crypto && typeof window.crypto.randomUUID === "function" ? window.crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2));
+        path = userId + "/" + new Date().toISOString().slice(0, 10) + "/" + unique + "." + ext;
         const uploaded = await sb.storage.from(BUCKET).upload(path, selectedFile, {
           contentType: selectedFile.type,
           cacheControl: "3600",
