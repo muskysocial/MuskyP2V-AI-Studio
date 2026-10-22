@@ -20,4 +20,6 @@ The existing Supabase URL and server key are supplied by Supabase's Edge Functio
 
 ## Important status
 
-This pull request adds secure TikTok account connection and account listing/disconnection. It does not yet publish content or enable paid feed placement. Publishing is a separate next step because the UI must retrieve creator privacy options, require explicit consent, upload supported media, and poll TikTok's publish status. Do not tell users that a post was published until TikTok confirms it.
+This pull request adds secure TikTok account connection and a first direct-publishing path for saved video drafts. Users must choose an audience option returned by TikTok and explicitly confirm before sending a video. The server uploads the video, records a publishing request, and checks TikTok's status; the UI must not claim a post is live until TikTok returns a completed status. This first version supports uploaded video drafts under 40 MB. Direct photo publishing and Instagram/Facebook/YouTube/X integrations are not included yet.
+
+TikTok's official developer review is required for public direct posting. Until the app passes TikTok's audit, its Direct Post API may restrict posts to private visibility. Paid placement inside the MuskySocials feed is separate and remains disabled until that feature is implemented and tested.
