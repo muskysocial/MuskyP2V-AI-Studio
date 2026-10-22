@@ -113,8 +113,17 @@ html.mx-light .mx-btn:disabled{background:#e4e6eb!important;color:#8a8d91!import
 #chatSection.mx-chat-fullscreen .mx-chat-brand{min-width:0;flex:1}
 #chatSection.mx-chat-fullscreen .mx-chat-brand strong{display:block;font-size:16px;color:var(--sh-text)}
 #chatSection.mx-chat-fullscreen .mx-chat-brand small{display:block;font-size:11px;color:var(--sh-sub)}
-#chatSection.mx-chat-fullscreen .mx-chat-log{display:flex;flex:1 1 0%;min-height:0!important;height:0;overflow-y:scroll!important;overflow-x:hidden!important;touch-action:pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;margin:0;padding:4px 2px 16px;gap:10px}
-#chatSection.mx-chat-fullscreen .ch-b{flex:0 0 auto;max-width:88%;white-space:pre-wrap;overflow-wrap:anywhere}
+#chatSection.mx-chat-fullscreen .mx-chat-log{display:flex!important;flex-direction:column!important;align-items:stretch!important;flex:1 1 0%;min-height:0!important;height:0;overflow-y:scroll!important;overflow-x:hidden!important;touch-action:pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;margin:0;padding:4px 2px 16px;gap:10px}
+#chatSection.mx-chat-fullscreen .ch-b{display:block;flex:0 0 auto;width:fit-content;max-width:min(88%,680px);white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box}
+#chatSection.mx-chat-fullscreen .ch-me{align-self:flex-end!important;margin-left:auto!important;border-bottom-right-radius:5px}
+#chatSection.mx-chat-fullscreen .ch-ai{align-self:flex-start!important;margin-right:auto!important;border-bottom-left-radius:5px}
+#chatSection.mx-chat-fullscreen .ch-attachment{display:block;max-width:100%;margin-top:8px;border-radius:12px}
+#chatSection.mx-chat-fullscreen .ch-attachment img{display:block;max-width:min(100%,320px);max-height:280px;object-fit:contain;border-radius:10px}
+#chatSection.mx-chat-fullscreen .ch-attachment a{color:var(--sh-blue);overflow-wrap:anywhere}
+#chatSection.mx-chat-fullscreen .ch-tools{display:flex;gap:4px;align-items:center}
+#chatSection.mx-chat-fullscreen .ch-tool{width:44px;min-width:44px;height:48px;border:1px solid var(--sh-line);border-radius:50%;background:var(--sh-card);color:var(--sh-text);font-size:20px}
+#chatSection.mx-chat-fullscreen .ch-pending{display:flex;align-items:center;gap:8px;flex:0 0 auto;padding:6px 10px;margin:4px 0;border:1px solid var(--sh-line);border-radius:12px;font-size:12px;color:var(--sh-sub)}
+#chatSection.mx-chat-fullscreen .ch-pending button{border:0;background:none;color:var(--sh-blue);font-size:18px}
 #chatSection.mx-chat-fullscreen .ch-bar{flex:0 0 auto;align-items:flex-end;padding:10px 0 2px;gap:8px;border-top:1px solid var(--sh-line);background:var(--sh-card)}
 #chatSection.mx-chat-fullscreen .ch-bar textarea{resize:none;max-height:25dvh;min-height:48px;border-radius:24px;padding:13px 16px}
 #chatSection.mx-chat-fullscreen .ch-go{min-height:48px;min-width:54px;border-radius:24px;padding:10px 14px}
@@ -198,10 +207,124 @@ function init() {
     "<button type='button' class='mx-chat-prompt' data-prompt='Show me which MuskySocials tools I can use and how to get started with them.'><span class='mx-chat-art tools' aria-hidden='true'>✨</span><strong>Explore tools</strong><small>Find the right AI tool</small></button>" +
     "</div></div>" +
     "<div class='mx-chat-log' id='chLog' hidden></div>" +
-    "<div class='ch-bar'><textarea id='chIn' rows='1' maxlength='1000' placeholder='Message Musky Assistant…' aria-label='Message Musky Assistant'></textarea>" +
+    "<div id='chPending' class='ch-pending' hidden></div><div class='ch-bar'><div class='ch-tools'><button type='button' class='ch-tool' id='chAttach' aria-label='Attach photo or document'>＋</button><input id='chFile' type='file' accept='image/*,.pdf,.txt,.doc,.docx' hidden><button type='button' class='ch-tool' id='chVoice' aria-label='Voice input'>🎙</button></div><textarea id='chIn' rows='1' maxlength='1000' placeholder='Message Musky Assistant…' aria-label='Message Musky Assistant'></textarea>" +
     "<button class='ch-go' id='chGo' aria-label='Send message'>↑</button></div><small class='mx-chat-note'>AI can make mistakes. Never share passwords or private information.</small>");
   document.body.appendChild(chat);
-  const hist = [];
+  let hist = [];
+  let pendingFile = null;
+  let loadingHistory = false;
+  let recognition = null;
+  const chLog = chat.querySelector("#chLog");
+  const chWelcome = chat.querySelector("#chWelcome");
+  const chIn = chat.querySelector("#chIn");
+  const chGo = chat.querySelector("#chGo");
+  const chFile = chat.querySelector("#chFile");
+  const chPending = chat.querySelector("#chPending");
+  const chVoice = chat.querySelector("#chVoice");
+  function updatePending() {
+    chPending.hidden = !pendingFile;
+    chPending.replaceChildren();
+    if (!pendingFile) return;
+    const label = document.createElement("span");
+    label.textContent = (pendingFile.type.startsWith("image/") ? "Photo: " : pendingFile.type.startsWith("audio/") ? "Voice note: " : "Document: ") + pendingFile.name + " (" + Math.ceil(pendingFile.size/1024) + " KB)";
+    const remove = document.createElement("button");
+    remove.type = "button"; remove.textContent = "×"; remove.setAttribute("aria-label","Remove attachment");
+    remove.addEventListener("click", () => { pendingFile = null; updatePending(); });
+    chPending.append(label, remove);
+  }
+  const bubble = (role, text, attachment) => {
+    chWelcome.hidden = true; chLog.hidden = false;
+    const d = document.createElement("div");
+    d.className = "ch-b " + (role === "user" ? "ch-me" : "ch-ai");
+    const t = document.createElement("div"); t.textContent = text || ""; d.appendChild(t);
+    if (attachment && attachment.attachment_path) {
+      const wrap = document.createElement("div"); wrap.className = "ch-attachment"; d.appendChild(wrap);
+      const M = window.musky;
+      Promise.resolve(M && M.sb.storage.from("assistant-attachments").createSignedUrl(attachment.attachment_path, 3600)).then(({data,error}) => {
+        if (error || !data?.signedUrl) return;
+        if (String(attachment.attachment_type || "").startsWith("image/")) {
+          const img = document.createElement("img"); img.src=data.signedUrl; img.alt=attachment.attachment_name || "Attached photo"; wrap.appendChild(img);
+        } else if (String(attachment.attachment_type || "").startsWith("audio/")) {
+          const audio=document.createElement("audio"); audio.controls=true; audio.src=data.signedUrl; wrap.appendChild(audio);
+        } else {
+          const link=document.createElement("a"); link.href=data.signedUrl; link.target="_blank"; link.rel="noopener"; link.textContent="Open " + (attachment.attachment_name || "attachment"); wrap.appendChild(link);
+        }
+      }).catch(()=>{});
+    }
+    chLog.appendChild(d); chLog.scrollTop = chLog.scrollHeight; return d;
+  };
+  async function loadHistory() {
+    if (loadingHistory) return;
+    const M = window.musky; if (!M) return;
+    loadingHistory = true;
+    try {
+      const session = await M.session(); if (!session?.user?.id) return;
+      const {data,error} = await M.sb.from("assistant_messages").select("id,role,content,attachment_path,attachment_name,attachment_type,attachment_size,created_at").eq("user_id",session.user.id).order("created_at",{ascending:true}).order("id",{ascending:true}).limit(200);
+      if (error) throw error;
+      chLog.replaceChildren(); hist = [];
+      (data || []).forEach((row) => { bubble(row.role,row.content,row.attachment_path ? row : null); hist.push({role:row.role,content:row.content}); });
+      hist = hist.slice(-12);
+      chWelcome.hidden = (data || []).length > 0; chLog.hidden = (data || []).length === 0;
+    } catch (e) { console.warn("Could not load assistant history", e); }
+    finally { loadingHistory = false; }
+  }
+  async function saveMessage(role, content, attachment) {
+    const M=window.musky; const session=M && await M.session(); if (!session?.user?.id) return null;
+    const row={user_id:session.user.id,role,content:content || ""};
+    if (attachment) { row.attachment_path=attachment.path; row.attachment_name=attachment.name; row.attachment_type=attachment.type; row.attachment_size=attachment.size; }
+    const {data,error}=await M.sb.from("assistant_messages").insert(row).select("id,role,content,attachment_path,attachment_name,attachment_type,attachment_size,created_at").single();
+    if (error) { console.warn("Could not save assistant history",error); return null; }
+    return data;
+  }
+  async function uploadPending(M, userId) {
+    if (!pendingFile) return null;
+    const file=pendingFile;
+    if (file.size > 15*1024*1024) throw new Error("Attachments must be 15 MB or smaller.");
+    const allowed=["image/jpeg","image/png","image/webp","image/gif","application/pdf","text/plain","application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+    if (!allowed.includes(file.type)) throw new Error("Choose a JPG, PNG, WebP, GIF, PDF, TXT or Word document.");
+    const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,"_").slice(-90) || "attachment";
+    const path=userId+"/"+crypto.randomUUID()+"_"+safe;
+    const {error}=await M.sb.storage.from("assistant-attachments").upload(path,file,{contentType:file.type,upsert:false});
+    if(error) throw new Error("Could not upload attachment: "+error.message);
+    return {path,name:file.name,type:file.type,size:file.size};
+  }
+  async function sendChat() {
+    const text = chIn.value.trim(); if (!text && !pendingFile) return;
+    const M=window.musky; const session=M && await M.session();
+    if (!session?.user?.id) { bubble("assistant","Please sign in to use the chat."); return; }
+    chGo.disabled=true; chVoice.disabled=true;
+    let attachment=null; let content=text;
+    try {
+      if (pendingFile) { attachment=await uploadPending(M,session.user.id); pendingFile=null; updatePending(); }
+      if (!content && attachment) content=attachment.type.startsWith("image/") ? "Please look at the attached photo and help me understand it." : "Please read and help me with the attached document.";
+      await saveMessage("user",content,attachment);
+      bubble("user",content,attachment ? {attachment_path:attachment.path,attachment_name:attachment.name,attachment_type:attachment.type} : null);
+      chIn.value=""; hist.push({role:"user",content});
+      const wait=bubble("assistant","Thinking…");
+      const body={messages:hist.slice(-12)};
+      if(attachment){body.attachmentPath=attachment.path;body.attachmentType=attachment.type;body.attachmentName=attachment.name;}
+      const {data,error}=await M.sb.functions.invoke(CHAT_FN,{body});
+      if(error){let msg="AI chat is not ready yet. Try again later.";try{const j=await error.context.json();msg=j.error||msg;if(typeof j.credits==="number")M.setBadge(j.credits);}catch{}wait.firstChild.textContent=msg;hist.pop();}
+      else{wait.firstChild.textContent=data.reply;hist.push({role:"assistant",content:data.reply});await saveMessage("assistant",data.reply,null);if(typeof data.credits==="number")M.setBadge(data.credits);}
+    } catch(e) { bubble("assistant",e?.message || "Could not send your message. Check your internet and try again."); }
+    finally { chGo.disabled=false;chVoice.disabled=false;chLog.scrollTop=chLog.scrollHeight; }
+  }
+  chGo.addEventListener("click",sendChat);
+  chat.querySelector("#chAttach").addEventListener("click",()=>chFile.click());
+  chFile.addEventListener("change",()=>{pendingFile=chFile.files?.[0]||null;chFile.value="";updatePending();});
+  chVoice.addEventListener("click",()=>{
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!SR){bubble("assistant","Voice input is not supported in this browser. You can still type or attach a photo or document.");return;}
+    if(recognition){recognition.stop();return;}
+    recognition=new SR();recognition.lang=navigator.language||"en-US";recognition.interimResults=true;recognition.continuous=false;
+    chVoice.textContent="■";chVoice.setAttribute("aria-label","Stop voice input");
+    recognition.onresult=(event)=>{let transcript="";for(let i=0;i<event.results.length;i++)transcript+=event.results[i][0].transcript;chIn.value=transcript;};
+    recognition.onerror=()=>{bubble("assistant","Voice input stopped. You can type your message instead.");};
+    recognition.onend=()=>{recognition=null;chVoice.textContent="🎙";chVoice.setAttribute("aria-label","Voice input");chIn.focus();};
+    try{recognition.start();}catch{recognition=null;chVoice.textContent="🎙";}
+  });
+  chIn.addEventListener("keydown",(e)=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendChat();}});
+
   const chLog = chat.querySelector("#chLog");
   const chWelcome = chat.querySelector("#chWelcome");
   const chIn = chat.querySelector("#chIn");
@@ -251,6 +374,7 @@ function init() {
   }
   chGo.addEventListener("click", sendChat);
   chat.querySelector("#chBack").addEventListener("click", () => go("toolsHubSection"));
+  loadHistory();
   chat.querySelectorAll("[data-prompt]").forEach((card) => {
     card.addEventListener("click", () => {
       chIn.value = card.dataset.prompt || "";
