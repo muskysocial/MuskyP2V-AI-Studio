@@ -38,7 +38,11 @@ function initPrivateMessaging() {
     #messagesSection.mx-messages-fullscreen .mxmsg-privacy{flex:0 0 auto;margin:5px 2px 0}
     #messagesSection.mx-messages-fullscreen .mxmsg-list{overflow-y:auto;min-height:0;padding-bottom:12px}
     #messagesSection.mx-messages-fullscreen .mxmsg-empty{flex:0 0 auto}
-    body.mx-messages-open{overflow:hidden!important}
+    body.mx-messages-open{overflow:hidden!important;overscroll-behavior:none}
+    body.mx-messages-open #studio{animation:none!important;transform:none!important}
+    body.mx-messages-open #mxBar,body.mx-messages-open>.topbar{display:none!important}
+    #messagesSection.mx-messages-fullscreen{position:fixed!important;inset:0!important;top:0!important;right:0!important;bottom:0!important;left:0!important;width:100vw!important;max-width:none!important;transform:none!important;box-sizing:border-box!important}
+    #messagesSection.mx-messages-fullscreen .mxmsg,#messagesSection.mx-messages-fullscreen #mxmsg-content{min-width:0;width:100%;box-sizing:border-box}
     @media(max-width:520px){#messagesSection.mx-messages-fullscreen{padding-left:10px!important;padding-right:10px!important}#messagesSection.mx-messages-fullscreen .mxmsg-bubbles{padding:10px 5px}#messagesSection.mx-messages-fullscreen .mxmsg-thread-head{padding:9px}#messagesSection.mx-messages-fullscreen .mxmsg-compose textarea{font-size:16px}}
     #messagesSection .mxmsg-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
     #messagesSection .mxmsg-kicker{margin:0 0 4px;color:#1877f2;font-size:10px;font-weight:900;letter-spacing:.16em}
