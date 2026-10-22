@@ -22,13 +22,13 @@ body{padding-bottom:0}
 #mxBar button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 6px;border:0;background:none;color:var(--sh-sub);font-size:calc(12px * var(--mx-font-scale,1));overflow-wrap:anywhere}
 #mxBar button span{font-size:22px;line-height:1.1}
 #mxBar button.on{color:var(--sh-blue);font-weight:700}
-.sh{color:var(--sh-text);font-size:calc(16px * var(--mx-font-scale,1));min-width:0;overflow-wrap:anywhere}
-.sh h2{margin:0 0 10px;font-size:calc(22px * var(--mx-font-scale,1))}
+.sh{color:var(--sh-text);font-size:calc(clamp(14px,3.9vw,16px) * var(--mx-font-scale,1));min-width:0;overflow-wrap:anywhere}
+.sh h2{margin:0 0 10px;font-size:calc(clamp(20px,5.5vw,24px) * var(--mx-font-scale,1))}
 .sh p,.sh small{color:var(--sh-sub)}
 .sh-bal{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px;border:1px solid var(--sh-line);border-radius:14px;background:var(--sh-card);margin-bottom:14px}
-.sh-bal strong{display:block;font-size:calc(26px * var(--mx-font-scale,1));color:var(--sh-text)}
+.sh-bal strong{display:block;font-size:calc(clamp(22px,6vw,26px) * var(--mx-font-scale,1));color:var(--sh-text)}
 .sh-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.sh-tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px;border:1px solid var(--sh-line);border-radius:14px;background:var(--sh-card);color:var(--sh-text);font-size:calc(16px * var(--mx-font-scale,1));font-weight:600;text-align:left;min-width:0;overflow-wrap:anywhere}
+.sh-tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px;border:1px solid var(--sh-line);border-radius:14px;background:var(--sh-card);color:var(--sh-text);font-size:calc(clamp(14px,4vw,16px) * var(--mx-font-scale,1));font-weight:600;text-align:left;min-width:0;overflow-wrap:anywhere}
 .sh-tile .ico{font-size:26px}
 .sh-tile small{font-weight:400;font-size:calc(12px * var(--mx-font-scale,1))}
 .sh-row{display:flex;gap:8px;margin:8px 0 16px}
@@ -100,7 +100,7 @@ html.mx-light .mx-btn:disabled{background:#e4e6eb!important;color:#8a8d91!import
 #mxBar{padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(min-width:700px){#studio .sh-grid{grid-template-columns:repeat(3,minmax(0,1fr))}#mxBar{left:50%;right:auto;bottom:14px;transform:translateX(-50%);width:min(720px,calc(100% - 48px));border:1px solid var(--sh-line);border-radius:18px;box-shadow:0 8px 32px #0002;overflow:hidden}}
 @media(min-width:1100px){#studio .sh-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:420px){#studio .sh-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#studio .sh-tile{padding:11px;font-size:calc(15px * var(--mx-font-scale,1))}#mxBar button{font-size:calc(11px * var(--mx-font-scale,1));padding:7px 1px 6px}#mxBar button span{font-size:20px}}
+@media(max-width:360px){#studio .sh-grid{grid-template-columns:minmax(0,1fr);gap:8px}#studio .sh-tile{padding:12px;font-size:calc(15px * var(--mx-font-scale,1))}}@media(min-width:361px) and (max-width:420px){#studio .sh-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#studio .sh-tile{padding:11px;font-size:calc(14px * var(--mx-font-scale,1))}}@media(max-width:420px){#mxBar button{font-size:calc(11px * var(--mx-font-scale,1));padding:7px 1px 6px}#mxBar button span{font-size:20px}}
 `;
 
 // id, icon, label, note
