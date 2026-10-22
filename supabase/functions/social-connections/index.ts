@@ -73,6 +73,176 @@ async function decryptToken(ciphertext: string, iv: string) {
 function missingConfig() {
   return !TIKTOK_CLIENT_KEY || !TIKTOK_CLIENT_SECRET || !TIKTOK_REDIRECT_URI || !TOKEN_KEY_B64;
 }
+async function getConnection(userId: string, provider: string) {
+  const admin = getAdmin();
+  const { data, error } = await admin.from("social_connections")
+    .select("*").eq("user_id", userId).eq("provider", provider).maybeSingle();
+  if (error || !data) throw new Error("Connect your " + provider + " account first.");
+  return data;
+}
+async function freshAccessToken(connection: any) {
+  const admin = getAdmin();
+  const expires = connection.access_token_expires_at ? new Date(connection.access_token_expires_at).getTime() : 0;
+  if (expires > Date.now() + 5 * 60 * 1000) {
+    return { connection, token: await decryptToken(connection.access_token_ciphertext, connection.access_token_iv) };
+  }
+  if (!connection.refresh_token_ciphertext || !connection.refresh_token_iv) {
+    throw new Error("Your TikTok connection expired. Disconnect it and connect again.");
+  }
+  if (!TIKTOK_CLIENT_KEY || !TIKTOK_CLIENT_SECRET) throw new Error("TikTok app credentials are not configured.");
+  const refreshToken = await decryptToken(connection.refresh_token_ciphertext, connection.refresh_token_iv);
+  const response = await fetch("https://open.tiktokapis.com/v2/oauth/token/", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_key: TIKTOK_CLIENT_KEY, client_secret: TIKTOK_CLIENT_SECRET,
+      grant_type: "refresh_token", refresh_token: refreshToken
+    })
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || !result.access_token) {
+    console.error("TikTok token refresh failed", response.status, result.error || "unknown error");
+    throw new Error("TikTok authorization expired. Please reconnect your account.");
+  }
+  const access = await encryptToken(result.access_token);
+  const refreshed = result.refresh_token ? await encryptToken(result.refresh_token) : null;
+  const updated = {
+    access_token_ciphertext: access.ciphertext, access_token_iv: access.iv,
+    refresh_token_ciphertext: refreshed?.ciphertext || connection.refresh_token_ciphertext,
+    refresh_token_iv: refreshed?.iv || connection.refresh_token_iv,
+    access_token_expires_at: result.expires_in ? new Date(Date.now() + Number(result.expires_in) * 1000).toISOString() : null,
+    refresh_token_expires_at: result.refresh_expires_in ? new Date(Date.now() + Number(result.refresh_expires_in) * 1000).toISOString() : connection.refresh_token_expires_at,
+    scopes: String(result.scope || connection.scopes?.join(",") || "").split(",").map((s: string) => s.trim()).filter(Boolean),
+    updated_at: new Date().toISOString()
+  };
+  const { error } = await admin.from("social_connections").update(updated).eq("id", connection.id);
+  if (error) throw new Error("Could not update TikTok authorization securely.");
+  return { connection: { ...connection, ...updated }, token: result.access_token };
+}
+async function tiktokCreatorInfo(token: string) {
+  const response = await fetch("https://open.tiktokapis.com/v2/post/publish/creator_info/query/", {
+    method: "POST",
+    headers: { Authorization: "Bearer " + token, "Content-Type": "application/json; charset=UTF-8" },
+    body: "{}"
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || result.error?.code && result.error.code !== "ok") {
+    console.error("TikTok creator info failed", response.status, result.error?.code || "unknown error");
+    throw new Error("TikTok could not load your posting settings. Reconnect the account or try again.");
+  }
+  return result.data || {};
+}
+async function getTikTokConnection(userId: string) {
+  const connection = await getConnection(userId, "tiktok");
+  return freshAccessToken(connection);
+}
+async function refreshPublishStatus(userId: string, publishId: string) {
+  const admin = getAdmin();
+  const { data: job, error } = await admin.from("social_publish_jobs")
+    .select("id,provider_publish_id,status,campaign_id").eq("user_id", userId)
+    .eq("provider", "tiktok").eq("provider_publish_id", publishId).maybeSingle();
+  if (error || !job) throw new Error("That TikTok publishing request was not found.");
+  if (job.status === "published" || job.status === "failed") return { status: job.status, message: "This publishing request is already complete." };
+  const { token } = await getTikTokConnection(userId);
+  const response = await fetch("https://open.tiktokapis.com/v2/post/publish/status/fetch/", {
+    method: "POST",
+    headers: { Authorization: "Bearer " + token, "Content-Type": "application/json; charset=UTF-8" },
+    body: JSON.stringify({ publish_id: publishId })
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || result.error?.code && result.error.code !== "ok") {
+    throw new Error("TikTok status is not available yet. Please refresh in a moment.");
+  }
+  const providerStatus = String(result.data?.status || "PROCESSING");
+  const status = providerStatus === "PUBLISH_COMPLETE" ? "published" :
+    providerStatus === "FAILED" ? "failed" : "processing";
+  const message = providerStatus === "PUBLISH_COMPLETE" ? "TikTok confirms the post was published." :
+    providerStatus === "FAILED" ? "TikTok reported that publishing failed." :
+    "TikTok is still processing this post.";
+  await admin.from("social_publish_jobs").update({ status, message, updated_at: new Date().toISOString() }).eq("id", job.id);
+  return { status, message, provider_status: providerStatus };
+}
+async function publishTikTokVideo(userId: string, body: any) {
+  if (body.consent !== true) throw new Error("Confirm that you want to send this content to TikTok.");
+  if (!body.campaign_id) throw new Error("Choose a saved video draft to publish.");
+  if (missingConfig()) throw new Error("TikTok publishing is not configured yet.");
+  const admin = getAdmin();
+  const { data: campaign, error: campaignError } = await admin.from("viral_campaigns")
+    .select("id,user_id,title,caption,hashtags,asset_path,content_type,file_size,original_file_name")
+    .eq("id", body.campaign_id).eq("user_id", userId).maybeSingle();
+  if (campaignError || !campaign) throw new Error("That saved draft was not found.");
+  if (!campaign.asset_path || !String(campaign.content_type || "").startsWith("video/")) {
+    throw new Error("Direct TikTok publishing currently supports uploaded video drafts only. Photo publishing needs a separate supported media flow.");
+  }
+  if (!String(campaign.asset_path).startsWith(userId + "/")) throw new Error("The saved media path is not owned by your account.");
+  const existing = await admin.from("social_publish_jobs").select("id,status,provider_publish_id,message")
+    .eq("user_id", userId).eq("campaign_id", campaign.id).eq("provider", "tiktok").maybeSingle();
+  if (existing.data && existing.data.status !== "failed") {
+    return { status: existing.data.status, publish_id: existing.data.provider_publish_id, message: existing.data.message || "This draft has already been submitted to TikTok. Refresh its status instead of publishing it again." };
+  }
+  const { connection, token } = await getTikTokConnection(userId);
+  const creator = await tiktokCreatorInfo(token);
+  const privacy = String(body.privacy_level || "");
+  const options = Array.isArray(creator.privacy_level_options) ? creator.privacy_level_options : [];
+  if (!options.includes(privacy)) throw new Error("Choose one of the privacy settings currently allowed by your TikTok account.");
+  const { data: blob, error: mediaError } = await admin.storage.from("viral-uploads").download(campaign.asset_path);
+  if (mediaError || !blob) throw new Error("Could not read your saved video from private storage.");
+  if (blob.size > 40 * 1024 * 1024) throw new Error("For this first direct-publishing version, choose a video under 40 MB.");
+  const videoSize = blob.size;
+  const chunkSize = Math.min(10 * 1024 * 1024, videoSize);
+  const chunkCount = Math.ceil(videoSize / chunkSize);
+  const caption = [campaign.caption, campaign.hashtags].filter(Boolean).join("\n\n").slice(0, 2200);
+  const initResponse = await fetch("https://open.tiktokapis.com/v2/post/publish/video/init/", {
+    method: "POST",
+    headers: { Authorization: "Bearer " + token, "Content-Type": "application/json; charset=UTF-8" },
+    body: JSON.stringify({
+      post_info: {
+        title: caption, privacy_level: privacy,
+        disable_duet: false, disable_stitch: false, disable_comment: false
+      },
+      source_info: { source: "FILE_UPLOAD", video_size: videoSize, chunk_size: chunkSize, total_chunk_count: chunkCount }
+    })
+  });
+  const init = await initResponse.json().catch(() => ({}));
+  if (!initResponse.ok || init.error?.code && init.error.code !== "ok" || !init.data?.upload_url || !init.data?.publish_id) {
+    const code = String(init.error?.code || "");
+    const msg = code === "unaudited_client_can_only_post_to_private_accounts"
+      ? "TikTok has not audited this developer app yet. Direct posts are restricted to private visibility until TikTok approves the app."
+      : "TikTok could not start this post. Check that the app has the approved video.publish permission.";
+    throw new Error(msg);
+  }
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+  for (let start = 0; start < videoSize; start += chunkSize) {
+    const part = bytes.slice(start, Math.min(start + chunkSize, videoSize));
+    const end = start + part.byteLength - 1;
+    const upload = await fetch(init.data.upload_url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": campaign.content_type || "video/mp4",
+        "Content-Range": "bytes " + start + "-" + end + "/" + videoSize,
+        "Content-Length": String(part.byteLength)
+      },
+      body: part
+    });
+    if (!upload.ok) {
+      console.error("TikTok video chunk upload failed", upload.status);
+      throw new Error("TikTok accepted the post request but the video upload failed. Please check the draft and try again.");
+    }
+  }
+  const { data: job, error: jobError } = await admin.from("social_publish_jobs").upsert({
+    user_id: userId, campaign_id: campaign.id, provider: "tiktok",
+    provider_publish_id: init.data.publish_id, status: "processing",
+    message: "Video uploaded; waiting for TikTok to process it.",
+    updated_at: new Date().toISOString()
+  }, { onConflict: "user_id,campaign_id,provider" }).select("id").single();
+  if (jobError || !job) throw new Error("TikTok received the video, but MuskySocials could not save its status. Contact support before retrying to avoid a duplicate.");
+  return {
+    status: "processing", publish_id: init.data.publish_id,
+    message: "Video sent to TikTok. It may take a few minutes to process; check status before trying again.",
+    creator_name: creator.creator_nickname || connection.display_name || "TikTok account"
+  };
+}
+
 async function handleCallback(req: Request) {
   const url = new URL(req.url);
   const errorCode = url.searchParams.get("error");
@@ -180,6 +350,29 @@ Deno.serve(async (req: Request) => {
         state
       }).toString();
       return json({ authorize_url: authorize.toString() });
+    }
+
+    if (action === "creator-info") {
+      const { token } = await getTikTokConnection(user.id);
+      const info = await tiktokCreatorInfo(token);
+      return json({
+        creator_nickname: info.creator_nickname || "",
+        creator_avatar_url: info.creator_avatar_url || "",
+        privacy_level_options: Array.isArray(info.privacy_level_options) ? info.privacy_level_options : [],
+        max_video_post_duration_sec: info.max_video_post_duration_sec || null,
+        can_post_now: info.can_post !== false
+      });
+    }
+
+    if (action === "publish-video") {
+      const result = await publishTikTokVideo(user.id, body);
+      return json(result);
+    }
+
+    if (action === "publish-status") {
+      const publishId = String(body.publish_id || "");
+      if (!publishId) return json({ error: "Missing TikTok publishing ID." }, 400);
+      return json(await refreshPublishStatus(user.id, publishId));
     }
 
     if (action === "list") {
