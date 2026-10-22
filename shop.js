@@ -57,7 +57,7 @@ html.mx-light #studio .gs-sub{color:#65676b!important}
   document.head.appendChild(st);
 
   // ---------- Gifts screen (everyone)
-  shop.querySelector(".sh").innerHTML = "<h2>Gift shop</h2><div class='gs-chips' id='gsChips'></div><div class='sh-grid' id='gsGrid'>Loading…</div>";
+  shop.querySelector(".sh").innerHTML = '<div class="ms-market-head"><div><h2>Marketplace</h2><p>Explore products and shop from MuskySocials</p></div><span aria-hidden="true" style="font-size:28px">⌕</span></div><div class="ms-market-hero"><div><strong>Discover something you love</strong><p>Browse available items and contact us to complete your order.</p></div><span class="ms-market-art" aria-hidden="true">🛍️</span></div><div class="ms-section-head"><strong>Browse categories</strong></div><div class="gs-chips" id="gsChips"></div><div class="ms-section-head"><strong>Trending now</strong></div><div class="sh-grid" id="gsGrid">Loading…</div>';
   const chips = shop.querySelector("#gsChips");
   const gridEl = shop.querySelector("#gsGrid");
   let items = [];
