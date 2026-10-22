@@ -23,7 +23,7 @@ function startViralBoost() {
       <h2>Viral Boost Studio 🚀</h2>
       <p class="vb-muted">Prepare stronger content and organize promotion campaigns in one place.</p>
     </div>
-    <div class="vb-info"><strong>What this does:</strong> create content drafts and save your campaign plan. Actual ads, direct publishing, and guaranteed views are not connected yet.</div>
+    <div class="vb-info"><strong>What this does:</strong> prepare and save drafts for free. Promote Post charges 950 coins for a picture or 1,020 coins for a video and records a promotion request. Actual advertising delivery is not connected yet, so a request is not a live ad.</div>
     <div class="vb-card">
       <h3>1. Add your content</h3>
       <label for="vbTitle">Campaign name</label>
@@ -33,6 +33,9 @@ function startViralBoost() {
       <div id="vbPreviewWrap" class="vb-preview-wrap" hidden></div>
       <label for="vbUrl">Or paste a post link (optional if you upload a file)</label>
       <input id="vbUrl" class="vb-input" type="url" maxlength="2000" placeholder="https://…">
+      <label for="vbMediaType">Promotion type</label>
+      <select id="vbMediaType" class="vb-input"><option value="picture">Picture post — 950 coins</option><option value="video">Video post — 1,020 coins</option></select>
+      <p class="vb-small">Choose the type that matches the post you want promoted. Drafts and editing are free. Coins are charged only after you press Promote Post and confirm.</p>
       <p class="vb-small">Use content you own or have permission to promote. Uploaded files are private to your account.</p>
     </div>
     <div class="vb-card">
@@ -88,6 +91,7 @@ function startViralBoost() {
     #viralBoostSection .vb-card h3{font-size:17px;margin:0 0 10px}
     #viralBoostSection .vb-card label{display:block;margin:12px 0 6px;font-size:13px;font-weight:650;color:var(--sh-text,#050505)}
     #viralBoostSection .vb-input{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;border:1px solid var(--sh-line,#dadde1);border-radius:10px;background:var(--sh-card,#fff);color:var(--sh-text,#050505);padding:11px 12px;font:inherit;font-size:16px}
+    #viralBoostSection select.vb-input{min-height:44px}
     #viralBoostSection input[type=file].vb-input{font-size:13px;padding:9px}
     #viralBoostSection .vb-preview-wrap{margin-top:10px}
     #viralBoostSection .vb-preview-wrap img,#viralBoostSection .vb-preview-wrap video{display:block;width:100%;max-height:360px;object-fit:contain;background:#080e1c;border-radius:12px}
@@ -135,6 +139,7 @@ function startViralBoost() {
     if (!file) return;
     const allowed = /^(image\/(jpeg|png|webp|gif)|video\/(mp4|webm|quicktime|x-m4v))$/i.test(file.type);
     if (!allowed) { $("vbFile").value = ""; say("Please choose a JPG, PNG, WebP, GIF, MP4, WebM, or MOV file.", true); return; }
+    $("vbMediaType").value = file.type.startsWith("video/") ? "video" : "picture";
     if (file.size > MAX_FILE) { $("vbFile").value = ""; say("That file is over 100 MB. Choose a smaller file.", true); return; }
     selectedFile = file;
     previewUrl = URL.createObjectURL(file);
@@ -318,7 +323,7 @@ function startViralBoost() {
       }
       if (saveId) {
         const { data: updated, error } = await sb.from("viral_campaigns")
-          .update({ title, post_url: postUrl || null, platforms, caption, hashtags })
+          .update({ title, post_url: postUrl || null, platforms, caption, hashtags, media_type: $("vbMediaType").value })
           .eq("id", saveId).eq("user_id", userId).select("id").maybeSingle();
         if (error || !updated) throw new Error("Could not update draft: " + (error && error.message || "draft not found or permission denied"));
         editingDraftId = null;
@@ -329,6 +334,7 @@ function startViralBoost() {
       } else {
         const { error } = await sb.from("viral_campaigns").insert({
           user_id: userId, title, post_url: postUrl || null, platforms, caption, hashtags,
+          media_type: $("vbMediaType").value,
           asset_path: path, original_file_name: selectedFile ? selectedFile.name : null,
           content_type: selectedFile ? selectedFile.type : null, file_size: selectedFile ? selectedFile.size : null
         });
@@ -347,6 +353,36 @@ function startViralBoost() {
     }
   }
   $("vbSave").addEventListener("click", saveDraft);
+
+  async function requestPromotion(row, button) {
+    if (row.promotion_status && row.promotion_status !== "draft") {
+      return say("This promotion has already been requested. No additional coins were charged.", true);
+    }
+    const mediaType = row.media_type || ((row.content_type || "").startsWith("video/") ? "video" : "picture");
+    const cost = mediaType === "video" ? 1020 : 950;
+    if (!row.post_url && !row.asset_path) return say("Add a post link or upload a media file before promoting.", true);
+    if (!Array.isArray(row.platforms) || !row.platforms.length) return say("Edit this draft and choose at least one platform before promoting.", true);
+    const confirmed = confirm(
+      "Promote this " + mediaType + " post for " + cost.toLocaleString("en-NG") +
+      " coins? The coins will be deducted now and a promotion request recorded. Actual advertising delivery is not connected yet, so this will not create a live ad."
+    );
+    if (!confirmed) return;
+    button.disabled = true;
+    const oldText = button.textContent;
+    button.textContent = "Submitting…";
+    try {
+      const { data, error } = await sb.rpc("request_viral_campaign_promotion", { p_campaign_id: row.id });
+      if (error) throw error;
+      const result = Array.isArray(data) ? data[0] : data;
+      const charged = Number(result && result.cost || cost);
+      say("Promotion request recorded. " + charged.toLocaleString("en-NG") + " coins charged. Status: awaiting fulfillment; this is not a live advertisement.");
+      await loadDrafts();
+    } catch (error) {
+      say(String(error && error.message || "Could not submit the promotion request. No successful request was confirmed."), true);
+      button.disabled = false;
+      button.textContent = oldText;
+    }
+  }
 
   async function openAsset(path, name) {
     const { data, error } = await sb.storage.from(BUCKET).createSignedUrl(path, 300, name ? { download: name } : undefined);
@@ -369,7 +405,7 @@ function startViralBoost() {
     try {
       const userId = await getUserId();
       const { data, error } = await sb.from("viral_campaigns")
-        .select("id,title,post_url,platforms,caption,hashtags,asset_path,original_file_name,created_at")
+        .select("id,title,post_url,platforms,caption,hashtags,asset_path,original_file_name,content_type,media_type,promotion_status,promotion_cost,created_at")
         .eq("user_id", userId).order("created_at", { ascending: false }).limit(20);
       if (error) throw error;
       if (!data || !data.length) { box.innerHTML = "<p class='vb-muted'>No saved drafts yet. Create your first one above.</p>"; return; }
@@ -380,7 +416,9 @@ function startViralBoost() {
         (row.original_file_name ? '<p class="vb-draft-meta">📎 ' + esc(row.original_file_name) + '</p>' : '') +
         (row.caption ? '<div class="vb-draft-copy">' + esc(row.caption) + '</div>' : '') +
         (row.hashtags ? '<div class="vb-draft-copy">' + esc(row.hashtags) + '</div>' : '') +
-        '<div class="vb-draft-actions"><button type="button" class="vb-btn secondary" data-vb-edit="' + esc(row.id) + '">Edit draft</button>' + (row.asset_path ? '<button type="button" class="vb-btn secondary" data-vb-open="' + esc(row.id) + '">Open uploaded file</button>' : '') +
+        '<p class="vb-draft-meta">Type: ' + esc(row.media_type || ((row.content_type || "").startsWith("video/") ? "video" : "picture")) + (row.promotion_status && row.promotion_status !== "draft" ? " · Promotion: " + esc(row.promotion_status) + (row.promotion_cost ? " (" + esc(String(row.promotion_cost)) + " coins)" : "") : "") + '</p>' +
+        (row.promotion_status && row.promotion_status !== "draft" ? '<p class="vb-small">Promotion requested. This is not a live advertisement; fulfillment still requires the promotion integration.</p>' : '') +
+        '<div class="vb-draft-actions"><button type="button" class="vb-btn secondary" data-vb-edit="' + esc(row.id) + '">Edit draft</button>' + (row.promotion_status && row.promotion_status !== "draft" ? "" : '<button type="button" class="vb-btn" data-vb-promote="' + esc(row.id) + '">Promote Post · ' + ((row.media_type || ((row.content_type || "").startsWith("video/") ? "video" : "picture")) === "video" ? "1,020" : "950") + ' coins</button>') + (row.asset_path ? '<button type="button" class="vb-btn secondary" data-vb-open="' + esc(row.id) + '">Open uploaded file</button>' : '') +
         '<button type="button" class="vb-btn secondary" data-vb-copy="' + esc(row.id) + '">Copy caption</button>' +
         '<button type="button" class="vb-btn secondary" data-vb-delete="' + esc(row.id) + '">Delete draft</button></div>' +
         '<span hidden data-vb-path="' + esc(row.id) + '">' + esc(row.asset_path || "") + '</span></article>'
@@ -397,6 +435,7 @@ function startViralBoost() {
     $("vbFile").disabled = true;
     $("vbTitle").value = row.title || "";
     $("vbUrl").value = row.post_url || "";
+    $("vbMediaType").value = row.media_type || ((row.content_type || "").startsWith("video/") ? "video" : "picture");
     $("vbTopic").value = "";
     $("vbCaption").value = row.caption || "";
     $("vbHashtags").value = row.hashtags || "";
@@ -412,6 +451,7 @@ function startViralBoost() {
   }
   pane.addEventListener("click", async event => {
     const edit = event.target.closest("[data-vb-edit]");
+    const promote = event.target.closest("[data-vb-promote]");
     const open = event.target.closest("[data-vb-open]");
     const copy = event.target.closest("[data-vb-copy]");
     const del = event.target.closest("[data-vb-delete]");
@@ -419,6 +459,10 @@ function startViralBoost() {
     if (edit) {
       const row = rows.find(r => r.id === edit.dataset.vbEdit);
       editDraft(row);
+    }
+    if (promote) {
+      const row = rows.find(r => r.id === promote.dataset.vbPromote);
+      if (row) await requestPromotion(row, promote);
     }
     if (open) {
       const row = rows.find(r => r.id === open.dataset.vbOpen);
