@@ -34,11 +34,30 @@ create table if not exists public.social_oauth_states (
 create index if not exists social_oauth_states_expiry_idx
   on public.social_oauth_states (expires_at);
 
+create table if not exists public.social_publish_jobs (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  campaign_id uuid not null references public.viral_campaigns(id) on delete cascade,
+  provider text not null check (provider in ('tiktok','instagram','facebook','youtube','x')),
+  provider_publish_id text,
+  status text not null default 'processing' check (status in ('processing','published','failed','unknown')),
+  message text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (user_id, campaign_id, provider)
+);
+
+create index if not exists social_publish_jobs_user_idx
+  on public.social_publish_jobs (user_id, created_at desc);
+
 alter table public.social_connections enable row level security;
 alter table public.social_oauth_states enable row level security;
 
 -- OAuth tokens and state are only read/written by trusted server-side Edge Functions.
 revoke all on table public.social_connections from public, anon, authenticated;
 revoke all on table public.social_oauth_states from public, anon, authenticated;
+alter table public.social_publish_jobs enable row level security;
+revoke all on table public.social_publish_jobs from public, anon, authenticated;
 grant all on table public.social_connections to service_role;
 grant all on table public.social_oauth_states to service_role;
+grant all on table public.social_publish_jobs to service_role;
