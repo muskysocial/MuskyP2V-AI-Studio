@@ -385,7 +385,8 @@ function startViralBoost() {
   function makeIdeas() {
     const topic = $("vbTopic").value.trim();
     const title = $("vbTitle").value.trim();
-    const base = topic || title || $("vbCategory").selectedOptions[0]?.textContent || "my latest content";
+    const categoryLabel = $("vbCategory").selectedOptions[0]?.textContent;
+    const base = topic || title || ($("vbCategory").value ? categoryLabel : "my latest content");
     const lower = base.toLowerCase();
     const tags = new Set(["#MuskySocials", "#ForYou"]);
     const categories = [
