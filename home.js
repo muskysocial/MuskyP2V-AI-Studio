@@ -196,6 +196,36 @@ html.mx-light body{background:#f7f8fc!important}
 #mxBar button span{font-size:21px!important}
 @media(min-width:620px){#studio #homeSection{padding:12px 18px 100px!important}.ms-post .hm-body{-webkit-line-clamp:5}}
 
+
+/* Profile redesign stage: responsive public member profile, using existing member data only. */
+.md-profile-intro{padding-bottom:8px!important}
+.md-profile-intro .md-eyebrow{margin:18px 0 5px;color:#1877f2;font-size:10px;font-weight:900;letter-spacing:.15em}
+.md-profile-intro h2{margin:0;font-size:26px;letter-spacing:-.04em}
+.md-profile-intro>p:last-child{margin:6px 0 0;color:var(--sh-sub)}
+.md-profile-redesign{overflow:hidden;padding:0!important;border-radius:22px!important;border-color:rgba(24,119,242,.16)!important;box-shadow:0 12px 36px rgba(31,65,112,.08)}
+.md-profile-cover{height:112px;display:flex;align-items:center;justify-content:space-between;padding:18px 20px;background:linear-gradient(120deg,#1877f2 0%,#6aa8ff 48%,#f45b9a 100%);color:#fff}
+.md-cover-mark{width:43px;height:43px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.65);border-radius:15px;background:rgba(255,255,255,.18);font-size:23px;font-weight:900}
+.md-cover-caption{max-width:150px;text-align:right;font-size:11px;font-weight:800;letter-spacing:.02em}
+.md-profile-main{padding:0 20px 20px}
+.md-profile-identity{display:flex;align-items:center;gap:14px;margin-top:-30px;position:relative}
+.md-profile-avatar-wrap{position:relative;flex:none;padding:4px;border-radius:50%;background:var(--sh-card);box-shadow:0 3px 14px rgba(15,40,80,.12)}
+.md-profile-redesign .md-avatar{width:76px!important;height:76px!important;border:3px solid #fff!important;font-size:27px!important}
+.md-profile-online{position:absolute;right:6px;bottom:6px;width:13px;height:13px;border:2px solid #fff;border-radius:50%;background:#9aa4b2}
+.md-profile-title{min-width:0;padding-top:30px}
+.md-profile-name-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.md-profile-redesign .md-profile-name-row h2{margin:0;font-size:21px;overflow-wrap:anywhere}
+.md-profile-handle{margin:4px 0;color:var(--sh-sub);font-size:12px}
+.md-profile-location{display:inline-block;margin-top:3px;color:var(--sh-sub);font-size:12px}
+.md-profile-redesign .md-profile-bio{margin:19px 0 14px;color:var(--sh-text);font-size:14px;white-space:pre-wrap}
+.md-profile-stats{gap:9px;margin:14px 0}
+.md-profile-stats .md-count{border:1px solid rgba(24,119,242,.13);background:linear-gradient(145deg,rgba(24,119,242,.055),rgba(244,91,154,.045));border-radius:15px;padding:13px 10px}
+.md-profile-stats .md-count strong{font-size:21px;color:#1877f2}
+.md-profile-stats .md-count span{font-weight:650}
+.md-profile-actions{margin-top:14px}
+.md-profile-actions button{min-height:43px;border-radius:13px;font-size:13px}
+.md-profile-actions .md-message-button{background:var(--sh-card);color:var(--sh-text);border:1px solid var(--sh-line)}
+.md-profile-note{display:flex;align-items:flex-start;gap:7px;margin-top:15px;padding:11px 12px;border-radius:12px;background:rgba(244,91,154,.07);color:var(--sh-sub);font-size:11px;line-height:1.45}
+@media(max-width:420px){.md-profile-cover{height:94px;padding:14px}.md-profile-main{padding:0 14px 16px}.md-profile-redesign .md-profile-name-row h2{font-size:19px}.md-profile-redesign .md-avatar{width:68px!important;height:68px!important}.md-profile-intro h2{font-size:23px}}
 `;
   document.head.appendChild(st);
 
@@ -551,15 +581,19 @@ html.mx-light body{background:#f7f8fc!important}
     const p = selectedPerson;
     const following = followedIds.has(p.id);
     const bio = p.bio ? esc(p.bio) : "This member hasn't added a bio yet.";
-    const country = p.country ? '<p class="muted">📍 ' + esc(p.country) + '</p>' : "";
-    pane.innerHTML = '<div class="md-hero"><button type="button" class="pt-btn" data-go="peopleSection">‹ Back to people</button><h2 style="margin-top:14px">Member profile</h2><p>Get to know the people in your community.</p></div>' +
-      '<div class="md-profile"><div class="md-profile-top">' + personAvatar(p) + '<div><h2>' + esc(p.display_name) + '</h2>' +
-      verifiedMark(p) + country + '</div></div><p class="md-profile-bio">' + bio + '</p>' +
-      '<div class="md-counts"><div class="md-count"><strong>' + Number(p.follower_count || 0) + '</strong><span>Followers</span></div>' +
-      '<div class="md-count"><strong>' + Number(p.following_count || 0) + '</strong><span>Following</span></div></div>' +
-      '<div class="md-actions"><button type="button" class="pt-btn md-follow' + (following ? " is-following" : "") + '" data-profile-follow="' + p.id + '">' +
-      (following ? "Following · Unfollow" : "Follow") + '</button><button type="button" class="pt-btn" data-message-soon="' + p.id + '">Message</button></div>' +
-      '<span class="md-coming">Private messaging · Coming soon</span></div>';
+    const country = p.country ? '<span class="md-profile-location">📍 ' + esc(p.country) + '</span>' : "";
+    pane.innerHTML = '<div class="md-hero md-profile-intro"><button type="button" class="pt-btn" data-go="peopleSection">← Back to people</button><p class="md-eyebrow">MUSKYSOCIALS COMMUNITY</p><h2>Member profile</h2><p>Connect with people and discover your community.</p></div>' +
+      '<article class="md-profile md-profile-redesign">' +
+      '<div class="md-profile-cover"><span class="md-cover-mark">M</span><span class="md-cover-caption">Your community. Your people.</span></div>' +
+      '<div class="md-profile-main"><div class="md-profile-identity"><div class="md-profile-avatar-wrap">' + personAvatar(p) + '<span class="md-profile-online" aria-label="Online status not available"></span></div>' +
+      '<div class="md-profile-title"><div class="md-profile-name-row"><h2>' + esc(p.display_name || "MuskySocials member") + '</h2>' + verifiedMark(p) + '</div><p class="md-profile-handle">Member on MuskySocials</p>' + country + '</div></div>' +
+      '<p class="md-profile-bio">' + bio + '</p>' +
+      '<div class="md-counts md-profile-stats"><div class="md-count"><strong>' + Number(p.follower_count || 0).toLocaleString() + '</strong><span>Followers</span></div>' +
+      '<div class="md-count"><strong>' + Number(p.following_count || 0).toLocaleString() + '</strong><span>Following</span></div></div>' +
+      '<div class="md-actions md-profile-actions"><button type="button" class="pt-btn md-follow' + (following ? " is-following" : "") + '" data-profile-follow="' + esc(p.id) + '">' +
+      (following ? "✓ Following · Unfollow" : "+ Follow") + '</button><button type="button" class="pt-btn md-message-button" data-message-soon="' + esc(p.id) + '">✉ Message</button></div>' +
+      '<div class="md-profile-note"><span aria-hidden="true">🔒</span><span>Private messaging is not available yet. Follow this member to stay connected.</span></div>' +
+      '</div></article>';
   }
 
   async function toggleFollow(id) {
