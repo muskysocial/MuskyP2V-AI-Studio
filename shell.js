@@ -520,8 +520,8 @@ function init() {
   // Bottom bar
   const bar = document.createElement("nav");
   bar.id = "mxBar";
-  bar.innerHTML = [["homeSection", "🏠", "Home"], ["exploreSection", "🧭", "Explore"], ["jobsSection", "💼", "Jobs"], ["toolsHubSection", "✨", "Tools"], ["profileSection", "👤", "Profile"]]
-    .map(([id, i, l]) => '<button data-go="' + id + '"><span>' + i + "</span>" + l + "</button>").join("");
+  bar.innerHTML = [["homeSection", "⌂", "Home"], ["shopSection", "▣", "Marketplace"], ["createPostSection", "＋", "Create"], ["messagesSection", "☏", "Messages"], ["profileSection", "♙", "Profile"]]
+    .map(([id, i, l]) => '<button data-go="' + id + '" aria-label="' + l + '"><span>' + i + "</span>" + l + "</button>").join("");
   document.body.appendChild(bar);
 
   // Global in-app back navigation: remember section transitions and provide Home as fallback.
@@ -570,6 +570,8 @@ function init() {
       jobsSection: ["jobsSection"],
       toolsHubSection: ["toolsHubSection", "videoSection", "headswapSection", "chatSection", "voiceCloneSection", "voiceSection", "cameraSection", "viralBoostSection", "creditSection"],
       profileSection: ["profileSection", "settingsSection", "adminSection", "membershipSection"],
+      messagesSection: ["messagesSection"],
+      createPostSection: ["createPostSection", "eventsSection"],
     };
     chat.classList.toggle("mx-chat-fullscreen", id === "chatSection");
     if (id === "chatSection") loadHistory();
