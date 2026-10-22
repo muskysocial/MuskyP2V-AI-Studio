@@ -82,6 +82,18 @@ html.mx-light #studio .ex-tag.ok{color:#0a7d33!important}
 html.mx-light #studio .ex-card b{color:#050505!important}
 
 .md-hero{padding:18px;border:1px solid var(--sh-line);border-radius:18px;background:linear-gradient(130deg,rgba(24,119,242,.12),rgba(244,91,154,.12));margin-bottom:14px}
+.md-discover-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.md-discover-icon{display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#1877f2,#f45b9a);color:#fff;font-size:22px}
+.md-discover-head h2{margin:0;font-size:23px}
+.md-discover-head p{margin:3px 0 0;font-size:13px}
+.md-filter-row{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;margin:0 0 8px}
+.md-filter{flex:none;padding:9px 15px;border:1px solid var(--sh-line);border-radius:999px;background:var(--sh-card);color:var(--sh-sub);font-size:13px;font-weight:700}
+.md-filter.is-active{border-color:#1877f2;background:#1877f2;color:#fff}
+.md-list-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 2px 10px}
+.md-list-heading strong{font-size:16px}
+.md-list-heading span{font-size:12px;color:var(--sh-sub)}
+.md-people-list .md-card{transition:transform .15s ease,box-shadow .15s ease}
+.md-people-list .md-card:active{transform:scale(.99)}
 .md-hero h2{margin:0 0 5px;font-size:24px;letter-spacing:-.03em}
 .md-hero p{margin:0;color:var(--sh-sub)}
 .md-search{display:flex;gap:8px;margin:14px 0}
@@ -443,6 +455,7 @@ html.mx-light body{background:#f7f8fc!important}
   let followedIds = new Set();
   let selectedPerson = null;
   let peopleLoadToken = 0;
+  let peopleFilter = "discover";
 
   const publicAvatarUrl = (person) => {
     if (!person || !person.avatar_path) return "";
@@ -461,14 +474,23 @@ html.mx-light body{background:#f7f8fc!important}
     const box = q("#mdPeopleList");
     if (!box) return;
     const search = (q("#mdSearch") && q("#mdSearch").value || "").trim().toLowerCase();
-    const visible = people.filter((p) => p.id !== uid && (
+    const visible = people.filter((p) => p.id !== uid &&
+      (peopleFilter === "discover" || followedIds.has(p.id)) && (
       (p.display_name || "").toLowerCase().includes(search) ||
       (p.country || "").toLowerCase().includes(search) ||
       (p.bio || "").toLowerCase().includes(search)
     ));
+    const heading = q("#mdPeopleHeading");
+    if (heading) heading.textContent = peopleFilter === "following" ? "People you follow" : "Discover people";
+    const count = q("#mdPeopleCount");
+    if (count) count.textContent = visible.length + (visible.length === 1 ? " member" : " members");
+    q("#mdFilterDiscover")?.classList.toggle("is-active", peopleFilter === "discover");
+    q("#mdFilterFollowing")?.classList.toggle("is-active", peopleFilter === "following");
     if (!visible.length) {
-      box.innerHTML = '<div class="pt-card"><strong>' + (search ? "No members match that search." : "No other members yet.") +
-        '</strong><p class="muted">New people will appear here as they join MuskySocials.</p></div>';
+      const emptyTitle = search ? "No members match that search." : (peopleFilter === "following" ? "You are not following anyone yet." : "No other members yet.");
+      const emptyBody = peopleFilter === "following" && !search ? "Follow a member from Discover and they will appear here." : "New people will appear here as they join MuskySocials.";
+      box.innerHTML = '<div class="pt-card"><strong>' + emptyTitle +
+        '</strong><p class="muted">' + emptyBody + '</p></div>';
       return;
     }
     box.innerHTML = visible.map((p) => {
@@ -561,9 +583,11 @@ html.mx-light body{background:#f7f8fc!important}
   }
 
   mkPane("peopleSection",
-    '<div class="md-hero"><h2>Meet people 👋</h2><p>Discover members, find people with shared interests, and grow your circle.</p>' +
+    '<div class="md-hero"><div class="md-discover-head"><span class="md-discover-icon" aria-hidden="true">👥</span><div><h2>Friends & Discover</h2><p>Find your people and grow your circle.</p></div></div>' +
     '<div class="md-search"><input id="mdSearch" type="search" maxlength="80" placeholder="Search by name, country or bio…" aria-label="Search members"></div>' +
     '<p class="muted" style="font-size:12px">Only public profile details are shown. Email, phone numbers and account credits stay private.</p></div>' +
+    '<div class="md-filter-row" role="group" aria-label="Filter members"><button type="button" id="mdFilterDiscover" class="md-filter is-active" data-people-filter="discover">Discover</button><button type="button" id="mdFilterFollowing" class="md-filter" data-people-filter="following">Following</button></div>' +
+    '<div class="md-list-heading"><strong id="mdPeopleHeading">Discover people</strong><span id="mdPeopleCount">Loading…</span></div>' +
     '<div id="mdPeopleList" class="md-people-list"><div class="pt-card">Loading members…</div></div>'
   );
   mkPane("publicProfileSection",
@@ -574,6 +598,8 @@ html.mx-light body{background:#f7f8fc!important}
   if (peopleSection) {
     peopleSection.addEventListener("click", (e) => {
       const t = e.target;
+      const filter = t.closest("[data-people-filter]");
+      if (filter) { peopleFilter = filter.dataset.peopleFilter === "following" ? "following" : "discover"; return paintPeople(); }
       const follow = t.closest("[data-follow]");
       if (follow) { e.preventDefault(); e.stopPropagation(); return toggleFollow(follow.dataset.follow); }
       const person = t.closest("[data-person]");
