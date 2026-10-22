@@ -120,8 +120,86 @@ html.mx-light #studio .ex-card b{color:#050505!important}
 @media(min-width:620px){.md-people-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:380px){.md-card{padding:12px}.md-avatar{width:46px;height:46px}.md-card-footer{align-items:flex-start;flex-direction:column}.md-follow{width:100%}.hm-meet-copy small{font-size:10px}}
 
+
+/* Social-first mobile interface: blue + pink accents on a clean white canvas */
+:root{--ms-blue:#1877f2;--ms-pink:#f45b9a;--ms-ink:#172033;--ms-paper:#fff}
+html.mx-light body{background:#f7f8fc!important}
+#studio #homeSection{max-width:760px;margin:0 auto;padding:8px 10px 92px!important}
+.ms-top-menu{width:42px;height:42px;flex:0 0 42px;border:0;border-radius:50%;background:#eef4ff;color:#1877f2;font-size:23px;font-weight:700;display:grid;place-items:center;margin-right:8px}
+.topbar{gap:8px!important}
+.topbar .brand{min-width:0;flex:1}
+.topbar .brand strong{font-size:17px!important;letter-spacing:-.4px}
+.topbar .brand small{font-size:9px!important;letter-spacing:.5px}
+.ms-top-avatar{position:relative;display:grid;place-items:center;width:42px;height:42px;flex:0 0 42px;padding:0;border:3px solid #fce3ef;border-radius:50%;background:linear-gradient(135deg,#1877f2,#f45b9a);color:#fff;font-weight:800;font-size:16px;overflow:visible}
+.ms-top-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.ms-top-avatar:after{content:"";position:absolute;right:-1px;bottom:0;width:10px;height:10px;border-radius:50%;background:#22c55e;border:2px solid #fff}
+#msQuickMenu{position:fixed;z-index:120;top:68px;left:12px;width:min(280px,calc(100vw - 24px));padding:10px;background:#fff;border:1px solid #e7eaf2;border-radius:18px;box-shadow:0 16px 48px #15264b30;display:none}
+#msQuickMenu.open{display:grid;gap:4px}
+#msQuickMenu button{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border:0;border-radius:11px;background:#fff;color:#20283b;text-align:left;font-size:14px;font-weight:650}
+#msQuickMenu button:active{background:#f0f5ff}
+.ms-search{display:flex;align-items:center;gap:9px;margin:8px 0 14px;padding:0 12px;height:46px;background:#eef1f7;border:1px solid #e7eaf2;border-radius:15px}
+.ms-search .glass{font-size:18px;color:#667085}
+.ms-search input{flex:1;min-width:0;border:0!important;outline:0;background:transparent!important;color:#172033!important;padding:8px 0!important;font-size:14px}
+.ms-search button{border:0;background:transparent;color:#1877f2;font-size:19px;padding:5px}
+.ms-section-head{display:flex;align-items:center;justify-content:space-between;margin:15px 2px 10px}
+.ms-section-head strong{font-size:17px;color:#172033}
+.ms-section-head button{border:0;background:transparent;color:#1877f2;font-weight:700;font-size:12px}
+.ms-story-strip{display:flex;gap:13px;overflow-x:auto;padding:2px 2px 12px;margin-bottom:10px;scrollbar-width:none}
+.ms-story-strip::-webkit-scrollbar{display:none}
+.ms-story{display:flex;flex-direction:column;align-items:center;gap:6px;flex:0 0 62px;width:62px;border:0;background:transparent;padding:0;color:#273149;font-size:11px;font-weight:650}
+.ms-story-ring{width:58px;height:58px;display:grid;place-items:center;border-radius:50%;padding:3px;background:linear-gradient(135deg,#1877f2 10%,#f45b9a 58%,#ffb15c);position:relative}
+.ms-story-ring>span,.ms-story-ring img{width:100%;height:100%;border-radius:50%;border:2px solid #fff;object-fit:cover;background:#edf3ff;display:grid;place-items:center;color:#1877f2;font-size:19px;font-weight:800}
+.ms-story-add .ms-story-ring{background:#e8efff;padding:2px}
+.ms-story-add .ms-story-ring>span{border:0;background:#fff;font-size:28px;color:#1877f2}
+.ms-compose{display:flex;align-items:center;gap:10px;padding:12px;background:#fff;border:1px solid #e8ebf2;border-radius:18px;box-shadow:0 3px 14px #1b2b4b08}
+.ms-compose .hm-av{width:42px;height:42px;border:2px solid #fce3ef}
+.ms-compose .hm-pill{background:#f1f4f9;color:#657087;border:1px solid #e7eaf2;padding:13px 15px}
+.ms-creditline{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 3px 12px;color:#748096;font-size:11px}
+.ms-creditline strong{color:#1877f2;font-weight:750}
+.ms-post{overflow:hidden;background:#fff!important;border:1px solid #e8ebf2!important;border-radius:20px!important;box-shadow:0 4px 20px #16274b0a!important;margin:12px 0!important;padding:0!important}
+.ms-post .hm-head{padding:14px 14px 8px;margin:0;gap:10px}
+.ms-post .hm-logo{width:42px;height:42px;border:2px solid #fce3ef;font-size:16px}
+.ms-post .ms-author{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}
+.ms-post .ms-author strong{font-size:13px;color:#19233a}
+.ms-post .ms-handle{font-size:11px;color:#8992a5}
+.ms-post .ms-more{width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:#64708a;font-size:23px}
+.ms-post .hm-title{padding:4px 14px 0;color:#182238;font-size:15px}
+.ms-post .hm-body{padding:0 14px 10px;color:#303b51;font-size:14px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.ms-post .hm-body.expanded{display:block;overflow:visible}
+.ms-readmore{margin:0 14px 10px;padding:0;border:0;background:transparent;color:#1877f2;font-size:12px;font-weight:750}
+.ms-tags{padding:0 14px 10px;color:#1877f2;font-size:12px;line-height:1.5}
+.ms-post .hm-counts{margin:0 14px;padding:10px 0;border-top:1px solid #f0f2f6;border-bottom:1px solid #f0f2f6;color:#7a8498;font-size:12px}
+.ms-post .hm-actions{padding:4px 8px 6px;gap:3px}
+.ms-post .hm-actions button{border-radius:10px;padding:10px 2px;font-size:12px;color:#68748b}
+.ms-post .hm-actions button.on{color:#1877f2;background:#edf4ff}
+.ms-post .hm-c,.ms-post .hm-cbar{margin-left:14px;margin-right:14px}
+.ms-empty-media{display:none}
+.ms-like-dot{display:inline-grid;place-items:center;width:19px;height:19px;border-radius:50%;background:#1877f2;color:#fff;font-size:11px}
+.ms-post .hm-actions button[data-bookmark].on{color:#f45b9a;background:#fff0f6}
+.ms-footer-links{display:flex;justify-content:center;flex-wrap:wrap;gap:8px 14px;padding:20px 6px;color:#9aa2b2;font-size:10px}
+.ms-footer-links a{color:inherit;text-decoration:none}
+#mxBar{box-shadow:0 -5px 24px #17233b0d!important;border-top:1px solid #edf0f6!important}
+#mxBar button{color:#8a93a6!important;font-size:10px!important;font-weight:650}
+#mxBar button.on{color:#1877f2!important}
+#mxBar button span{font-size:21px!important}
+@media(min-width:620px){#studio #homeSection{padding:12px 18px 100px!important}.ms-post .hm-body{-webkit-line-clamp:5}}
+
 `;
   document.head.appendChild(st);
+
+  // Upgrade the existing header in place; keep the app shell and its auth hooks.
+  const topbar=q(".topbar");
+  if(topbar&&!q("#msMenuButton")){
+    const menu=document.createElement("button");menu.id="msMenuButton";menu.className="ms-top-menu";menu.type="button";menu.setAttribute("aria-label","Open navigation menu");menu.textContent="☰";
+    const brand=topbar.querySelector(".brand");if(brand)topbar.insertBefore(menu,brand);
+    const actions=topbar.querySelector(".top-actions");
+    if(actions){actions.innerHTML='<button id="msTopAvatar" class="ms-top-avatar" type="button" aria-label="Open your profile">M</button>';q("#msTopAvatar").addEventListener("click",()=>window.shell.go("profileSection"));}
+    const quick=document.createElement("div");quick.id="msQuickMenu";quick.innerHTML='<button data-msgo="homeSection">🏠 Home</button><button data-msgo="peopleSection">👥 Friends & Discover</button><button data-msgo="notifSection">♡ Activity</button><button data-msgo="profileSection">👤 My profile</button><button data-msgo="shopSection">🛍 Shop</button><button data-msgo="settingsSection">⚙ Settings</button>';
+    document.body.appendChild(quick);
+    menu.addEventListener("click",()=>quick.classList.toggle("open"));
+    quick.addEventListener("click",e=>{const b=e.target.closest("[data-msgo]");if(!b)return;quick.classList.remove("open");window.shell.go(b.dataset.msgo);});
+    document.addEventListener("click",e=>{if(!quick.contains(e.target)&&e.target!==menu)quick.classList.remove("open");});
+  }
 
   const toast = (msg) => {
     const t = document.createElement("div");
@@ -169,6 +247,8 @@ html.mx-light #studio .ex-card b{color:#050505!important}
       avatarPath = data && data.avatar_path;
       const el = q("#hmAv");
       if (el) paintAv(el);
+      const topAvatar=q("#msTopAvatar");
+      if(topAvatar){if(avatarPath)topAvatar.innerHTML='<img src="'+esc(avUrl(avatarPath))+'" alt="">';else topAvatar.textContent=(myName||"M").charAt(0).toUpperCase();}
     } catch {}
   }
   function paintAv(el) {
@@ -215,14 +295,14 @@ html.mx-light #studio .ex-card b{color:#050505!important}
       const liked = uid && set.has(uid);
       const list = cms[p.id] || [];
       const open = openC.has(p.id);
-      return '<div class="pt-card hm-post" data-id="' + p.id + '">' +
-        '<div class="hm-head"><div class="hm-logo">M</div><div><strong>MuskySocials Updates</strong><div class="hm-sub">' + ago(p.created_at) + (p.pinned ? " · 📌 Pinned" : "") + " · 🌐</div></div></div>" +
+      return '<div class="pt-card hm-post ms-post" data-id="' + p.id + '">' +
+        '<div class="hm-head"><div class="hm-logo">M</div><div class="ms-author"><strong>MuskySocials Updates</strong><span class="ms-handle">@muskysocials · ' + ago(p.created_at) + (p.pinned ? " · 📌 Pinned" : "") + '</span></div><button class="ms-more" type="button" data-postmenu="' + p.id + '" aria-label="Post options">⋯</button></div>' +
         '<div class="hm-title">' + esc(p.title) + "</div>" +
-        (p.body ? '<div class="hm-body">' + esc(p.body) + "</div>" : "") +
-        (p.cta !== "none" ? '<div style="margin-top:10px"><button class="pt-btn" data-cta="' + p.cta + '" data-title="' + esc(p.title) + '">' + (p.cta === "buy" ? "Buy" : "Contact us") + "</button></div>" : "") +
-        '<div class="hm-counts"><span>👍 ' + set.size + "</span><span>" + list.length + " comment" + (list.length === 1 ? "" : "s") + "</span></div>" +
-        '<div class="hm-actions"><button data-like="' + p.id + '" class="' + (liked ? "on" : "") + '">👍 Like</button>' +
-        '<button data-cm="' + p.id + '">💬 Comment</button><button data-share="' + p.id + '">↗ Share</button></div>' +
+        (p.body ? '<div class="hm-body" data-caption="' + p.id + '">' + esc(p.body) + "</div>" + (p.body.length>150?'<button class="ms-readmore" data-read="' + p.id + '">Read more</button>':"") + '<div class="ms-tags">' + ((p.title+" "+p.body).match(/#[a-z0-9_]+/ig)||[]).map(tag=>esc(tag)).join(" ") + '</div>' : "") +
+        (p.cta !== "none" ? '<div style="padding:0 14px 10px"><button class="pt-btn" data-cta="' + p.cta + '" data-title="' + esc(p.title) + '">' + (p.cta === "buy" ? "Buy" : "Contact us") + "</button></div>" : "") +
+        '<div class="hm-counts"><span><span class="ms-like-dot">♥</span> ' + set.size + '</span><span>' + list.length + ' comment' + (list.length === 1 ? "" : "s") + '</span></div>' +
+        '<div class="hm-actions"><button data-like="' + p.id + '" class="' + (liked ? "on" : "") + '">♥ Like</button>' +
+        '<button data-cm="' + p.id + '">▢ Comment</button><button data-share="' + p.id + '">↗ Share</button><button data-bookmark="' + p.id + '" aria-label="Bookmark post">▱ Save</button></div>' +
         (open ? list.map((c) => '<div class="hm-c"><strong>' + esc(c.author_name) + "</strong> " + esc(c.body) +
           ' <span class="hm-sub">' + ago(c.created_at) + "</span>" +
           ((uid && c.user_id === uid) || isAdmin ? ' <button class="hm-meta" style="border:0;background:none;font-size:13px" data-cdel="' + c.id + '">🗑</button>' : "") + "</div>").join("") +
@@ -279,6 +359,12 @@ html.mx-light #studio .ex-card b{color:#050505!important}
     if (t.closest("#hmMeet")) { loadPeople(true); return go("peopleSection"); }
     if (t.closest("#hmShare")) return compose();
     if (t.closest("#hmAdmin")) return go("adminSection");
+    const read=t.closest("[data-read]");
+    if(read){const body=q('[data-caption="'+read.dataset.read+'"]');if(body){body.classList.toggle("expanded");read.textContent=body.classList.contains("expanded")?"Read less":"Read more";}return;}
+    const save=t.closest("[data-bookmark]");
+    if(save){save.classList.toggle("on");save.textContent=save.classList.contains("on")?"▰ Saved":"▱ Save";toast(save.classList.contains("on")?"Saved on this screen.":"Removed saved mark.");return;}
+    const menu=t.closest("[data-postmenu]");
+    if(menu){const p=posts.find(x=>x.id===menu.dataset.postmenu);if(p)share(p);return;}
     const lk = t.closest("[data-like]");
     if (lk) return toggleLike(lk.dataset.like);
     const cm = t.closest("[data-cm]");
@@ -315,17 +401,24 @@ html.mx-light #studio .ex-card b{color:#050505!important}
   ];
   window.shell.homeRenderer = (el, ctx) => {
     credits = ctx && ctx.credits;
-    el.innerHTML = '<div class="sh"><div class="hm-comp"><div class="hm-av" id="hmAv">?</div>' +
-      '<button class="hm-pill" id="hmShare">What would you like to share?</button></div>' +
-      '<div class="hm-meta"><span>🪙 ' + (credits === null || credits === undefined ? "…" : credits) + ' credits · refills to 80 daily</span>' +
-      (isAdmin ? '<button id="hmAdmin">🛠️ Admin studio</button>' : "") + "</div>" +
-      '<button class="hm-meet" id="hmMeet" type="button"><span class="hm-meet-icon">👥</span><span class="hm-meet-copy"><strong>Meet people</strong><small>Discover members, follow people and grow your circle</small></span><span class="hm-meet-arrow">›</span></button>' +
-      '<div class="hm-stories">' + STORIES.map(([id, ic, label, bg]) =>
-        '<button class="hm-story" data-go="' + id + '" style="background:' + bg + '"><span class="ic">' + ic + "</span><b>" + label + "</b></button>").join("") + "</div>" +
-      '<div id="hmFeed">Loading…</div></div>';
+    el.innerHTML = '<div class="sh ms-home">' +
+      '<div class="ms-search"><span class="glass">⌕</span><input id="msSearchInput" type="search" placeholder="Search people, posts and more" aria-label="Search MuskySocials"><button id="msVoiceSearch" type="button" aria-label="Voice search">🎙</button></div>' +
+      '<div class="ms-section-head"><strong>Stories</strong><button id="msWatchStories" type="button">Watch all →</button></div>' +
+      '<div class="ms-story-strip"><button class="ms-story ms-story-add" data-go="profileSection"><span class="ms-story-ring"><span>＋</span></span><span>Add story</span></button>' +
+      STORIES.slice(1).map(([id, ic, label, bg]) => '<button class="ms-story" data-go="' + id + '"><span class="ms-story-ring"><span style="background:' + bg + ';color:#fff">' + ic + '</span></span><span>' + label + '</span></button>').join("") + '</div>' +
+      '<div class="ms-compose"><div class="hm-av" id="hmAv">?</div><button class="hm-pill" id="hmShare">What would you like to share?</button></div>' +
+      '<div class="ms-creditline"><span><strong>MuskySocials</strong> · Connect, discover, create</span><span>🪙 ' + (credits === null || credits === undefined ? "…" : credits) + '</span></div>' +
+      '<button class="hm-meet" id="hmMeet" type="button"><span class="hm-meet-icon">👥</span><span class="hm-meet-copy"><strong>Discover friends</strong><small>Find people, follow members and grow your circle</small></span><span class="hm-meet-arrow">›</span></button>' +
+      '<div id="hmFeed">Loading feed…</div>' +
+      '<div class="ms-footer-links"><a href="#" data-go="aboutSection">About</a><a href="#" data-go="aboutSection">Accessibility</a><a href="#" data-go="contactSection">Help Center</a><a href="#" data-go="privacySection">Privacy</a><a href="#" data-go="privacySection">Terms</a><a href="#" data-go="shopSection">Advertising</a></div></div>';
     paintAv(q("#hmAv"));
     paintFeed();
     fetchFeed(false);
+    const search=q("#msSearchInput");
+    if(search) search.addEventListener("keydown",e=>{if(e.key==="Enter"&&search.value.trim()){window.shell.go("peopleSection");setTimeout(()=>{const target=q("#mdSearch")||q("#mdSearchInput")||q("#peopleSearch");if(target){target.value=search.value.trim();target.dispatchEvent(new Event("input",{bubbles:true}));}},150);}});
+    const voice=q("#msVoiceSearch");
+    if(voice) voice.addEventListener("click",()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast("Voice search isn't supported in this browser. You can type in search.");return;}const rec=new SR();rec.lang=navigator.language||"en-US";rec.onresult=e=>{if(search)search.value=e.results[0][0].transcript;};rec.onerror=()=>toast("Couldn't hear that. Please try again.");rec.start();});
+    const watch=q("#msWatchStories");if(watch)watch.addEventListener("click",()=>go("peopleSection"));
   };
   // Fix the startup race: shell.js can render its legacy tile grid before this
   // module finishes loading. Re-render immediately so the new social home is
