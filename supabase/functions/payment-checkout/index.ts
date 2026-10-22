@@ -56,6 +56,7 @@ Deno.serve(async (req: Request) => {
 
   let body: { plan_code?: string };
   try { body = await req.json(); } catch { return reply({ error: "Invalid request body." }, 400); }
+  if (body.action === "status") return reply({ configured: true, mode: "test" });
   const planCode = String(body.plan_code || "");
   const plan = plans[planCode];
   if (!plan) return reply({ error: "Choose a valid membership plan." }, 400);
