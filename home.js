@@ -175,7 +175,9 @@ html.mx-light #studio .ex-card b{color:#050505!important}
     if (avatarPath) { el.style.backgroundImage = "url('" + avUrl(avatarPath) + "')"; el.textContent = ""; }
     else { el.style.backgroundImage = ""; el.textContent = myName.charAt(0).toUpperCase(); }
   }
-  sb.auth.onAuthStateChange(() => setTimeout(loadMe, 0));
+  sb.auth.onAuthStateChange(() => {
+    setTimeout(() => { loadMe().then(() => loadPeople(true)); }, 0);
+  });
   loadMe();
 
   // ---------- Feed data (posts, likes, comments)
@@ -497,10 +499,6 @@ html.mx-light #studio .ex-card b{color:#050505!important}
   document.addEventListener("click", (e) => {
     if (e.target.closest && e.target.closest('[data-go="peopleSection"]')) loadPeople(true);
   });
-  sb.auth.onAuthStateChange(() => {
-    setTimeout(() => { loadMe().then(() => loadPeople(true)); }, 0);
-  });
-
   // ---------- Explore page
   const CARDS = [
     ["peopleSection", "👥", "Meet people", "Discover community members, follow profiles and grow your circle.", "Open", "24,119,242"],
