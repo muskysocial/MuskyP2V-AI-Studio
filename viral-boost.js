@@ -52,6 +52,11 @@ function startViralBoost() {
       <input id="vbPublishFile" type="file" accept="video/mp4,video/webm,video/quicktime" hidden>
       <label for="vbTikTokPrivacy">TikTok audience privacy (loaded from your connected account)</label>
       <select id="vbTikTokPrivacy" class="vb-input" disabled><option value="">Connect TikTok to load options</option></select>
+      <div class="vb-tiktok-options">
+        <label><input id="vbTikTokComments" type="checkbox" checked disabled> Allow comments</label>
+        <label><input id="vbTikTokDuet" type="checkbox" checked disabled> Allow Duet</label>
+        <label><input id="vbTikTokStitch" type="checkbox" checked disabled> Allow Stitch</label>
+      </div>
       <div class="vb-actions">
         <button type="button" class="vb-btn" id="vbConnectTikTok">Connect TikTok</button>
         <button type="button" class="vb-btn secondary" id="vbRefreshConnections">Refresh connections</button>
@@ -147,6 +152,9 @@ function startViralBoost() {
     #viralBoostSection .vb-connection-copy{min-width:0;flex:1;overflow-wrap:anywhere}
     #viralBoostSection .vb-connection-copy strong{display:block;font-size:13px}
     #viralBoostSection .vb-connection-copy small{display:block;color:var(--sh-sub,#65676b);font-size:12px;margin-top:3px}
+    #viralBoostSection .vb-tiktok-options{display:grid;grid-template-columns:1fr;gap:8px;margin:10px 0}
+    #viralBoostSection .vb-tiktok-options label{display:flex;align-items:center;gap:9px;font-size:14px}
+    #viralBoostSection .vb-tiktok-options input{width:18px;height:18px;flex:none}
     #viralBoostSection .vb-connection .vb-btn{padding:8px 10px;min-height:36px;font-size:12px;flex:none}
     #viralBoostSection .vb-connection{display:flex;align-items:center;gap:10px;border:1px solid var(--sh-line,#dadde1);border-radius:10px;padding:10px;margin:8px 0;min-width:0}
     #viralBoostSection .vb-connection-avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;background:var(--sh-line,#dadde1);flex:none}
@@ -224,6 +232,7 @@ function startViralBoost() {
         tikTokCreatorInfo = null;
         $("vbTikTokPrivacy").disabled = true;
         $("vbTikTokPrivacy").innerHTML = "<option value=''>Connect TikTok to load options</option>";
+        ["Comments","Duet","Stitch"].forEach(name => { $("vbTikTok" + name).checked = false; $("vbTikTok" + name).disabled = true; });
         box.innerHTML = "<p class='vb-small'>No social accounts connected yet.</p>";
         $("vbConnectTikTok").textContent = "Connect TikTok";
         await loadDrafts();
@@ -248,11 +257,17 @@ function startViralBoost() {
             : "<option value=''>No posting privacy options available</option>";
           $("vbTikTokPrivacy").disabled = !privacy.length;
           if (privacy.length) $("vbTikTokPrivacy").value = privacy[0];
-          connectionMessage("TikTok connected as " + (tikTokCreatorInfo.creator_nickname || "your account") + ". Review the audience setting before posting.");
+          [["Comments","comment_disabled"],["Duet","duet_disabled"],["Stitch","stitch_disabled"]].forEach(([label, key]) => {
+            const control = $("vbTikTok" + label);
+            control.checked = tikTokCreatorInfo[key] !== true;
+            control.disabled = tikTokCreatorInfo[key] === true;
+          });
+          connectionMessage("TikTok connected as " + (tikTokCreatorInfo.creator_nickname || "your account") + ". Review audience and interaction settings before posting.");
         } catch (error) {
           tikTokCreatorInfo = null;
           $("vbTikTokPrivacy").disabled = true;
           $("vbTikTokPrivacy").innerHTML = "<option value=''>TikTok posting permissions need attention</option>";
+          ["Comments","Duet","Stitch"].forEach(name => { $("vbTikTok" + name).checked = false; $("vbTikTok" + name).disabled = true; });
           connectionMessage(String(error && error.message || "Could not load TikTok posting settings."), true);
         }
       } else {
@@ -316,6 +331,9 @@ function startViralBoost() {
     try {
       const result = await invokeSocial("publish-video", {
         campaign_id: campaignId, privacy_level: $("vbTikTokPrivacy").value,
+        allow_comments: $("vbTikTokComments").checked,
+        allow_duet: $("vbTikTokDuet").checked,
+        allow_stitch: $("vbTikTokStitch").checked,
         consent: true, video_size: file.size, video_type: file.type
       });
       if (result.publish_id) button.dataset.publishId = result.publish_id;
