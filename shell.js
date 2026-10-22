@@ -90,6 +90,17 @@ html.mx-light #studio .ch-ai{background:#e4e6eb!important}
 html.mx-light #studio .ch-go{background:#1877f2!important;color:#fff!important}
 html.mx-light .mx-btn{background:#1877f2!important;color:#fff!important}
 html.mx-light .mx-btn:disabled{background:#e4e6eb!important;color:#8a8d91!important}
+#studio .sh-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+#studio .sh-tile{min-width:0;overflow-wrap:anywhere}
+#studio .sh-row{min-width:0;flex-wrap:wrap}
+#studio .sh-row button{min-width:0}
+#studio .ch-log{min-height:0}
+#studio .ch-bar{align-items:stretch}
+#studio .ch-bar textarea{min-width:0}
+#mxBar{padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(min-width:700px){#studio .sh-grid{grid-template-columns:repeat(3,minmax(0,1fr))}#mxBar{left:50%;right:auto;bottom:14px;transform:translateX(-50%);width:min(720px,calc(100% - 48px));border:1px solid var(--sh-line);border-radius:18px;box-shadow:0 8px 32px #0002;overflow:hidden}}
+@media(min-width:1100px){#studio .sh-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:420px){#studio .sh-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#studio .sh-tile{padding:11px;font-size:calc(15px * var(--mx-font-scale,1))}#mxBar button{font-size:calc(11px * var(--mx-font-scale,1));padding:7px 1px 6px}#mxBar button span{font-size:20px}}
 `;
 
 // id, icon, label, note
