@@ -209,10 +209,14 @@ async function publishTikTokVideo(userId: string, body: any) {
   const privacy = String(body.privacy_level || "");
   const options = Array.isArray(creator.privacy_level_options) ? creator.privacy_level_options : [];
   if (!options.includes(privacy)) throw new Error("Choose one of the privacy settings currently allowed by your TikTok account.");
-  const { data: blob, error: mediaError } = await admin.storage.from("viral-uploads").download(campaign.asset_path);
-  if (mediaError || !blob) throw new Error("Could not read your saved video from private storage.");
-  if (blob.size > 40 * 1024 * 1024) throw new Error("For this first direct-publishing version, choose a video under 40 MB.");
-  const videoSize = blob.size;
+  const videoSize = Number(body.video_size);
+  const videoType = String(body.video_type || "");
+  if (!Number.isFinite(videoSize) || videoSize < 1 || videoSize > 40 * 1024 * 1024) {
+    throw new Error("Choose a video under 40 MB for direct TikTok publishing.");
+  }
+  if (!["video/mp4", "video/webm", "video/quicktime", "video/x-m4v"].includes(videoType)) {
+    throw new Error("Choose an MP4, WebM, or MOV video file.");
+  }
   const chunkSize = Math.min(10 * 1024 * 1024, videoSize);
   const chunkCount = Math.ceil(videoSize / chunkSize);
   const caption = [campaign.caption, campaign.hashtags].filter(Boolean).join("\n\n").slice(0, 2200);
@@ -241,33 +245,13 @@ async function publishTikTokVideo(userId: string, body: any) {
     updated_at: new Date().toISOString()
   }).eq("id", jobId);
   if (recordInitError) throw new Error("TikTok started a publishing request, but MuskySocials could not record its ID. Contact support before retrying to avoid a duplicate.");
-  const bytes = new Uint8Array(await blob.arrayBuffer());
-  for (let start = 0; start < videoSize; start += chunkSize) {
-    const part = bytes.slice(start, Math.min(start + chunkSize, videoSize));
-    const end = start + part.byteLength - 1;
-    const upload = await fetch(init.data.upload_url, {
-      method: "PUT",
-      headers: {
-        "Content-Type": campaign.content_type || "video/mp4",
-        "Content-Range": "bytes " + start + "-" + end + "/" + videoSize,
-        "Content-Length": String(part.byteLength)
-      },
-      body: part
-    });
-    if (!upload.ok) {
-      console.error("TikTok video chunk upload failed", upload.status);
-      throw new Error("TikTok accepted the post request but the video upload failed. Please check the draft and try again.");
-    }
-  }
-  const { error: completeUploadError } = await admin.from("social_publish_jobs").update({
-    status: "processing",
-    message: "Video uploaded; waiting for TikTok to process it.",
-    updated_at: new Date().toISOString()
-  }).eq("id", jobId);
-  if (completeUploadError) throw new Error("TikTok received the video, but MuskySocials could not update its status. Use Check TikTok status before retrying.");
   return {
-    status: "processing", publish_id: init.data.publish_id,
-    message: "Video sent to TikTok. It may take a few minutes to process; check status before trying again.",
+    status: "upload_ready",
+    publish_id: init.data.publish_id,
+    upload_url: init.data.upload_url,
+    chunk_size: chunkSize,
+    video_size: videoSize,
+    message: "TikTok is ready to receive the video. Uploading from your device is required.",
     creator_name: creator.creator_nickname || connection.display_name || "TikTok account"
   };
 }
