@@ -106,6 +106,7 @@ async function init() {
       if (factorsError) throw factorsError;
       const factor = (factors.totp || []).find((f) => f.status === "verified");
       if (!factor) throw new Error("Two-factor sign-in is enabled but no verified authenticator was found. Contact support.");
+      document.documentElement.classList.remove("app-booting");
       const { data: challenge, error: challengeError } = await sb.auth.mfa.challenge({ factorId: factor.id });
       if (challengeError) throw challengeError;
       form.innerHTML = `
@@ -249,6 +250,7 @@ async function init() {
   function enter(session) {
     if (entered) return;
     entered = true;
+    document.documentElement.classList.remove("app-booting");
     const u = session.user;
     const name = (u.user_metadata && u.user_metadata.display_name) || (u.email || "Creator").split("@")[0];
     nameInput.value = name.slice(0, 40);
@@ -306,7 +308,18 @@ async function init() {
     }
   });
 
-  // Returning visitor with a saved session: go straight in.
-  const { data } = await sb.auth.getSession();
-  if (data && data.session) await continueAfterAuth(data.session);
+  // Returning visitor with a saved session: keep the legacy welcome screen hidden
+  // until the session is restored and the current app shell is ready.
+  try {
+    const { data, error } = await sb.auth.getSession();
+    if (error) throw error;
+    if (data && data.session) {
+      await continueAfterAuth(data.session);
+    } else {
+      document.documentElement.classList.remove("app-booting");
+    }
+  } catch (err) {
+    document.documentElement.classList.remove("app-booting");
+    say(friendly(err), true);
+  }
 }

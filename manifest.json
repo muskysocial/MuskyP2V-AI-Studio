@@ -1,13 +1,13 @@
 {
-  "name": "Musky P2V AI Studio",
-  "short_name": "Musky P2V",
-  "description": "Musky P2V AI Studio Web App",
+  "name": "MuskySocials",
+  "short_name": "MuskySocials",
+  "description": "MuskySocials creator community and tools",
   "start_url": "/MuskyP2V-AI-Studio/",
   "scope": "/MuskyP2V-AI-Studio/",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "background_color": "#ffffff",
-  "theme_color": "#0055FF",
+  "orientation": "any",
+  "background_color": "#f0f2f5",
+  "theme_color": "#1877f2",
   "icons": [
     {
       "src": "icon-192.png",

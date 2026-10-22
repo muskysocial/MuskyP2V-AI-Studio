@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="app-booting">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#070b14"><meta name="description" content="MuskyP2V AI Studio — creator tools for photos, video and voice.">
   <link rel="manifest" href="./manifest.json">
-  <title>MuskyP2V AI Studio</title><link rel="stylesheet" href="style.css">
+  <title>MuskySocials</title><link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="topbar">
@@ -12,6 +12,7 @@
     <div class="top-actions"><span class="online-dot"></span><span>Creator workspace</span></div>
   </header>
   <main>
+    <div id="appBoot" role="status" aria-live="polite">Loading MuskySocials…</div>
     <section id="loginPanel" class="welcome-screen">
       <div class="orb orb-one"></div><div class="orb orb-two"></div>
       <div class="welcome-content">
@@ -77,9 +78,8 @@
       <section id="plansSection" class="pane" hidden><div class="section-heading"><div><p class="eyebrow">COINS & PLANS</p><h2>Demo packages</h2></div></div><p class="muted">These are ideas only. Payments and coin crediting are not active.</p><div class="plan-grid"><article class="plan"><h3>Starter</h3><p class="price">₦1,500</p><p>200 coins</p></article><article class="plan"><h3>Creator</h3><p class="price">₦3,000</p><p>420 coins</p></article><article class="plan"><h3>Pro</h3><p class="price">₦5,000</p><p>750 coins</p></article></div><div class="notice"><span>ⓘ</span><p>Packages are not for sale yet. Secure account and payment setup must come first.</p></div></section>
 
       <section id="privacySection" class="pane" hidden><div class="section-heading"><div><p class="eyebrow">YOUR SAFETY</p><h2>Privacy basics</h2></div></div><ul class="privacy-list"><li>Camera and microphone are requested only when you tap their controls.</li><li>Local camera and voice previews stay in your browser unless you choose to upload them to an external tool.</li><li>This preview name is not a real account, and demo coins have no cash value.</li><li>Never put passwords, secret API keys or payment keys in public website files.</li><li>Use photos and voices you own or have permission to use.</li></ul></section>
-      <footer><span>✦ MuskyP2V AI Studio</span><span>Built for creators</span></footer>
     </section>
-  </main><script src="script.js"></script>
+  </main><script>window.setTimeout(function(){document.documentElement.classList.remove("app-booting");},10000);</script><script src="script.js"></script>
   <script type="module" src="headswap.js"></script>
   <script type="module" src="auth.js"></script>
   <script type="module" src="shell.js"></script>

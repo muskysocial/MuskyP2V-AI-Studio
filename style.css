@@ -2,3 +2,56 @@
 @media(max-width:520px){main{width:calc(100% - 20px);margin:14px auto 30px}.topbar{height:60px;padding:0 13px}.top-actions{font-size:10px}.welcome-screen{min-height:calc(100dvh - 90px);padding:25px 17px;border-radius:22px}.mini-logo{margin-bottom:25px}.entry-form{padding:15px}.hello-row{margin:7px 2px 17px}.pane{padding:14px}.preview-grid{grid-template-columns:1fr 1fr;gap:7px}.preview-box{padding:7px}.preview-box .button-row button{min-width:0}.plan-grid{grid-template-columns:1fr}.plan{display:flex;align-items:center;justify-content:space-between;gap:8px}.plan h3,.plan p{margin:0}.plan .price{font-size:14px!important}.section-heading h2{font-size:20px}}
 
 .ai-generator{border:1px solid #30466d;border-radius:18px;background:linear-gradient(145deg,#101d35,#0a1120);padding:15px;margin:12px 0 18px}.ai-generator-heading{display:flex;align-items:center;gap:11px;margin-bottom:8px}.ai-generator-heading>div{display:flex;flex-direction:column;gap:3px}.ai-generator-heading strong{font-size:14px}.ai-generator-heading small,.ai-smallprint{font-size:10px;color:var(--muted)}.ai-generator textarea{resize:vertical;min-height:78px}.wan-image-preview{width:min(100%,220px);aspect-ratio:auto;max-height:280px;object-fit:contain;margin:10px auto;border:1px solid #293956}.ai-generator #wanResultVideo{aspect-ratio:9/16;max-height:480px;object-fit:contain;margin:14px auto;background:#03060b}.ai-smallprint{line-height:1.5;margin:12px 0 0}.ai-generator button:disabled{opacity:.55;cursor:wait}
+
+
+/* Responsive, browser-safe layout foundation */
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+html{min-height:100%;scroll-behavior:auto;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;overflow-wrap:anywhere}
+img,video,canvas,iframe{max-width:100%}
+button,input,textarea,select{max-width:100%;min-width:0}
+input,textarea,select{font-size:16px}
+main{width:calc(100% - 32px);max-width:1120px;margin:18px auto 24px}
+.topbar{padding-left:max(16px,calc((100% - 1120px)/2));padding-right:max(16px,calc((100% - 1120px)/2))}
+.welcome-screen{min-height:calc(100vh - 125px);min-height:calc(100dvh - 125px)}
+#appBoot{display:none;position:fixed;inset:0;z-index:1000;place-items:center;padding:24px;background:var(--bg,#070a12);color:var(--text,#f3f6ff);font:500 15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;text-align:center}
+.app-booting #appBoot{display:grid}
+.app-booting #loginPanel,.app-booting #studio{visibility:hidden}
+#studio{min-width:0;width:100%}
+#studio>.pane{min-width:0}
+#studio .pane,#studio .sh{overflow-wrap:anywhere}
+#studio .sh-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+#studio .sh-tile{min-width:0;overflow-wrap:anywhere}
+#mxBar{box-sizing:border-box;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+#mxBar button{min-width:0;white-space:normal;overflow-wrap:anywhere}
+body.mx-app-open{padding-bottom:calc(68px + env(safe-area-inset-bottom,0px))}
+@media (min-width:700px){
+  main{width:calc(100% - 48px);margin-top:24px}
+  .welcome-screen{min-height:calc(100vh - 130px);min-height:calc(100dvh - 130px)}
+  #studio .sh-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #mxBar{left:50%;right:auto;bottom:14px;transform:translateX(-50%);width:min(720px,calc(100% - 48px));border:1px solid var(--sh-line);border-radius:18px;box-shadow:0 8px 32px #0002;overflow:hidden}
+  body.mx-app-open{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+}
+@media (min-width:1100px){
+  #studio .sh-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .pane{padding:22px}
+}
+@media (max-width:420px){
+  main{width:calc(100% - 20px);margin:10px auto 16px}
+  .topbar{padding-left:10px;padding-right:10px}
+  .top-actions{gap:5px;font-size:10px}
+  .brand{gap:7px}
+  .brand-mark{width:34px;height:34px}
+  .welcome-screen{min-height:calc(100vh - 90px);min-height:calc(100dvh - 90px);padding:20px 14px}
+  .welcome-content h1{font-size:clamp(29px,8vw,38px)}
+  .intro{font-size:14px}
+  .pane{padding:12px;border-radius:15px}
+  .preview-grid,.form-grid{grid-template-columns:minmax(0,1fr)}
+  .button-row{gap:7px}
+  .button-row button{min-width:0}
+  #mxBar button{font-size:11px;padding:7px 1px 6px}
+  #mxBar button span{font-size:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
