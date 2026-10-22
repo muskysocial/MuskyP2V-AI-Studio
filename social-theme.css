@@ -1,0 +1,188 @@
+/* MuskySocials interface refresh — additive theme layer.
+   Deliberately separate from style.css so existing modules and functionality stay intact. */
+:root{
+  --ms-blue:#1877f2;
+  --ms-blue-deep:#1158bd;
+  --ms-pink:#f45b9a;
+  --ms-pink-soft:#fff0f6;
+  --ms-white:#ffffff;
+  --ms-ink:#172033;
+  --ms-muted:#68758a;
+  --ms-shadow:0 8px 28px rgba(25,45,85,.075);
+  --ms-radius:18px;
+}
+html.mx-light{
+  --sh-card:#fff;
+  --sh-text:#172033;
+  --sh-sub:#68758a;
+  --sh-line:#e7eaf1;
+  --sh-blue:var(--ms-blue);
+}
+html:not(.mx-light){
+  --sh-blue:#6ea0ff;
+}
+body{
+  background:
+    radial-gradient(ellipse at 100% 0%,rgba(244,91,154,.08),transparent 34%),
+    radial-gradient(ellipse at 0% 0%,rgba(24,119,242,.075),transparent 30%),
+    var(--bg,#f6f8fc);
+}
+.topbar{
+  border-bottom:1px solid rgba(110,130,165,.18);
+  box-shadow:0 3px 18px rgba(25,45,85,.035);
+  backdrop-filter:blur(18px);
+}
+.topbar .mk-logo{
+  background:linear-gradient(135deg,var(--ms-blue),#559dff 62%,var(--ms-pink));
+  box-shadow:0 5px 16px rgba(24,119,242,.22);
+}
+.topbar .mk-name{color:var(--ms-blue)!important;letter-spacing:-.025em}
+.topbar .tb-ic{
+  transition:transform .16s ease,background .16s ease;
+}
+.topbar .tb-ic:active{transform:scale(.94)}
+#studio{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+#studio .sh{
+  line-height:1.55;
+}
+#studio .sh h2{
+  letter-spacing:-.035em;
+  line-height:1.2;
+}
+#studio .pt-card,
+#studio .hm-post,
+#studio .ex-card,
+#studio .sh-tile,
+#studio .gs-card,
+#studio .mx-notif-item,
+#studio .mx-notifications .mx-notif-item{
+  border-radius:var(--ms-radius)!important;
+  border-color:var(--sh-line)!important;
+  box-shadow:var(--ms-shadow);
+}
+#studio .pt-card{
+  padding:15px!important;
+  background:var(--sh-card,#fff);
+}
+#studio .hm-comp{
+  padding:12px;
+  border:1px solid var(--sh-line);
+  border-radius:var(--ms-radius);
+  background:var(--sh-card);
+  box-shadow:var(--ms-shadow);
+}
+#studio .hm-pill{
+  border:1px solid var(--sh-line);
+  background:color-mix(in srgb,var(--sh-card) 88%,var(--ms-blue) 12%);
+}
+#studio .hm-av,#studio .hm-logo{
+  background-color:var(--ms-blue);
+}
+#studio .hm-story{
+  border-radius:18px;
+  box-shadow:0 8px 20px rgba(18,35,70,.12);
+  transition:transform .16s ease,filter .16s ease;
+}
+#studio .hm-story:active{transform:scale(.98)}
+#studio .hm-story:nth-child(3n+1){background:linear-gradient(155deg,#1877f2,#5a9cff)!important}
+#studio .hm-story:nth-child(3n+2){background:linear-gradient(155deg,#f45b9a,#ff8db8)!important}
+#studio .hm-story:nth-child(3n){background:linear-gradient(155deg,#394e86,#7089bd)!important}
+#studio .hm-post{
+  padding:15px!important;
+  border:1px solid var(--sh-line);
+  background:var(--sh-card);
+}
+#studio .hm-head{gap:11px}
+#studio .hm-logo{box-shadow:0 0 0 3px color-mix(in srgb,var(--ms-blue) 12%,transparent)}
+#studio .hm-counts{border-bottom-color:var(--sh-line)}
+#studio .hm-actions button{
+  border-radius:10px;
+  transition:background .15s ease,color .15s ease;
+}
+#studio .hm-actions button:active{background:var(--ms-pink-soft)}
+#studio .hm-actions button.on{color:var(--ms-blue)!important}
+#studio .hm-actions button[data-action="like"].on{color:var(--ms-pink)!important}
+#studio .ex-grid{gap:12px}
+#studio .ex-card{
+  min-height:120px;
+  background:var(--sh-card);
+  transition:transform .16s ease,border-color .16s ease;
+}
+#studio .ex-card:active{transform:scale(.985)}
+#studio .ex-card .ic{color:var(--ms-blue)}
+#studio .ex-card:nth-child(3n+2) .ic{color:var(--ms-pink)}
+#studio .ex-row{
+  padding:15px 8px;
+  border-radius:12px;
+}
+#studio .ex-row:active{background:color-mix(in srgb,var(--sh-card) 90%,var(--ms-blue) 10%)}
+#studio .pt-btn,#studio .mx-btn,#studio .mx-notif-btn,#studio .mx-notif-read{
+  border-radius:12px;
+  transition:filter .15s ease,transform .15s ease;
+}
+#studio .pt-btn:not(:disabled),#studio .mx-btn:not(:disabled){background-color:var(--ms-blue)}
+#studio .pt-btn:active,#studio .mx-btn:active{transform:scale(.98)}
+#studio .pt-btn.del{background:#fff0f1!important;color:#c6283a!important;border-color:#ffd5db!important}
+#studio input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+#studio textarea,#studio select{
+  border-radius:12px;
+}
+#studio input:focus-visible,#studio textarea:focus-visible,#studio select:focus-visible,
+#studio button:focus-visible,#mxBar button:focus-visible{
+  outline:3px solid color-mix(in srgb,var(--ms-blue) 40%,transparent);
+  outline-offset:2px;
+}
+#mxBar{
+  background:color-mix(in srgb,var(--sh-card) 94%,transparent);
+  backdrop-filter:blur(18px);
+  border-top-color:var(--sh-line);
+  box-shadow:0 -5px 24px rgba(25,45,85,.06);
+}
+#mxBar button{min-height:54px}
+#mxBar button.on{color:var(--ms-blue)!important}
+#mxBar button.on span{filter:drop-shadow(0 2px 5px rgba(24,119,242,.12))}
+#studio .hm-toast{
+  bottom:calc(84px + env(safe-area-inset-bottom,0px));
+  border:1px solid rgba(255,255,255,.15);
+  box-shadow:0 8px 28px rgba(0,0,0,.2);
+  border-radius:14px;
+}
+#notifSection .mx-notif-item{box-shadow:var(--ms-shadow)}
+#notifSection .mx-notif-item.unread{border-left:4px solid var(--ms-pink)!important}
+#notifSection .mx-notif-btn{color:var(--ms-blue)}
+#studio .gs-chip.on{background:var(--ms-blue)!important;border-color:var(--ms-blue)!important}
+#studio .gs-card img{border-radius:13px}
+#studio .hm-badge{background:var(--ms-pink-soft);border-color:#ffc3d9;color:#a92d61}
+#studio .hm-badge.ok{background:#eafaf1;border-color:#bce8ce;color:#137443}
+#studio .mx-coming-soon,
+#studio [data-coming-soon="true"]{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  border:1px solid #ffd1e1;
+  border-radius:999px;
+  padding:4px 9px;
+  background:var(--ms-pink-soft);
+  color:#a92d61;
+  font-size:11px;
+  font-weight:750;
+}
+@media(min-width:760px){
+  #studio .hm-stories{gap:12px}
+  #studio .hm-story{width:116px;height:164px}
+  #studio .hm-post{padding:19px!important}
+  #studio .ex-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:420px){
+  .topbar{padding-left:12px!important;padding-right:12px!important}
+  .topbar .mk-name{font-size:16px}
+  .topbar .mk-txt small{font-size:9px}
+  .topbar .top-actions{gap:5px}
+  .topbar .tb-ic{width:32px;height:32px}
+  #studio .pt-card{padding:12px!important}
+  #studio .hm-story{width:92px;height:136px}
+  #mxBar button{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}
