@@ -25,6 +25,21 @@ function initPrivateMessaging() {
   const style = document.createElement("style");
   style.textContent = `
     #messagesSection .mxmsg{max-width:760px;margin:0 auto;padding:2px 0 24px;color:var(--sh-text,#172033)}
+    #messagesSection.mx-messages-fullscreen{position:fixed!important;inset:0!important;z-index:999!important;display:flex!important;flex-direction:column!important;width:100%!important;max-width:none!important;height:100vh!important;height:100dvh!important;min-height:0!important;margin:0!important;padding:calc(env(safe-area-inset-top,0px) + 10px) 14px calc(env(safe-area-inset-bottom,0px) + 10px)!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important;background:var(--sh-card,#fff)!important;color:var(--sh-text,#172033)!important}
+    #messagesSection.mx-messages-fullscreen .mxmsg{display:flex;flex-direction:column;width:100%;max-width:900px;flex:1;min-height:0;margin:0 auto;padding:0}
+    #messagesSection.mx-messages-fullscreen .mxmsg-head{flex:0 0 auto;padding:3px 0 12px;margin-bottom:6px}
+    #messagesSection.mx-messages-fullscreen #mxmsg-status{flex:0 0 auto;margin:4px 1px 8px}
+    #messagesSection.mx-messages-fullscreen #mxmsg-content{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
+    #messagesSection.mx-messages-fullscreen .mxmsg-thread{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
+    #messagesSection.mx-messages-fullscreen .mxmsg-thread-head{flex:0 0 auto;margin-bottom:8px}
+    #messagesSection.mx-messages-fullscreen .mxmsg-bubbles{flex:1;min-height:0;max-height:none;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+    #messagesSection.mx-messages-fullscreen .mxmsg-compose{flex:0 0 auto;padding:8px 0 0;margin-top:0;background:var(--sh-card,#fff)}
+    #messagesSection.mx-messages-fullscreen .mxmsg-compose textarea{min-height:46px;max-height:120px;resize:none}
+    #messagesSection.mx-messages-fullscreen .mxmsg-privacy{flex:0 0 auto;margin:5px 2px 0}
+    #messagesSection.mx-messages-fullscreen .mxmsg-list{overflow-y:auto;min-height:0;padding-bottom:12px}
+    #messagesSection.mx-messages-fullscreen .mxmsg-empty{flex:0 0 auto}
+    body.mx-messages-open{overflow:hidden!important}
+    @media(max-width:520px){#messagesSection.mx-messages-fullscreen{padding-left:10px!important;padding-right:10px!important}#messagesSection.mx-messages-fullscreen .mxmsg-bubbles{padding:10px 5px}#messagesSection.mx-messages-fullscreen .mxmsg-thread-head{padding:9px}#messagesSection.mx-messages-fullscreen .mxmsg-compose textarea{font-size:16px}}
     #messagesSection .mxmsg-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
     #messagesSection .mxmsg-kicker{margin:0 0 4px;color:#1877f2;font-size:10px;font-weight:900;letter-spacing:.16em}
     #messagesSection .mxmsg h2{margin:0;font-size:clamp(25px,7vw,32px);letter-spacing:-.04em}
@@ -67,7 +82,7 @@ function initPrivateMessaging() {
   let userId = null;
   let currentConversationId = null;
   let currentPeer = null;
-  let busy = false;
+  let busy = false;\n  let threadBusy = false;\n  let threadRefreshTimer = null;
 
   const safeTime = (value) => {
     if (!value) return "";
@@ -200,31 +215,59 @@ function initPrivateMessaging() {
       say(error.message || "Could not open this conversation.");
     }
   }
-  async function renderThread() {
+  async function renderThread(options = {}) {
     if (!currentConversationId || !currentPeer) return loadInbox();
-    say("Loading conversation…");
-    const { error: markError } = await sb.from("direct_messages").update({ read_at: new Date().toISOString() })
-      .eq("conversation_id", currentConversationId).neq("sender_id", userId).is("read_at", null);
-    if (markError) console.warn("Could not mark received messages as read:", markError);
-    const { data: messages, error } = await sb.from("direct_messages")
-      .select("id,sender_id,body,created_at,read_at").eq("conversation_id", currentConversationId)
-      .order("created_at", { ascending: true }).limit(300);
-    if (error) {
-      say("Could not load this conversation. Please try again.");
-      content.innerHTML = '<button type="button" class="mxmsg-back" data-msg-back>← Inbox</button><div class="mxmsg-empty"><b>Conversation unavailable</b><p>Please refresh and try again.</p></div>';
-      return;
+    if (threadBusy) return;
+    threadBusy = true;
+    const oldBubbles = content.querySelector(".mxmsg-bubbles");
+    const wasNearBottom = !oldBubbles || oldBubbles.scrollHeight - oldBubbles.scrollTop - oldBubbles.clientHeight < 90;
+    const previousScrollTop = oldBubbles?.scrollTop || 0;
+    try {
+      if (!options.silent) say("Loading conversation…");
+      const { error: markError } = await sb.from("direct_messages").update({ read_at: new Date().toISOString() })
+        .eq("conversation_id", currentConversationId).neq("sender_id", userId).is("read_at", null);
+      if (markError) console.warn("Could not mark received messages as read:", markError);
+      const { data: messages, error } = await sb.from("direct_messages")
+        .select("id,sender_id,body,created_at,read_at").eq("conversation_id", currentConversationId)
+        .order("created_at", { ascending: true }).limit(300);
+      if (error) {
+        if (!options.silent) say("Could not load this conversation. Please try again.");
+        if (!oldBubbles) content.innerHTML = '<button type="button" class="mxmsg-back" data-msg-back>← Inbox</button><div class="mxmsg-empty"><b>Conversation unavailable</b><p>Please refresh and try again.</p></div>';
+        return;
+      }
+      if (!options.silent) say("");
+      const lastOwn = [...(messages || [])].reverse().find((message) => message.sender_id === userId);
+      const seenText = lastOwn?.read_at ? "Seen" : "Private conversation";
+      const bubblesHtml = (messages || []).map((message) => '<div class="mxmsg-bubble ' + (message.sender_id === userId ? "mine" : "theirs") + '">' +
+        esc(message.body) + '<time>' + esc(safeTime(message.created_at)) + (message.sender_id === userId && message.read_at ? ' · Seen' : '') + '</time></div>').join("") ||
+        '<div class="mxmsg-empty"><b>Say hello 👋</b><p>Your conversation starts here.</p></div>';
+      const existingForm = content.querySelector("[data-msg-compose]");
+      const oldComposer = existingForm?.elements?.message;
+      const wasFocused = !!oldComposer && document.activeElement === oldComposer;
+      const selectionStart = oldComposer?.selectionStart ?? 0;
+      const selectionEnd = oldComposer?.selectionEnd ?? selectionStart;
+      const draft = oldComposer?.value || "";
+      content.innerHTML = '<div class="mxmsg-thread"><div class="mxmsg-thread-head"><button type="button" class="mxmsg-back" data-msg-back aria-label="Back to inbox">← Inbox</button>' +
+        avatarHtml(currentPeer) + '<span class="mxmsg-thread-person"><strong>' + esc(currentPeer.display_name || "Member") + '</strong><small>' + seenText + '</small></span></div>' +
+        '<div class="mxmsg-bubbles" aria-label="Conversation messages" aria-live="polite">' + bubblesHtml + '</div>' +
+        '<form class="mxmsg-compose" data-msg-compose><textarea name="message" maxlength="4000" rows="1" required aria-label="Write a private message" placeholder="Message…"></textarea><button class="mxmsg-send" type="submit">Send</button></form>' +
+        '<p class="mxmsg-privacy">Private chat · Only participants can read these messages.</p></div>';
+      const bubbles = content.querySelector(".mxmsg-bubbles");
+      const composer = content.querySelector("[data-msg-compose] textarea");
+      if (composer) {
+        composer.value = draft;
+        if (wasFocused) {
+          composer.focus({ preventScroll: true });
+          try { composer.setSelectionRange(selectionStart, selectionEnd); } catch {}
+        }
+      }
+      if (bubbles) bubbles.scrollTop = options.forceBottom || wasNearBottom ? bubbles.scrollHeight : previousScrollTop;
+    } catch (error) {
+      console.error("Could not refresh conversation:", error);
+      if (!options.silent) say("Could not refresh messages. Tap refresh to try again.");
+    } finally {
+      threadBusy = false;
     }
-    say("");
-    content.innerHTML = '<div class="mxmsg-thread-head"><button type="button" class="mxmsg-back" data-msg-back>←</button>' +
-      avatarHtml(currentPeer) + '<span class="mxmsg-thread-person"><strong>' + esc(currentPeer.display_name || "Member") + '</strong><small>Private conversation</small></span></div>' +
-      '<div class="mxmsg-bubbles" aria-label="Conversation messages">' +
-      ((messages || []).map((message) => '<div class="mxmsg-bubble ' + (message.sender_id === userId ? "mine" : "theirs") + '">' +
-        esc(message.body) + '<time>' + esc(safeTime(message.created_at)) + '</time></div>').join("") ||
-        '<div class="mxmsg-empty"><b>Say hello 👋</b><p>Your conversation starts here.</p></div>') +
-      '</div><form class="mxmsg-compose" data-msg-compose><textarea name="message" maxlength="4000" rows="2" required aria-label="Write a private message" placeholder="Write a message…"></textarea><button class="mxmsg-send" type="submit">Send</button></form>' +
-      '<p class="mxmsg-privacy">Only the two conversation participants can read these messages. Keep personal and financial secrets out of chats.</p>';
-    const bubbles = content.querySelector(".mxmsg-bubbles");
-    if (bubbles) bubbles.scrollTop = bubbles.scrollHeight;
   }
   async function sendMessage(form) {
     if (!currentConversationId || !userId) return;
@@ -241,7 +284,7 @@ function initPrivateMessaging() {
       });
       if (error) throw error;
       input.value = "";
-      await renderThread();
+      await renderThread({ forceBottom: true });
     } catch (error) {
       console.error("Could not send message:", error);
       say("Message wasn't sent. Check your connection and try again.");
@@ -251,6 +294,8 @@ function initPrivateMessaging() {
   }
 
   pane.addEventListener("click", async (event) => {
+    const close = event.target.closest("[data-msg-close]");
+    if (close) { currentConversationId = null; currentPeer = null; return window.shell.go("homeSection"); }
     const back = event.target.closest("[data-msg-back]");
     if (back) { currentConversationId = null; currentPeer = null; return loadInbox(); }
     const refresh = event.target.closest("[data-msg-refresh]");
@@ -258,16 +303,38 @@ function initPrivateMessaging() {
     const openThread = event.target.closest("[data-msg-open-conversation]");
     if (openThread) return openConversation(openThread.dataset.msgOpenConversation);
   });
+  pane.addEventListener("keydown", (event) => {
+    if (event.target.matches("[data-msg-compose] textarea") && event.key === "Enter" && !event.shiftKey && !event.isComposing) {
+      event.preventDefault();
+      const form = event.target.closest("[data-msg-compose]");
+      if (form && !form.querySelector("button[type=submit]").disabled) sendMessage(form);
+    }
+  });
   pane.addEventListener("submit", (event) => {
     const form = event.target.closest("[data-msg-compose]");
     if (!form) return;
     event.preventDefault();
     sendMessage(form);
   });
-  const observer = new MutationObserver(() => {
-    if (!pane.hidden && !currentConversationId) loadInbox();
-  });
+  function syncChatLayout() {
+    const openNow = !pane.hidden;
+    pane.classList.toggle("mx-messages-fullscreen", openNow);
+    document.body.classList.toggle("mx-messages-open", openNow);
+    if (threadRefreshTimer) { clearInterval(threadRefreshTimer); threadRefreshTimer = null; }
+    if (openNow && currentConversationId) {
+      threadRefreshTimer = setInterval(() => {
+        if (!pane.hidden && currentConversationId && !document.hidden) renderThread({ silent: true });
+      }, 5000);
+    } else if (openNow && !currentConversationId) {
+      loadInbox();
+    }
+  }
+  const observer = new MutationObserver(syncChatLayout);
   observer.observe(pane, { attributes: true, attributeFilter: ["hidden"] });
+  syncChatLayout();
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && !pane.hidden && currentConversationId) renderThread({ silent: true });
+  });
   window.muskyMessaging = {
     inbox() { currentConversationId = null; currentPeer = null; window.shell.go("messagesSection"); return loadInbox(); },
     open,
