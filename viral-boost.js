@@ -283,6 +283,20 @@ function startViralBoost() {
     if (!button) return;
     if (!/^video\/(mp4|webm|quicktime|x-m4v)$/i.test(file.type)) return say("Choose an MP4, WebM, or MOV video.", true);
     if (file.size < 1 || file.size > 40 * 1024 * 1024) return say("Choose a video under 40 MB for direct TikTok publishing.", true);
+    try {
+      const videoUrl = URL.createObjectURL(file);
+      const duration = await new Promise((resolve, reject) => {
+        const video = document.createElement("video");
+        video.preload = "metadata";
+        video.onloadedmetadata = () => { const value = video.duration; URL.revokeObjectURL(videoUrl); resolve(value); };
+        video.onerror = () => { URL.revokeObjectURL(videoUrl); reject(new Error("Could not read this video's duration. Try another video file.")); };
+        video.src = videoUrl;
+      });
+      const maxDuration = Number(tikTokCreatorInfo?.max_video_post_duration_sec || 0);
+      if (maxDuration && duration > maxDuration) return say("This TikTok account allows videos up to " + maxDuration + " seconds. Choose a shorter video.", true);
+    } catch (error) {
+      return say(String(error && error.message || "Could not check video duration."), true);
+    }
     if (!confirm("Post the selected video to " + (tikTokCreatorInfo?.creator_nickname || "your connected TikTok account") + "? Audience: " + $("vbTikTokPrivacy").selectedOptions[0].textContent + ". Choose the original video used in this draft. Continue?")) return;
     button.disabled = true;
     const oldLabel = button.textContent;
