@@ -207,7 +207,7 @@ function init() {
     "<button type='button' class='mx-chat-prompt' data-prompt='Show me which MuskySocials tools I can use and how to get started with them.'><span class='mx-chat-art tools' aria-hidden='true'>✨</span><strong>Explore tools</strong><small>Find the right AI tool</small></button>" +
     "</div></div>" +
     "<div class='mx-chat-log' id='chLog' hidden></div>" +
-    "<div id='chPending' class='ch-pending' hidden></div><div class='ch-bar'><div class='ch-tools'><button type='button' class='ch-tool' id='chAttach' aria-label='Attach photo or document'>＋</button><input id='chFile' type='file' accept='image/*,audio/*,.pdf,.txt,.doc,.docx' hidden><button type='button' class='ch-tool' id='chVoice' aria-label='Voice input'>🎙</button></div><textarea id='chIn' rows='1' maxlength='1000' placeholder='Message Musky Assistant…' aria-label='Message Musky Assistant'></textarea>" +
+    "<div id='chPending' class='ch-pending' hidden></div><div class='ch-bar'><div class='ch-tools'><button type='button' class='ch-tool' id='chAttach' aria-label='Attach photo or document'>＋</button><input id='chFile' type='file' accept='image/*,audio/*,.pdf,.txt' hidden><button type='button' class='ch-tool' id='chVoice' aria-label='Voice input'>🎙</button></div><textarea id='chIn' rows='1' maxlength='1000' placeholder='Message Musky Assistant…' aria-label='Message Musky Assistant'></textarea>" +
     "<button class='ch-go' id='chGo' aria-label='Send message'>↑</button></div><small class='mx-chat-note'>AI can make mistakes. Never share passwords or private information.</small>");
   document.body.appendChild(chat);
   let hist = [];
@@ -279,8 +279,8 @@ function init() {
   async function uploadPending(M, userId) {
     if (!pendingFile) return null;
     const file=pendingFile;
-    if (file.size > 15*1024*1024) throw new Error("Attachments must be 15 MB or smaller.");
-    const allowed=["image/jpeg","image/png","image/webp","image/gif","application/pdf","text/plain","application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document","audio/webm","audio/ogg","audio/mp4","audio/mpeg","audio/wav"];
+    if (file.size > 8*1024*1024) throw new Error("Attachments must be 8 MB or smaller for AI processing.");
+    const allowed=["image/jpeg","image/png","image/webp","image/gif","application/pdf","text/plain","audio/webm","audio/ogg","audio/mp4","audio/mpeg","audio/wav"];
     if (!allowed.includes(file.type)) throw new Error("Choose a photo, voice recording, PDF, TXT or Word document.");
     const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,"_").slice(-90) || "attachment";
     const path=userId+"/"+crypto.randomUUID()+"_"+safe;
@@ -326,7 +326,7 @@ function init() {
         stream.getTracks().forEach((track)=>track.stop());
         const blob=new Blob(recordingChunks,{type:recorder.mimeType||"audio/webm"});
         const ext=blob.type.includes("mp4")?"m4a":blob.type.includes("ogg")?"ogg":"webm";
-        if(blob.size){pendingFile=new File([blob],"voice-note-"+Date.now()+"."+ext,{type:blob.type});updatePending();}
+        if(blob.size){pendingFile=new File([blob],"voice-note-"+Date.now()+"."+ext,{type:(blob.type||"audio/webm").split(";")[0]});updatePending();}
         recorder=null;chVoice.textContent="🎙";chVoice.setAttribute("aria-label","Record voice note");
       };
       recorder.start();chVoice.textContent="■";chVoice.setAttribute("aria-label","Stop voice note");
