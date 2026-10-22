@@ -97,21 +97,47 @@ html.mx-light .mx-btn:disabled{background:#e4e6eb!important;color:#8a8d91!import
 #studio .ch-log{min-height:0}
 #studio .ch-bar{align-items:stretch}
 #studio .ch-bar textarea{min-width:0}
-#studio #chatSection.mx-chat-fullscreen{
-  position:fixed!important;inset:0!important;z-index:80!important;
-  width:100vw!important;max-width:none!important;height:100vh;height:100dvh!important;
-  margin:0!important;padding:calc(env(safe-area-inset-top,0px) + 12px) 12px calc(env(safe-area-inset-bottom,0px) + 12px)!important;
-  border:0!important;border-radius:0!important;box-shadow:none!important;
-  display:flex!important;flex-direction:column!important;overflow:hidden!important;
-  background:var(--sh-card)!important;
+/* Full-screen chat is moved to body so no studio/main transform can trap its scroll. */
+#chatSection.mx-chat-fullscreen{
+  position:fixed!important;inset:0!important;z-index:999!important;
+  display:flex!important;flex-direction:column!important;
+  width:100%!important;max-width:none!important;height:100vh!important;height:100dvh!important;
+  min-height:0!important;margin:0!important;
+  padding:calc(env(safe-area-inset-top,0px) + 10px) 14px calc(env(safe-area-inset-bottom,0px) + 10px)!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important;
+  background:var(--sh-card,#fff)!important;color:var(--sh-text,#111)!important;
 }
-#studio #chatSection.mx-chat-fullscreen>.sh{display:flex;flex:1 1 auto;flex-direction:column;min-height:0;overflow:hidden}
-#studio #chatSection.mx-chat-fullscreen h2{flex:0 0 auto;margin:0 0 12px;padding:4px 0 10px;border-bottom:1px solid var(--sh-line)}
-#studio #chatSection.mx-chat-fullscreen .ch-log{display:flex;flex:1 1 auto;min-height:0!important;height:auto;overflow-y:auto;overflow-x:hidden;touch-action:pan-y;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;margin:0 0 10px;padding:4px 0 12px}
-#studio #chatSection.mx-chat-fullscreen .ch-bar{flex:0 0 auto;align-items:flex-end;padding-bottom:2px}
-#studio #chatSection.mx-chat-fullscreen .ch-bar textarea{resize:none;max-height:28dvh;min-height:48px}
-#studio #chatSection.mx-chat-fullscreen .sh>small{flex:0 0 auto;margin-top:8px;font-size:10px;line-height:1.35}
-body.mx-chat-open #mxBar{display:none!important}
+#chatSection.mx-chat-fullscreen>.sh{display:flex!important;flex:1 1 auto;flex-direction:column;min-width:0;min-height:0;height:100%;overflow:hidden}
+#chatSection.mx-chat-fullscreen .mx-chat-head{display:flex;align-items:center;gap:10px;flex:0 0 auto;padding:4px 0 12px;border-bottom:1px solid var(--sh-line);margin-bottom:12px}
+#chatSection.mx-chat-fullscreen .mx-chat-back{width:40px;height:40px;flex:0 0 40px;border:1px solid var(--sh-line);border-radius:50%;background:var(--sh-card);color:var(--sh-text);font-size:22px}
+#chatSection.mx-chat-fullscreen .mx-chat-brand{min-width:0;flex:1}
+#chatSection.mx-chat-fullscreen .mx-chat-brand strong{display:block;font-size:16px;color:var(--sh-text)}
+#chatSection.mx-chat-fullscreen .mx-chat-brand small{display:block;font-size:11px;color:var(--sh-sub)}
+#chatSection.mx-chat-fullscreen .mx-chat-log{display:flex;flex:1 1 0%;min-height:0!important;height:0;overflow-y:scroll!important;overflow-x:hidden!important;touch-action:pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;margin:0;padding:4px 2px 16px;gap:10px}
+#chatSection.mx-chat-fullscreen .ch-b{flex:0 0 auto;max-width:88%;white-space:pre-wrap;overflow-wrap:anywhere}
+#chatSection.mx-chat-fullscreen .ch-bar{flex:0 0 auto;align-items:flex-end;padding:10px 0 2px;gap:8px;border-top:1px solid var(--sh-line);background:var(--sh-card)}
+#chatSection.mx-chat-fullscreen .ch-bar textarea{resize:none;max-height:25dvh;min-height:48px;border-radius:24px;padding:13px 16px}
+#chatSection.mx-chat-fullscreen .ch-go{min-height:48px;min-width:54px;border-radius:24px;padding:10px 14px}
+#chatSection.mx-chat-fullscreen .mx-chat-note{flex:0 0 auto;margin:7px 0 0;text-align:center;font-size:10px;line-height:1.35}
+#chatSection.mx-chat-fullscreen .mx-chat-welcome{flex:1 0 auto;min-height:min-content;display:flex;flex-direction:column;justify-content:center;gap:14px;padding:8px 0 18px}
+#chatSection.mx-chat-fullscreen .mx-chat-welcome[hidden],#chatSection.mx-chat-fullscreen .mx-chat-log[hidden]{display:none!important}
+#chatSection.mx-chat-fullscreen .mx-chat-welcome h2{font-size:clamp(25px,6vw,34px);line-height:1.12;letter-spacing:-.04em;margin:0;color:var(--sh-text);border:0;padding:0}
+#chatSection.mx-chat-fullscreen .mx-chat-welcome p{font-size:13px;line-height:1.5;margin:0;color:var(--sh-sub)}
+#chatSection.mx-chat-fullscreen .mx-chat-prompts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:4px}
+#chatSection.mx-chat-fullscreen .mx-chat-prompt{min-width:0;min-height:124px;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:10px;text-align:left;padding:12px;border:1px solid var(--sh-line);border-radius:17px;background:var(--sh-card);color:var(--sh-text);overflow:hidden}
+#chatSection.mx-chat-fullscreen .mx-chat-art{width:100%;height:62px;display:flex;align-items:center;justify-content:center;border-radius:12px;font-size:34px;line-height:1}
+#chatSection.mx-chat-fullscreen .mx-chat-art.video{background:linear-gradient(135deg,#d9e7ff,#9dbbff)}
+#chatSection.mx-chat-fullscreen .mx-chat-art.gift{background:linear-gradient(135deg,#ffe1ee,#ffb5d0)}
+#chatSection.mx-chat-fullscreen .mx-chat-art.pay{background:linear-gradient(135deg,#d7f8e8,#8eddbc)}
+#chatSection.mx-chat-fullscreen .mx-chat-art.tools{background:linear-gradient(135deg,#e8e0ff,#bdb0ff)}
+#chatSection.mx-chat-fullscreen .mx-chat-prompt strong{font-size:12px;line-height:1.3}
+#chatSection.mx-chat-fullscreen .mx-chat-prompt small{font-size:10px;color:var(--sh-sub);line-height:1.35}
+body.mx-chat-open{overflow:hidden!important;overscroll-behavior:none}
+body.mx-chat-open #mxBar,body.mx-chat-open>.topbar{display:none!important}
+@media(min-width:700px){
+ #chatSection.mx-chat-fullscreen{padding:16px max(20px,calc((100vw - 820px)/2)) 14px!important}
+ #chatSection.mx-chat-fullscreen .mx-chat-prompts{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 @media(min-width:700px){#studio #chatSection.mx-chat-fullscreen{padding:20px max(20px,calc((100vw - 900px)/2)) 18px!important}}
 #mxBar{padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(min-width:700px){#studio .sh-grid{grid-template-columns:repeat(3,minmax(0,1fr))}#mxBar{left:50%;right:auto;bottom:14px;transform:translateX(-50%);width:min(720px,calc(100% - 48px));border:1px solid var(--sh-line);border-radius:18px;box-shadow:0 8px 32px #0002;overflow:hidden}}
@@ -163,14 +189,26 @@ function init() {
   mk("shopSection", "<h2>Gift shop</h2><p>Gifts for the people you care about will appear here soon.</p>");
   const CHAT_FN = "rapid-function"; // name of the Supabase function that runs the chat
   const chat = mk("chatSection",
-    "<h2>AI chat</h2><div class='ch-log' id='chLog'></div>" +
-    "<div class='ch-bar'><textarea id='chIn' rows='2' maxlength='1000' placeholder='Ask anything…'></textarea>" +
-    "<button class='ch-go' id='chGo'>Send</button></div><small>Free to use. Messages go to Google's free AI service, so never share passwords or private details. AI can make mistakes; for tax, legal or money decisions, check the official source.</small>");
+    "<div class='mx-chat-head'><button type='button' class='mx-chat-back' id='chBack' aria-label='Back to tools'>‹</button><div class='mx-chat-brand'><strong>Musky Assistant</strong><small>Ask, create, and get help</small></div><span aria-hidden='true'>✦</span></div>" +
+    "<div class='mx-chat-welcome' id='chWelcome'><h2>What can I help you with?</h2><p>Choose a topic to get started, or type your own question below.</p>" +
+    "<div class='mx-chat-prompts'>" +
+    "<button type='button' class='mx-chat-prompt' data-prompt='Help me turn a photo into a video. Explain how to use Photo to Video on MuskySocials.'><span class='mx-chat-art video' aria-hidden='true'>🎬</span><strong>Photo to video</strong><small>Make a photo move</small></button>" +
+    "<button type='button' class='mx-chat-prompt' data-prompt='Help me understand how gifts work on MuskySocials and how to send or receive one.'><span class='mx-chat-art gift' aria-hidden='true'>🎁</span><strong>Gifts</strong><small>Sending and receiving gifts</small></button>" +
+    "<button type='button' class='mx-chat-prompt' data-prompt='Explain payments, coins, and credits on MuskySocials. Tell me where to check my balance.'><span class='mx-chat-art pay' aria-hidden='true'>🪙</span><strong>Payments & coins</strong><small>Credits, balance, and payments</small></button>" +
+    "<button type='button' class='mx-chat-prompt' data-prompt='Show me which MuskySocials tools I can use and how to get started with them.'><span class='mx-chat-art tools' aria-hidden='true'>✨</span><strong>Explore tools</strong><small>Find the right AI tool</small></button>" +
+    "</div></div>" +
+    "<div class='mx-chat-log' id='chLog' hidden></div>" +
+    "<div class='ch-bar'><textarea id='chIn' rows='1' maxlength='1000' placeholder='Message Musky Assistant…' aria-label='Message Musky Assistant'></textarea>" +
+    "<button class='ch-go' id='chGo' aria-label='Send message'>↑</button></div><small class='mx-chat-note'>AI can make mistakes. Never share passwords or private information.</small>");
+  document.body.appendChild(chat);
   const hist = [];
   const chLog = chat.querySelector("#chLog");
+  const chWelcome = chat.querySelector("#chWelcome");
   const chIn = chat.querySelector("#chIn");
   const chGo = chat.querySelector("#chGo");
   const bubble = (role, text) => {
+    chWelcome.hidden = true;
+    chLog.hidden = false;
     const d = document.createElement("div");
     d.className = "ch-b " + (role === "user" ? "ch-me" : "ch-ai");
     d.textContent = text;
@@ -178,7 +216,6 @@ function init() {
     chLog.scrollTop = chLog.scrollHeight;
     return d;
   };
-  bubble("assistant", "Hi, I am Musky Assistant. Ask me about talking to clients, dating, life in the USA, or anything else.");
   async function sendChat() {
     const text = chIn.value.trim();
     if (!text) return;
@@ -213,6 +250,20 @@ function init() {
     chLog.scrollTop = chLog.scrollHeight;
   }
   chGo.addEventListener("click", sendChat);
+  chat.querySelector("#chBack").addEventListener("click", () => go("toolsHubSection"));
+  chat.querySelectorAll("[data-prompt]").forEach((card) => {
+    card.addEventListener("click", () => {
+      chIn.value = card.dataset.prompt || "";
+      chIn.focus();
+      sendChat();
+    });
+  });
+  chIn.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendChat();
+    }
+  });
   const settings = mk("settingsSection",
     "<h2>Settings</h2><h3>Account</h3><p id='shEmail'>Signed in</p><p id='shCred'></p>" +
     "<h3>Appearance</h3><div class='sh-row' id='shTheme'><button data-theme='light'>Light</button><button data-theme='dark'>Dark</button></div>" +
@@ -248,6 +299,7 @@ function init() {
       const hide = p.id !== id;
       if (p.hidden !== hide) p.hidden = hide;
     });
+    chat.hidden = id !== "chatSection";
     const GROUPS = {
       exploreSection: ["exploreSection", "datingSection", "designSection", "aitoolsSection", "librarySection", "shopSection", "socialsSection", "askazaSection", "aboutSection", "contactSection", "privacySection", "docsSection"],
       jobsSection: ["jobsSection"],
