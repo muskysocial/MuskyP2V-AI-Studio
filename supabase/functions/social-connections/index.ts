@@ -218,8 +218,11 @@ async function publishTikTokVideo(userId: string, body: any) {
   if (!["video/mp4", "video/webm", "video/quicktime"].includes(videoType)) {
     throw new Error("Choose an MP4, WebM, or MOV video file.");
   }
-  const chunkSize = videoSize < 5 * 1024 * 1024 ? videoSize : Math.min(10 * 1024 * 1024, videoSize);
-  const chunkCount = Math.max(1, Math.floor(videoSize / chunkSize));
+  // Split larger videos into balanced chunks so the last chunk is not a tiny remainder.
+  // TikTok expects chunks to be at least 5 MB except when the entire file is smaller.
+  const maxChunkSize = 10 * 1024 * 1024;
+  const chunkCount = Math.max(1, Math.ceil(videoSize / maxChunkSize));
+  const chunkSize = Math.ceil(videoSize / chunkCount);
   const caption = [campaign.caption, campaign.hashtags].filter(Boolean).join("\n\n").slice(0, 2200);
   const initResponse = await fetch("https://open.tiktokapis.com/v2/post/publish/video/init/", {
     method: "POST",
