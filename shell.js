@@ -105,11 +105,12 @@ html.mx-light .mx-btn:disabled{background:#e4e6eb!important;color:#8a8d91!import
   display:flex!important;flex-direction:column!important;overflow:hidden!important;
   background:var(--sh-card)!important;
 }
+#studio #chatSection.mx-chat-fullscreen>.sh{display:flex;flex:1 1 auto;flex-direction:column;min-height:0;overflow:hidden}
 #studio #chatSection.mx-chat-fullscreen h2{flex:0 0 auto;margin:0 0 12px;padding:4px 0 10px;border-bottom:1px solid var(--sh-line)}
-#studio #chatSection.mx-chat-fullscreen .ch-log{flex:1 1 auto;min-height:0!important;overflow-y:auto;overscroll-behavior:contain;margin:0 0 10px;padding:4px 0 12px}
+#studio #chatSection.mx-chat-fullscreen .ch-log{display:flex;flex:1 1 auto;min-height:0!important;height:auto;overflow-y:auto;overflow-x:hidden;touch-action:pan-y;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;margin:0 0 10px;padding:4px 0 12px}
 #studio #chatSection.mx-chat-fullscreen .ch-bar{flex:0 0 auto;align-items:flex-end;padding-bottom:2px}
 #studio #chatSection.mx-chat-fullscreen .ch-bar textarea{resize:none;max-height:28dvh;min-height:48px}
-#studio #chatSection.mx-chat-fullscreen>small{flex:0 0 auto;margin-top:8px;font-size:10px;line-height:1.35}
+#studio #chatSection.mx-chat-fullscreen .sh>small{flex:0 0 auto;margin-top:8px;font-size:10px;line-height:1.35}
 body.mx-chat-open #mxBar{display:none!important}
 @media(min-width:700px){#studio #chatSection.mx-chat-fullscreen{padding:20px max(20px,calc((100vw - 900px)/2)) 18px!important}}
 #mxBar{padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -174,7 +175,7 @@ function init() {
     d.className = "ch-b " + (role === "user" ? "ch-me" : "ch-ai");
     d.textContent = text;
     chLog.appendChild(d);
-    d.scrollIntoView({ block: "end" });
+    chLog.scrollTop = chLog.scrollHeight;
     return d;
   };
   bubble("assistant", "Hi, I am Musky Assistant. Ask me about talking to clients, dating, life in the USA, or anything else.");
@@ -209,7 +210,7 @@ function init() {
       hist.pop();
     }
     chGo.disabled = false;
-    wait.scrollIntoView({ block: "end" });
+    chLog.scrollTop = chLog.scrollHeight;
   }
   chGo.addEventListener("click", sendChat);
   const settings = mk("settingsSection",
