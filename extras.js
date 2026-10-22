@@ -236,7 +236,7 @@ html.mx-light .topbar #xAv{color:#fff!important}
     const name = d.display_name || s.user.email.split("@")[0];
     const credits = await window.musky.credits();
     $p("pfName").textContent = name;
-    $p("pfRole").textContent = d.role === "admin" ? "Admin" : "Client";
+    $p("pfRole").textContent = (d.role === "admin" ? "Admin" : "Client") + (d.is_verified ? " · Verified ✓" : "");
     $p("pfEmail").textContent = s.user.email;
     $p("pfBio").textContent = d.bio || "";
     $p("pfMeta").textContent = "Credits: " + (credits === null ? "…" : credits) +
@@ -453,6 +453,8 @@ html.mx-light .topbar #xAv{color:#fff!important}
       ["customer_orders", () => sb.from("customer_orders").select("*").eq("user_id", uid).order("created_at", { ascending: false })],
       ["user_activity", () => sb.from("user_activity").select("*").eq("user_id", uid).order("created_at", { ascending: false })],
       ["notifications", () => sb.from("notifications").select("*").eq("user_id", uid).order("created_at", { ascending: false })],
+      ["referrals", () => sb.from("referrals").select("*").eq("referrer_id", uid).order("created_at", { ascending: false })],
+      ["verified_badge_requests", () => sb.from("verified_badge_requests").select("*").eq("user_id", uid).order("created_at", { ascending: false })],
       ["comments", () => sb.from("post_comments").select("*").eq("user_id", uid).order("created_at", { ascending: false })],
       ["likes", () => sb.from("post_likes").select("*").eq("user_id", uid).order("created_at", { ascending: false })],
     ];
@@ -482,16 +484,124 @@ html.mx-light .topbar #xAv{color:#fff!important}
     }
   });
 
-  // These two paid/referral actions remain gated until their reward rules are approved.
-  $p("pfVerified").addEventListener("click", () => {
+  // Verified badge: charge through a server-side RPC, then submit a review request.
+  $p("pfVerified").addEventListener("click", async () => {
     const body = document.createElement("div");
-    body.innerHTML = "<p>Verified badge is a paid feature. Its price has not been configured yet, so no coins or money will be taken.</p><p>Once the price is approved, this screen will let you submit a verification request and track its review status.</p>";
+    body.innerHTML = "<p>A verified badge request costs <strong>7,000 coins</strong>. The badge appears after an admin approves your request. If a request is rejected, the coins are refunded automatically.</p><p id='pfBadgeMsg' class='pt-msg' role='status'>Checking your badge status…</p><div id='pfBadgeHistory'></div><button id='pfBadgeRequest' type='button' class='pt-btn' style='width:100%'>Pay 7,000 coins and submit request</button>";
     settingsModal("pfVerifiedModal", "Verified badge", body);
+    const msg = body.querySelector("#pfBadgeMsg");
+    const btn = body.querySelector("#pfBadgeRequest");
+    if (!uid) { msg.textContent = "Sign in to request a verified badge."; btn.disabled = true; return; }
+    btn.disabled = true;
+    try {
+      const [profileResult, requestResult] = await Promise.all([
+        sb.from("profiles").select("is_verified").eq("id", uid).maybeSingle(),
+        sb.from("verified_badge_requests").select("status,coins_paid,created_at,reviewed_at").eq("user_id", uid).order("created_at", { ascending: false }).limit(5),
+      ]);
+      if (profileResult.error) throw profileResult.error;
+      if (requestResult.error) throw requestResult.error;
+      if (profileResult.data && profileResult.data.is_verified) {
+        msg.textContent = "Your account is already verified.";
+        btn.hidden = true;
+      } else {
+        const pending = (requestResult.data || []).some((r) => r.status === "pending");
+        msg.textContent = pending ? "Your request is waiting for admin review. You have not been charged again." : "No pending request. Submit one when you're ready.";
+        btn.disabled = pending;
+      }
+      body.querySelector("#pfBadgeHistory").innerHTML = (requestResult.data || []).map((r) =>
+        "<div class='pt-card'><strong>" + esc(r.status) + "</strong><p>" + Number(r.coins_paid || 7000).toLocaleString() + " coins · " +
+        esc(r.created_at ? new Date(r.created_at).toLocaleDateString() : "") + "</p></div>"
+      ).join("");
+    } catch (err) {
+      msg.textContent = "Could not load badge status: " + (err.message || err);
+      btn.disabled = true;
+      return;
+    }
+    btn.addEventListener("click", async () => {
+      btn.disabled = true;
+      msg.textContent = "Checking your balance and submitting the request…";
+      try {
+        const { data, error } = await sb.rpc("request_verified_badge");
+        if (error) throw error;
+        if (data && data.status === "approved") {
+          msg.textContent = "Your account is already verified.";
+          btn.hidden = true;
+          return;
+        }
+        if (data && data.status === "pending" && data.already_pending) {
+          msg.textContent = "You already have a pending request. No additional coins were charged.";
+          return;
+        }
+        const balance = await window.musky.credits();
+        if (balance !== null) window.musky.setBadge(balance);
+        msg.textContent = "Request submitted. 7,000 coins were deducted. Your request is pending admin review.";
+        body.querySelector("#pfBadgeHistory").insertAdjacentHTML("afterbegin", "<div class='pt-card'><strong>pending</strong><p>7,000 coins · just now</p></div>");
+      } catch (err) {
+        const message = String(err && err.message || err);
+        msg.textContent = /not enough credits|insufficient|credit/i.test(message)
+          ? "You need at least 7,000 coins to submit this request. No coins were deducted."
+          : "Could not submit the request: " + message;
+        btn.disabled = false;
+      }
+    });
   });
-  $p("pfInvite").addEventListener("click", () => {
+
+  // Referral links and reward history. Rewards are issued by database triggers only
+  // after the referred account confirms its email; browser code never credits coins.
+  $p("pfInvite").addEventListener("click", async () => {
     const body = document.createElement("div");
-    body.innerHTML = "<p>Invite friends and earn coins when eligible new members join.</p><p>The referral reward amount and eligibility rules have not been configured yet, so this screen will not issue unverified rewards.</p><p>Once the reward rules are approved, each account will receive a referral link and a reward history.</p>";
+    body.innerHTML = "<p>Earn <strong>300 coins</strong> for each eligible friend who joins with your link and confirms their email. After 10 successful referrals, your reward doubles to <strong>600 coins</strong> for each additional eligible friend.</p><label for='pfInviteLink'>Your invite link</label><input id='pfInviteLink' class='pt-in' readonly><p id='pfInviteMsg' class='pt-msg' role='status'>Loading your invite link…</p><p id='pfInviteStats'></p><button id='pfInviteCopy' type='button' class='pt-btn' style='width:100%'>Copy invite link</button><button id='pfInviteShare' type='button' class='pt-btn' style='width:100%;margin-top:8px'>Share invite link</button><div id='pfInviteHistory'></div>";
     settingsModal("pfInviteModal", "Invite friends, earn credits", body);
+    const msg = body.querySelector("#pfInviteMsg");
+    const linkInput = body.querySelector("#pfInviteLink");
+    const copy = body.querySelector("#pfInviteCopy");
+    const share = body.querySelector("#pfInviteShare");
+    if (!uid) { msg.textContent = "Sign in to get your invite link."; copy.disabled = true; share.disabled = true; return; }
+    let inviteUrl = "";
+    try {
+      const { data: profile, error: profileError } = await sb.from("profiles").select("referral_code").eq("id", uid).maybeSingle();
+      if (profileError) throw profileError;
+      if (!profile || !profile.referral_code) throw new Error("Your invite code is not ready yet. Refresh and try again.");
+      const url = new URL(window.location.href);
+      url.searchParams.set("ref", profile.referral_code);
+      inviteUrl = url.toString();
+      linkInput.value = inviteUrl;
+      const { data: refs, error: refsError } = await sb.from("referrals").select("referred_user_id,status,reward_coins,created_at,qualified_at").eq("referrer_id", uid).order("created_at", { ascending: false }).limit(100);
+      if (refsError) throw refsError;
+      const qualified = (refs || []).filter((r) => r.status === "qualified");
+      const earned = qualified.reduce((sum, r) => sum + (Number(r.reward_coins) || 0), 0);
+      body.querySelector("#pfInviteStats").textContent = "Successful referrals: " + qualified.length + " · Total earned: " + earned.toLocaleString() + " coins · Next reward rate: " + (qualified.length >= 10 ? "600" : "300") + " coins";
+      body.querySelector("#pfInviteHistory").innerHTML = (refs || []).map((r) =>
+        "<div class='pt-card'><strong>" + (r.status === "qualified" ? "Successful referral" : r.status === "pending" ? "Awaiting email confirmation" : "Not eligible") +
+        "</strong><p>" + (r.status === "qualified" ? "+" + Number(r.reward_coins || 0).toLocaleString() + " coins" : "No reward issued yet") +
+        " · " + esc(r.created_at ? new Date(r.created_at).toLocaleDateString() : "") + "</p></div>"
+      ).join("");
+      msg.textContent = "Share this link with friends. Rewards are credited after they confirm their email.";
+    } catch (err) {
+      msg.textContent = "Could not load your referral details: " + (err.message || err);
+      copy.disabled = true; share.disabled = true;
+      return;
+    }
+    async function copyInvite() {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(inviteUrl);
+        else {
+          linkInput.focus(); linkInput.select();
+          if (!document.execCommand("copy")) throw new Error("Copy is not supported here. Select and copy the link manually.");
+        }
+        msg.textContent = "Invite link copied. Send it to your friends.";
+      } catch (err) {
+        msg.textContent = "Could not copy automatically. Tap and hold the invite link to copy it.";
+        linkInput.focus(); linkInput.select();
+      }
+    }
+    copy.addEventListener("click", copyInvite);
+    share.addEventListener("click", async () => {
+      if (navigator.share) {
+        try { await navigator.share({ title: "Join MuskySocials", text: "Join me on MuskySocials using my invite link:", url: inviteUrl }); }
+        catch (err) { if (!err || err.name !== "AbortError") await copyInvite(); }
+      } else await copyInvite();
+    });
   });
 
   $p("pfMfa").addEventListener("click", () => {
