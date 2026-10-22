@@ -285,7 +285,12 @@ async function init() {
     try {
       if (mode === "signup") {
         const display_name = ($("authName").value.trim() || email.split("@")[0]).slice(0, 40);
-        const { data, error } = await sb.auth.signUp({ email, password, options: { data: { display_name } } });
+        // Referral codes come from the invite URL and are only attribution metadata;
+        // the database validates the code and issues rewards after email confirmation.
+        const candidateCode = (new URLSearchParams(window.location.search).get("ref") || "").trim().toUpperCase();
+        const signupMetadata = { display_name };
+        if (/^MS[A-F0-9]{12}$/.test(candidateCode)) signupMetadata.referral_code = candidateCode;
+        const { data, error } = await sb.auth.signUp({ email, password, options: { data: signupMetadata } });
         if (error) throw error;
         if (data.session) await continueAfterAuth(data.session);
         else say("Account created. Check your email to confirm it, then sign in.");
