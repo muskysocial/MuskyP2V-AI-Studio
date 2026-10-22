@@ -135,12 +135,14 @@ function startViralBoost() {
   }
   $("vbFile").addEventListener("change", () => {
     cleanupPreview();
+    $("vbMediaType").disabled = false;
     const file = $("vbFile").files && $("vbFile").files[0];
     if (!file) return;
     const allowed = /^(image\/(jpeg|png|webp|gif)|video\/(mp4|webm|quicktime|x-m4v))$/i.test(file.type);
     if (!allowed) { $("vbFile").value = ""; say("Please choose a JPG, PNG, WebP, GIF, MP4, WebM, or MOV file.", true); return; }
-    $("vbMediaType").value = file.type.startsWith("video/") ? "video" : "picture";
     if (file.size > MAX_FILE) { $("vbFile").value = ""; say("That file is over 100 MB. Choose a smaller file.", true); return; }
+    $("vbMediaType").value = file.type.startsWith("video/") ? "video" : "picture";
+    $("vbMediaType").disabled = true;
     selectedFile = file;
     previewUrl = URL.createObjectURL(file);
     let media;
@@ -265,6 +267,7 @@ function startViralBoost() {
   function resetEditor() {
     cleanupPreview();
     $("vbFile").value = ""; $("vbFile").disabled = false;
+    $("vbMediaType").disabled = false;
     $("vbTitle").value = ""; $("vbUrl").value = "";
     $("vbTopic").value = ""; $("vbCaption").value = ""; $("vbHashtags").value = "";
     pane.querySelectorAll('input[name="vbPlatform"]').forEach(el => el.checked = false);
@@ -344,7 +347,9 @@ function startViralBoost() {
         }
         say("Draft saved. No coins were charged; no post was published or promoted.");
       }
-      cleanupPreview(); $("vbFile").value = ""; $("vbTopic").value = "";
+      cleanupPreview(); $("vbFile").value = ""; $("vbFile").disabled = false;
+      $("vbMediaType").disabled = false;
+      $("vbTopic").value = "";
       await loadDrafts();
     } catch (error) {
       say(String(error && error.message || "Could not save this draft."), true);
@@ -433,6 +438,7 @@ function startViralBoost() {
     cleanupPreview();
     $("vbFile").value = "";
     $("vbFile").disabled = true;
+    $("vbMediaType").disabled = !!row.asset_path;
     $("vbTitle").value = row.title || "";
     $("vbUrl").value = row.post_url || "";
     $("vbMediaType").value = row.media_type || ((row.content_type || "").startsWith("video/") ? "video" : "picture");
