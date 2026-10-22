@@ -80,6 +80,46 @@ html.mx-light #studio .hm-badge{color:#9a6700!important}
 html.mx-light #studio .ex-tag{color:#9a6700!important}
 html.mx-light #studio .ex-tag.ok{color:#0a7d33!important}
 html.mx-light #studio .ex-card b{color:#050505!important}
+
+.md-hero{padding:18px;border:1px solid var(--sh-line);border-radius:18px;background:linear-gradient(130deg,rgba(24,119,242,.12),rgba(244,91,154,.12));margin-bottom:14px}
+.md-hero h2{margin:0 0 5px;font-size:24px;letter-spacing:-.03em}
+.md-hero p{margin:0;color:var(--sh-sub)}
+.md-search{display:flex;gap:8px;margin:14px 0}
+.md-search input{flex:1;min-width:0;border:1px solid var(--sh-line);border-radius:12px;padding:13px;background:var(--sh-card);color:var(--sh-text)}
+.md-people-list{display:grid;grid-template-columns:1fr;gap:12px}
+.md-card{padding:14px;border:1px solid var(--sh-line);border-radius:18px;background:var(--sh-card);box-shadow:0 8px 24px rgba(25,45,85,.06);min-width:0}
+.md-person{display:flex;gap:12px;align-items:flex-start;width:100%;padding:0;border:0;background:transparent;color:var(--sh-text);text-align:left;min-width:0}
+.md-avatar{display:grid;place-items:center;flex:none;width:54px;height:54px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,#1877f2,#f45b9a);color:#fff;font-size:20px;font-weight:800}
+.md-avatar-fallback{display:inline-flex;align-items:center;justify-content:center}
+.md-person-copy{display:flex;flex:1;flex-direction:column;gap:4px;min-width:0}
+.md-person-copy strong{font-size:16px;overflow-wrap:anywhere}
+.md-verified{display:inline-flex;align-self:flex-start;align-items:center;gap:4px;border-radius:999px;background:#eaf3ff;color:#1456a0;padding:3px 7px;font-size:10px;font-weight:800}
+.md-person-copy small{color:var(--sh-sub);font-size:12px}
+.md-bio{color:var(--sh-sub);font-size:13px;line-height:1.45;overflow-wrap:anywhere}
+.md-card-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--sh-line);font-size:12px;color:var(--sh-sub)}
+.md-follow{flex:none;padding:9px 14px;border:1px solid var(--ms-blue,#1877f2);border-radius:999px;background:var(--ms-blue,#1877f2);color:#fff;font-weight:750;font-size:12px}
+.md-follow.is-following{background:transparent;color:var(--sh-text);border-color:var(--sh-line)}
+.md-profile{padding:18px;border:1px solid var(--sh-line);border-radius:20px;background:var(--sh-card)}
+.md-profile-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.md-profile .md-avatar{width:76px;height:76px;font-size:28px}
+.md-profile h2{margin:0 0 5px;font-size:24px}
+.md-profile-bio{line-height:1.6;overflow-wrap:anywhere}
+.md-counts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0}
+.md-count{padding:12px;border:1px solid var(--sh-line);border-radius:14px;text-align:center}
+.md-count strong{display:block;font-size:20px;color:var(--sh-text)}
+.md-count span{font-size:12px;color:var(--sh-sub)}
+.md-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+.md-actions button{flex:1;min-width:120px}
+.md-coming{display:inline-flex;align-items:center;gap:5px;margin-top:12px;padding:5px 9px;border:1px solid #ffd1e1;border-radius:999px;background:#fff0f6;color:#a92d61;font-size:11px;font-weight:800}
+.hm-meet{display:flex;align-items:center;gap:11px;width:100%;margin:12px 0;padding:13px;border:1px solid color-mix(in srgb,#1877f2 20%,var(--sh-line));border-radius:16px;background:linear-gradient(110deg,rgba(24,119,242,.09),rgba(244,91,154,.09));color:var(--sh-text);text-align:left}
+.hm-meet-icon{display:grid;place-items:center;flex:none;width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#1877f2,#f45b9a);color:#fff;font-size:21px}
+.hm-meet-copy{display:flex;flex:1;flex-direction:column;gap:2px}
+.hm-meet-copy strong{font-size:14px}
+.hm-meet-copy small{font-size:11px;color:var(--sh-sub)}
+.hm-meet-arrow{font-size:19px;color:var(--ms-blue,#1877f2)}
+@media(min-width:620px){.md-people-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:380px){.md-card{padding:12px}.md-avatar{width:46px;height:46px}.md-card-footer{align-items:flex-start;flex-direction:column}.md-follow{width:100%}.hm-meet-copy small{font-size:10px}}
+
 `;
   document.head.appendChild(st);
 
@@ -108,7 +148,8 @@ html.mx-light #studio .ex-card b{color:#050505!important}
   }
   const actions = q(".topbar .top-actions");
   if (actions) {
-    actions.insertAdjacentHTML("afterbegin", "<button class='tb-ic' id='tbSearch' aria-label='Search'>🔍</button><button class='tb-ic' id='tbBell' aria-label='Notifications'>🔔</button>");
+    actions.insertAdjacentHTML("afterbegin", "<button class='tb-ic' id='tbSearch' aria-label='Search'>🔍</button><button class='tb-ic' id='tbPeople' aria-label='Meet people'>👥</button><button class='tb-ic' id='tbBell' aria-label='Notifications'>🔔</button>");
+    q("#tbPeople").addEventListener("click", () => { loadPeople(true); go("peopleSection"); });
     q("#tbBell").addEventListener("click", () => go("notifSection"));
     q("#tbSearch").addEventListener("click", () => {
       go("homeSection");
@@ -233,6 +274,7 @@ html.mx-light #studio .ex-card b{color:#050505!important}
 
   home.addEventListener("click", async (e) => {
     const t = e.target;
+    if (t.closest("#hmMeet")) { loadPeople(true); return go("peopleSection"); }
     if (t.closest("#hmShare")) return compose();
     if (t.closest("#hmAdmin")) return go("adminSection");
     const lk = t.closest("[data-like]");
@@ -261,6 +303,7 @@ html.mx-light #studio .ex-card b{color:#050505!important}
   // ---------- Home screen (replaces the old tile grid)
   const STORIES = [
     ["profileSection", "🙂", "You", "linear-gradient(160deg,#1877f2,#6aa8ff)"],
+    ["peopleSection", "👥", "Meet people", "linear-gradient(160deg,#1877f2,#f45b9a)"],
     ["notifSection", "🔔", "Notifications", "linear-gradient(160deg,#1877f2,#8a5cf6)"],
     ["datingSection", "❤️", "Dating Guide", "linear-gradient(160deg,#ff5f6d,#ffc371)"],
     ["jobsSection", "💼", "Job Updates", "linear-gradient(160deg,#11998e,#38ef7d)"],
@@ -274,6 +317,7 @@ html.mx-light #studio .ex-card b{color:#050505!important}
       '<button class="hm-pill" id="hmShare">What would you like to share?</button></div>' +
       '<div class="hm-meta"><span>🪙 ' + (credits === null || credits === undefined ? "…" : credits) + ' credits · refills to 80 daily</span>' +
       (isAdmin ? '<button id="hmAdmin">🛠️ Admin studio</button>' : "") + "</div>" +
+      '<button class="hm-meet" id="hmMeet" type="button"><span class="hm-meet-icon">👥</span><span class="hm-meet-copy"><strong>Meet people</strong><small>Discover members, follow people and grow your circle</small></span><span class="hm-meet-arrow">›</span></button>' +
       '<div class="hm-stories">' + STORIES.map(([id, ic, label, bg]) =>
         '<button class="hm-story" data-go="' + id + '" style="background:' + bg + '"><span class="ic">' + ic + "</span><b>" + label + "</b></button>").join("") + "</div>" +
       '<div id="hmFeed">Loading…</div></div>';
@@ -293,8 +337,173 @@ html.mx-light #studio .ex-card b{color:#050505!important}
   });
   if (isAdmin) window.dispatchEvent(new CustomEvent("musky-admin", { detail: true }));
 
+
+  // ---------- Meet people: public member directory, follow/unfollow, public profile
+  const PEOPLE_FIELDS = "id,display_name,bio,country,avatar_path,is_verified,created_at,follower_count,following_count";
+  let people = [];
+  let followedIds = new Set();
+  let selectedPerson = null;
+  let peopleLoadToken = 0;
+
+  const publicAvatarUrl = (person) => {
+    if (!person || !person.avatar_path) return "";
+    try { return sb.storage.from("avatars").getPublicUrl(person.avatar_path).data.publicUrl || ""; }
+    catch { return ""; }
+  };
+  const personAvatar = (person) => {
+    const url = publicAvatarUrl(person);
+    if (url) return '<img class="md-avatar" src="' + esc(url) + '" alt="" loading="lazy">';
+    return '<span class="md-avatar md-avatar-fallback">' + esc(((person && person.display_name) || "M").charAt(0).toUpperCase()) + "</span>";
+  };
+  const verifiedMark = (person) => person && person.is_verified
+    ? '<span class="md-verified" aria-label="Verified member">✓ Verified</span>' : "";
+
+  function paintPeople() {
+    const box = q("#mdPeopleList");
+    if (!box) return;
+    const search = (q("#mdSearch") && q("#mdSearch").value || "").trim().toLowerCase();
+    const visible = people.filter((p) => p.id !== uid && (
+      (p.display_name || "").toLowerCase().includes(search) ||
+      (p.country || "").toLowerCase().includes(search) ||
+      (p.bio || "").toLowerCase().includes(search)
+    ));
+    if (!visible.length) {
+      box.innerHTML = '<div class="pt-card"><strong>' + (search ? "No members match that search." : "No other members yet.") +
+        '</strong><p class="muted">New people will appear here as they join MuskySocials.</p></div>';
+      return;
+    }
+    box.innerHTML = visible.map((p) => {
+      const following = followedIds.has(p.id);
+      const country = p.country ? "📍 " + esc(p.country) : "MuskySocials member";
+      const bio = p.bio ? esc(p.bio) : "No bio added yet.";
+      return '<article class="md-card">' +
+        '<button type="button" class="md-person" data-person="' + p.id + '" aria-label="View ' + esc(p.display_name) + " profile">" +
+        personAvatar(p) + '<span class="md-person-copy"><strong>' + esc(p.display_name) + '</strong>' + verifiedMark(p) +
+        '<small>' + country + '</small><span class="md-bio">' + bio + '</span></span></button>' +
+        '<div class="md-card-footer"><span>👥 ' + Number(p.follower_count || 0) + ' followers</span>' +
+        '<button type="button" class="md-follow' + (following ? " is-following" : "") + '" data-follow="' + p.id + '">' +
+        (following ? "Following" : "Follow") + "</button></div></article>";
+    }).join("");
+  }
+
+  async function loadPeople(force) {
+    const token = ++peopleLoadToken;
+    const box = q("#mdPeopleList");
+    if (!uid) await loadMe();
+    if (!uid) {
+      if (box) box.innerHTML = '<div class="pt-card"><strong>Sign in to meet people</strong><p class="muted">Create or sign in to your account to discover community members and follow profiles.</p></div>';
+      return;
+    }
+    if (!force && people.length) { paintPeople(); return; }
+    if (box) box.innerHTML = '<div class="pt-card">Finding community members…</div>';
+    const results = await Promise.all([
+      sb.from("member_directory").select(PEOPLE_FIELDS).order("created_at", { ascending: false }).limit(100),
+      sb.from("member_follows").select("followed_id").eq("follower_id", uid)
+    ]);
+    if (token !== peopleLoadToken) return;
+    const directory = results[0], followRows = results[1];
+    if (directory.error) {
+      if (box) box.innerHTML = '<div class="pt-card"><strong>People could not load right now.</strong><p class="muted">Please refresh and try again.</p></div>';
+      return;
+    }
+    people = directory.data || [];
+    followedIds = new Set((followRows.data || []).map((row) => row.followed_id));
+    paintPeople();
+    if (followRows.error) toast("People loaded, but your following list could not be refreshed.");
+  }
+
+  async function openPerson(id) {
+    let person = people.find((p) => p.id === id);
+    if (!person) {
+      const result = await sb.from("member_directory").select(PEOPLE_FIELDS).eq("id", id).maybeSingle();
+      if (result.error || !result.data) return toast("That profile could not be opened.");
+      person = result.data;
+    }
+    selectedPerson = person;
+    paintPublicProfile();
+    go("publicProfileSection");
+  }
+
+  function paintPublicProfile() {
+    const pane = q("#publicProfileSection .pt") || q("#publicProfileSection");
+    if (!pane || !selectedPerson) return;
+    const p = selectedPerson;
+    const following = followedIds.has(p.id);
+    const bio = p.bio ? esc(p.bio) : "This member hasn't added a bio yet.";
+    const country = p.country ? '<p class="muted">📍 ' + esc(p.country) + '</p>' : "";
+    pane.innerHTML = '<div class="md-hero"><button type="button" class="pt-btn" data-go="peopleSection">‹ Back to people</button><h2 style="margin-top:14px">Member profile</h2><p>Get to know the people in your community.</p></div>' +
+      '<div class="md-profile"><div class="md-profile-top">' + personAvatar(p) + '<div><h2>' + esc(p.display_name) + '</h2>' +
+      verifiedMark(p) + country + '</div></div><p class="md-profile-bio">' + bio + '</p>' +
+      '<div class="md-counts"><div class="md-count"><strong>' + Number(p.follower_count || 0) + '</strong><span>Followers</span></div>' +
+      '<div class="md-count"><strong>' + Number(p.following_count || 0) + '</strong><span>Following</span></div></div>' +
+      '<div class="md-actions"><button type="button" class="pt-btn md-follow' + (following ? " is-following" : "") + '" data-profile-follow="' + p.id + '">' +
+      (following ? "Following · Unfollow" : "Follow") + '</button><button type="button" class="pt-btn" data-message-soon="' + p.id + '">Message</button></div>' +
+      '<span class="md-coming">Private messaging · Coming soon</span></div>';
+  }
+
+  async function toggleFollow(id) {
+    if (!(await needUser())) return;
+    if (!id || id === uid) return toast("You can't follow your own profile.");
+    const wasFollowing = followedIds.has(id);
+    const result = wasFollowing
+      ? await sb.from("member_follows").delete().eq("follower_id", uid).eq("followed_id", id)
+      : await sb.from("member_follows").insert({ follower_id: uid, followed_id: id });
+    if (result.error) {
+      toast(result.error.code === "23505" ? "You're already following this member." : "Could not update your follow. Please try again.");
+      return;
+    }
+    if (wasFollowing) followedIds.delete(id); else followedIds.add(id);
+    toast(wasFollowing ? "You unfollowed this member." : "You're now following this member.");
+    await loadPeople(true);
+    if (selectedPerson && selectedPerson.id === id) {
+      selectedPerson = people.find((p) => p.id === id) || selectedPerson;
+      paintPublicProfile();
+    }
+  }
+
+  mkPane("peopleSection",
+    '<div class="md-hero"><h2>Meet people 👋</h2><p>Discover members, find people with shared interests, and grow your circle.</p>' +
+    '<div class="md-search"><input id="mdSearch" type="search" maxlength="80" placeholder="Search by name, country or bio…" aria-label="Search members"></div>' +
+    '<p class="muted" style="font-size:12px">Only public profile details are shown. Email, phone numbers and account credits stay private.</p></div>' +
+    '<div id="mdPeopleList" class="md-people-list"><div class="pt-card">Loading members…</div></div>'
+  );
+  mkPane("publicProfileSection",
+    '<div class="md-profile" id="mdPublicProfile"><p class="muted">Choose a member to view their profile.</p></div>'
+  );
+
+  const peopleSection = q("#peopleSection");
+  if (peopleSection) {
+    peopleSection.addEventListener("click", (e) => {
+      const t = e.target;
+      const follow = t.closest("[data-follow]");
+      if (follow) { e.preventDefault(); e.stopPropagation(); return toggleFollow(follow.dataset.follow); }
+      const person = t.closest("[data-person]");
+      if (person) return openPerson(person.dataset.person);
+    });
+    peopleSection.addEventListener("input", (e) => {
+      if (e.target && e.target.id === "mdSearch") paintPeople();
+    });
+  }
+  const publicProfilePane = q("#publicProfileSection");
+  if (publicProfilePane) {
+    publicProfilePane.addEventListener("click", (e) => {
+      const t = e.target;
+      const follow = t.closest("[data-profile-follow]");
+      if (follow) return toggleFollow(follow.dataset.profileFollow);
+      const message = t.closest("[data-message-soon]");
+      if (message) toast("Private messaging is coming soon. You can follow this member for now.");
+    });
+  }
+  document.addEventListener("click", (e) => {
+    if (e.target.closest && e.target.closest('[data-go="peopleSection"]')) loadPeople(true);
+  });
+  sb.auth.onAuthStateChange(() => {
+    setTimeout(() => { loadMe().then(() => loadPeople(true)); }, 0);
+  });
+
   // ---------- Explore page
   const CARDS = [
+    ["peopleSection", "👥", "Meet people", "Discover community members, follow profiles and grow your circle.", "Open", "24,119,242"],
     ["datingSection", "❤️", "Dating Site First With Love Log", "Directory of dating websites, with safety tips.", "Open", "255,95,109"],
     ["jobsSection", "💼", "Apply for Jobs", "Admin-posted job openings.", "Open", "17,153,142"],
     ["designSection", "🎓", "Educational Design Studio", "Practice templates for design learning.", "Open", "106,90,205"],
