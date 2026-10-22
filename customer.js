@@ -43,8 +43,15 @@ function start() {
   function syncSaveButtons() {
     document.querySelectorAll("[data-cs-save-type][data-cs-save-id]").forEach((button) => {
       const k = key(button.dataset.csSaveType, button.dataset.csSaveId);
-      button.textContent = savedKeys.has(k) ? "♥ Saved · Remove" : "♡ Save";
-      button.setAttribute("aria-pressed", savedKeys.has(k) ? "true" : "false");
+      const label = savedKeys.has(k) ? "♥ Saved · Remove" : "♡ Save";
+      // Avoid changing text nodes when the label is already correct. The cards
+      // are watched by MutationObserver, so needless text changes can retrigger
+      // attachSaveButtons indefinitely and freeze navigation.
+      if (button.textContent !== label) button.textContent = label;
+      const pressed = savedKeys.has(k) ? "true" : "false";
+      if (button.getAttribute("aria-pressed") !== pressed) {
+        button.setAttribute("aria-pressed", pressed);
+      }
     });
   }
 
