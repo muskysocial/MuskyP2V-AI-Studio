@@ -272,9 +272,9 @@ async function handleCallback(req: Request) {
   if (stateError || !stateRow || stateRow.used_at || new Date(stateRow.expires_at).getTime() < Date.now()) {
     return html("Connection expired", "This connection request expired or has already been used. Return to MuskySocials and try again.", 400);
   }
-  const { error: consumeError } = await admin.from("social_oauth_states")
-    .update({ used_at: new Date().toISOString() }).eq("id", stateRow.id).is("used_at", null);
-  if (consumeError) return html("Connection failed", "The authorization request could not be verified. Please try again.", 400);
+  const { data: consumedState, error: consumeError } = await admin.from("social_oauth_states")
+    .update({ used_at: new Date().toISOString() }).eq("id", stateRow.id).is("used_at", null).select("id").maybeSingle();
+  if (consumeError || !consumedState) return html("Connection failed", "The authorization request expired or has already been used. Please start a new connection.", 400);
 
   const tokenResponse = await fetch("https://open.tiktokapis.com/v2/oauth/token/", {
     method: "POST",
