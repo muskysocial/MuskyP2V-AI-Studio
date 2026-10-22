@@ -25,7 +25,7 @@ function initPrivateMessaging() {
   const style = document.createElement("style");
   style.textContent = `
     #messagesSection .mxmsg{max-width:760px;margin:0 auto;padding:2px 0 24px;color:var(--sh-text,#172033)}
-    #messagesSection.mx-messages-fullscreen{position:fixed!important;inset:0!important;z-index:999!important;display:flex!important;flex-direction:column!important;width:100%!important;max-width:none!important;height:100vh!important;height:100dvh!important;min-height:0!important;margin:0!important;padding:calc(env(safe-area-inset-top,0px) + 10px) 14px calc(env(safe-area-inset-bottom,0px) + 78px)!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important;background:var(--sh-card,#fff)!important;color:var(--sh-text,#172033)!important}
+    #messagesSection.mx-messages-fullscreen{position:fixed!important;inset:0!important;z-index:999!important;display:flex!important;flex-direction:column!important;width:100%!important;max-width:none!important;height:100vh!important;height:100dvh!important;min-height:0!important;margin:0!important;padding:calc(env(safe-area-inset-top,0px) + 10px) 14px calc(env(safe-area-inset-bottom,0px) + 10px)!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important;background:var(--sh-card,#fff)!important;color:var(--sh-text,#172033)!important}
     #messagesSection.mx-messages-fullscreen .mxmsg{display:flex;flex-direction:column;width:100%;max-width:900px;flex:1;min-height:0;margin:0 auto;padding:0}
     #messagesSection.mx-messages-fullscreen .mxmsg-head{flex:0 0 auto;padding:3px 0 12px;margin-bottom:6px}
     #messagesSection.mx-messages-fullscreen #mxmsg-status{flex:0 0 auto;margin:4px 1px 8px}
@@ -237,7 +237,11 @@ function initPrivateMessaging() {
       esc(message.body) + '<time>' + esc(safeTime(message.created_at)) + (message.sender_id === userId && message.read_at ? ' · Seen' : '') + '</time></div>').join("") ||
       '<div class="mxmsg-empty"><b>Say hello 👋</b><p>Your conversation starts here.</p></div>';
     const existingForm = content.querySelector("[data-msg-compose]");
-    const draft = existingForm?.elements?.message?.value || "";
+    const oldComposer = existingForm?.elements?.message;
+    const wasFocused = !!oldComposer && document.activeElement === oldComposer;
+    const selectionStart = oldComposer?.selectionStart ?? 0;
+    const selectionEnd = oldComposer?.selectionEnd ?? selectionStart;
+    const draft = oldComposer?.value || "";
     content.innerHTML = '<div class="mxmsg-thread"><div class="mxmsg-thread-head"><button type="button" class="mxmsg-back" data-msg-back aria-label="Back to inbox">← Inbox</button>' +
       avatarHtml(currentPeer) + '<span class="mxmsg-thread-person"><strong>' + esc(currentPeer.display_name || "Member") + '</strong><small>' + seenText + '</small></span></div>' +
       '<div class="mxmsg-bubbles" aria-label="Conversation messages" aria-live="polite">' + bubblesHtml + '</div>' +
@@ -245,7 +249,13 @@ function initPrivateMessaging() {
       '<p class="mxmsg-privacy">Private chat · Only participants can read these messages.</p></div>';
     const bubbles = content.querySelector(".mxmsg-bubbles");
     const composer = content.querySelector("[data-msg-compose] textarea");
-    if (composer) composer.value = draft;
+    if (composer) {
+      composer.value = draft;
+      if (wasFocused) {
+        composer.focus({ preventScroll: true });
+        try { composer.setSelectionRange(selectionStart, selectionEnd); } catch {}
+      }
+    }
     if (bubbles) bubbles.scrollTop = options.forceBottom || wasNearBottom ? bubbles.scrollHeight : previousScrollTop;
     threadBusy = false;
   }
@@ -274,6 +284,8 @@ function initPrivateMessaging() {
   }
 
   pane.addEventListener("click", async (event) => {
+    const close = event.target.closest("[data-msg-close]");
+    if (close) { currentConversationId = null; currentPeer = null; return window.shell.go("homeSection"); }
     const back = event.target.closest("[data-msg-back]");
     if (back) { currentConversationId = null; currentPeer = null; return loadInbox(); }
     const refresh = event.target.closest("[data-msg-refresh]");
