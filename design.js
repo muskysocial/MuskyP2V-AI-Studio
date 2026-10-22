@@ -233,8 +233,15 @@ html.mx-light #studio .ds-req{color:#d93025!important}
   }
   function redraw() {
     const c = editBox.querySelector("#dsCanvas");
-    if (!c || !cur) return;
-    try { render(c, cur, curImg, curCfg, values, photo, adj, false); } catch (e) { const m = editBox.querySelector("#dsEMsg"); if (m) m.textContent = "Could not draw the preview."; }
+    if (!c || !cur) return false;
+    try {
+      render(c, cur, curImg, curCfg, values, photo, adj, false);
+      return true;
+    } catch (e) {
+      const m = editBox.querySelector("#dsEMsg");
+      if (m) m.textContent = "Could not draw the preview.";
+      return false;
+    }
   }
   const later = () => { clearTimeout(timer); timer = setTimeout(redraw, 100); };
 
@@ -291,11 +298,11 @@ html.mx-light #studio .ds-req{color:#d93025!important}
     try {
       const session = await window.musky.session();
       if (!session) throw new Error("Sign in required. Please sign in before downloading.");
-      redraw();
+      if (!redraw()) throw new Error("Could not render the design. No coins were deducted.");
       msg.textContent = "Preparing your file…";
       const blob = await new Promise((resolve, reject) => {
         try {
-          c.toBlob((value) => value ? resolve(value) : reject(new Error("Could not create the file. Try again.")), type, 0.92);
+          c.toBlob((value) => value && value.size > 0 ? resolve(value) : reject(new Error("Could not create the file. Try again.")), type, 0.92);
         } catch (error) { reject(error); }
       });
       objectUrl = URL.createObjectURL(blob);
