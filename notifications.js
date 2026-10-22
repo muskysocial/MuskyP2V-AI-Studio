@@ -105,7 +105,7 @@ function initNotifications(pane) {
 
       // RLS scopes this query to the authenticated user.
       const { data, error } = await sb.from("notifications")
-        .select("id,title,message,type,link,read_at,created_at")
+        .select("id,title,message,type,link,metadata,read_at,created_at")
         .order("created_at", { ascending: false }).limit(50);
       if (error) throw error;
       const rows = data || [];
@@ -155,6 +155,10 @@ function initNotifications(pane) {
         const actions = document.createElement("div"); actions.className = "mx-notif-actions";
         if (row.link && row.link.startsWith("/") && !row.link.startsWith("//")) {
           const link = document.createElement("a"); link.href = row.link; link.textContent = "Open"; actions.append(link);
+        }
+        if (row.type === "message" && row.metadata && row.metadata.conversation_id) {
+          const openMessage = document.createElement("button"); openMessage.type = "button"; openMessage.className = "mx-notif-read"; openMessage.textContent = "Open conversation";
+          openMessage.addEventListener("click", async () => { if (!row.read_at) await markRead(row.id, openMessage); if (window.muskyMessaging) await window.muskyMessaging.openConversation(row.metadata.conversation_id); else status.textContent = "Messaging is still loading. Please try again."; }); actions.append(openMessage);
         }
         if (!row.read_at) {
           const button = document.createElement("button"); button.type = "button";
