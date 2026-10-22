@@ -8,7 +8,7 @@ Before submitting the app, publish and review the MuskySocials policy pages:
 - Privacy policy: `https://muskysocial.github.io/MuskyP2V-AI-Studio/privacy.html`
 - Terms of service: `https://muskysocial.github.io/MuskyP2V-AI-Studio/terms.html`
 
-Both pages currently contain a support-contact placeholder. Replace it with a real support email and review the wording before publishing these URLs in TikTok Developer settings. TikTok also requires app URL details and URL ownership verification for relevant features.
+The policy pages now list the MuskySocials support contact. Review the wording against the live service before submitting these URLs in TikTok Developer settings. TikTok also requires app URL details and URL ownership verification for relevant features.
 
 1. Create a TikTok for Developers app and add the Content Posting API.
 2. Enable Direct Post and request the `user.info.basic` and `video.publish` scopes.
