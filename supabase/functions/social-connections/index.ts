@@ -227,7 +227,9 @@ async function publishTikTokVideo(userId: string, body: any) {
     body: JSON.stringify({
       post_info: {
         title: caption, privacy_level: privacy,
-        disable_duet: false, disable_stitch: false, disable_comment: false
+        disable_duet: creator.duet_disabled === true || body.allow_duet !== true,
+        disable_stitch: creator.stitch_disabled === true || body.allow_stitch !== true,
+        disable_comment: creator.comment_disabled === true || body.allow_comments !== true
       },
       source_info: { source: "FILE_UPLOAD", video_size: videoSize, chunk_size: chunkSize, total_chunk_count: chunkCount }
     })
@@ -373,6 +375,9 @@ Deno.serve(async (req: Request) => {
         creator_nickname: info.creator_nickname || "",
         creator_avatar_url: info.creator_avatar_url || "",
         privacy_level_options: Array.isArray(info.privacy_level_options) ? info.privacy_level_options : [],
+        comment_disabled: info.comment_disabled === true,
+        duet_disabled: info.duet_disabled === true,
+        stitch_disabled: info.stitch_disabled === true,
         max_video_post_duration_sec: info.max_video_post_duration_sec || null,
         can_post_now: info.can_post !== false
       });
