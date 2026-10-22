@@ -1,127 +1,152 @@
-/* MuskySocials theme finishing layer.
-   Keeps the existing brand/logo and app logic untouched. Theme selection remains
-   controlled by shell.js via html.mx-light; this layer fixes the redesign's
-   dark-mode declarations that previously overrode the Light setting. */
-:root { color-scheme: dark; }
-html.mx-light { color-scheme: light !important; background: #f0f2f5 !important; }
-html.mx-light body {
-  color: #172033 !important;
-  background: #f0f2f5 !important;
-  background-image: none !important;
+/* Reference-layout pass for MuskySocials.
+   Visual-only overrides: preserves the existing logo, route handlers, data, and business logic. */
+:root{
+  --ms-bg:#050914;--ms-surface:#0b1424;--ms-surface-2:#111d31;
+  --ms-border:#273651;--ms-text:#f5f6ff;--ms-muted:#a8b4c9;
+  --ms-purple:#9552f5;--ms-pink:#eb54b5;
 }
-html.mx-light .topbar {
-  background: rgba(255,255,255,.96) !important;
-  border-bottom: 1px solid #e2e5eb !important;
-  box-shadow: 0 4px 18px rgba(20,35,65,.06) !important;
+html{color-scheme:dark;background:#050914}
+html body{
+  min-height:100dvh!important;padding-bottom:calc(78px + env(safe-area-inset-bottom,0px))!important;
+  color:var(--ms-text)!important;
+  background:radial-gradient(ellipse at 12% -8%,rgba(133,63,229,.18),transparent 34%),#050914!important;
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
 }
-html.mx-light .topbar .brand strong,
-html.mx-light .topbar .mk-name { color: #172033 !important; }
-html.mx-light .topbar .brand small,
-html.mx-light .topbar .mk-txt small,
-html.mx-light .topbar .top-actions { color: #687386 !important; }
-html.mx-light main { background: transparent !important; }
-html.mx-light #studio .pane {
-  color: #172033 !important;
-  background: #fff !important;
-  border-color: #e1e5ed !important;
-  box-shadow: 0 5px 22px rgba(25,39,67,.07) !important;
+.topbar{
+  min-height:66px!important;padding:10px max(14px,env(safe-area-inset-right)) 10px max(14px,env(safe-area-inset-left))!important;
+  display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;
+  background:rgba(5,9,20,.94)!important;border-bottom:1px solid rgba(143,115,202,.2)!important;
+  box-shadow:0 6px 22px rgba(0,0,0,.16)!important;backdrop-filter:blur(18px)!important;
 }
-html.mx-light #studio .sh,
-html.mx-light #studio .sh h2,
-html.mx-light #studio .sh h3,
-html.mx-light #studio .sh strong,
-html.mx-light #studio .hm-title,
-html.mx-light #studio .gs-name,
-html.mx-light #studio .gs-price,
-html.mx-light #studio .ms-post .ms-author strong,
-html.mx-light #studio .ms-post .hm-title,
-html.mx-light #studio .ms-post .hm-body,
-html.mx-light #studio .ex-card,
-html.mx-light #studio .ex-card b { color: #172033 !important; }
-html.mx-light #studio .sh p,
-html.mx-light #studio .sh small,
-html.mx-light #studio .hm-sub,
-html.mx-light #studio .hm-counts,
-html.mx-light #studio .hm-meta,
-html.mx-light #studio .gs-sub,
-html.mx-light #studio .muted,
-html.mx-light #studio .status,
-html.mx-light #studio .ms-handle,
-html.mx-light #studio .ms-post .hm-actions button { color: #687386 !important; }
-html.mx-light #studio .sh-tile,
-html.mx-light #studio .pt-card,
-html.mx-light #studio .hm-post,
-html.mx-light #studio .ex-card,
-html.mx-light #studio .gs-card,
-html.mx-light #studio .mx-notif-item,
-html.mx-light #studio .mxmsg-item,
-html.mx-light #studio .sh-bal,
-html.mx-light #studio .sh-account-card,
-html.mx-light #studio .sh-account-detail-card,
-html.mx-light #studio .hm-comp,
-html.mx-light #studio .ms-post {
-  background: #fff !important;
-  color: #172033 !important;
-  border-color: #e1e5ed !important;
-  box-shadow: 0 4px 16px rgba(25,39,67,.06) !important;
+/* Brand is intentionally not restyled: preserve the existing MuskySocials logo. */
+.topbar .top-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;min-width:0!important}
+.topbar .top-actions>span:not(.online-dot){display:none!important}
+.topbar .tb-ic,.topbar .ms-top-menu{min-width:38px!important;min-height:38px!important;border-radius:12px!important}
+#studio{width:100%!important;max-width:100%!important;min-width:0!important;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))!important}
+#studio .pane{
+  background:linear-gradient(145deg,#0d1729,#08101e)!important;color:#f5f6ff!important;
+  border:1px solid #25334c!important;border-radius:19px!important;box-shadow:0 8px 26px rgba(0,0,0,.18)!important;
 }
-html.mx-light #studio .hm-pill,
-html.mx-light #studio .gs-chip,
-html.mx-light #studio .secondary,
-html.mx-light #studio .ghost,
-html.mx-light #studio .sh-row button,
-html.mx-light #studio .sh-out {
-  background: #f0f2f5 !important;
-  color: #273348 !important;
-  border-color: #dce1e9 !important;
+#studio .sh,#studio .sh h2,#studio .sh h3,#studio .sh strong,
+#studio .hm-title,#studio .gs-name,#studio .gs-price{color:#f5f6ff!important}
+#studio .sh p,#studio .sh small,#studio .hm-sub,#studio .hm-counts,#studio .gs-sub,
+#studio .muted,#studio .status{color:#a8b4c9!important}
+#studio #homeSection{width:100%!important;max-width:720px!important;margin:0 auto!important;padding:10px 12px calc(104px + env(safe-area-inset-bottom,0px))!important}
+#studio #homeSection .ms-search{
+  display:flex!important;align-items:center!important;gap:8px!important;min-height:44px!important;
+  padding:4px 10px!important;background:#101b2d!important;border:1px solid #293954!important;border-radius:15px!important;
 }
-html.mx-light #studio input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
-html.mx-light #studio textarea,
-html.mx-light #studio select {
-  background: #f7f8fb !important;
-  color: #172033 !important;
-  border-color: #dce1e9 !important;
+#studio #homeSection .ms-search input{min-width:0!important;background:transparent!important;color:#f5f6ff!important;border:0!important;box-shadow:none!important}
+#studio #homeSection .ms-section-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;margin:15px 2px 9px!important}
+#studio #homeSection .ms-section-head strong{font-size:16px!important;font-weight:750!important;color:#f5f6ff!important}
+#studio #homeSection .ms-section-head button{font-size:12px!important;color:#c59aff!important}
+#studio #homeSection .ms-story-strip{display:flex!important;gap:11px!important;overflow-x:auto!important;padding:2px 1px 10px!important;scrollbar-width:none!important}
+#studio #homeSection .ms-story{flex:0 0 62px!important;width:62px!important;color:#dce4f4!important;font-size:11px!important}
+#studio #homeSection .ms-story-ring{width:58px!important;height:58px!important;padding:3px!important;background:linear-gradient(135deg,#f04eaa,#9251f5,#21b9ed)!important}
+#studio #homeSection .ms-story-ring>span,#studio #homeSection .ms-story-ring img{border:2px solid #08101e!important}
+#studio #homeSection .ms-compose{display:flex!important;align-items:center!important;gap:10px!important;margin:5px 0 12px!important;padding:10px!important;background:#0d1728!important;border:1px solid #263650!important;border-radius:17px!important}
+#studio #homeSection .ms-compose .hm-av{width:40px!important;height:40px!important;flex:none!important;border:2px solid #d98cff!important}
+#studio #homeSection .ms-compose .hm-pill{flex:1!important;min-width:0!important;text-align:left!important;background:#152238!important;color:#c6d0e2!important;border:1px solid #30415e!important;border-radius:999px!important;padding:12px 14px!important;font-size:13px!important}
+#studio #homeSection .ms-home-shortcuts{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important;margin:0 0 14px!important}
+#studio #homeSection .ms-shortcut{
+  min-width:0!important;min-height:91px!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:5px!important;
+  padding:11px 9px!important;border:1px solid #2b3954!important;border-radius:15px!important;
+  background:linear-gradient(150deg,#172238,#0d1627)!important;color:#f5f6ff!important;text-align:left!important;
 }
-html.mx-light #studio .primary,
-html.mx-light #studio .primary *,
-html.mx-light #studio .pt-btn,
-html.mx-light #studio .mx-btn,
-html.mx-light #studio .mx-notif-btn,
-html.mx-light #studio .mx-notif-read,
-html.mx-light .ch-go,
-html.mx-light #mxBar button.on { color: #fff !important; }
-html.mx-light #mxBar {
-  background: rgba(255,255,255,.97) !important;
-  border-color: #e1e5ed !important;
-  box-shadow: 0 -5px 22px rgba(25,39,67,.08) !important;
+#studio #homeSection .ms-shortcut>span{width:29px!important;height:29px!important;display:grid!important;place-items:center!important;border-radius:9px!important;background:linear-gradient(135deg,#e843a5,#8c4df5)!important;color:white!important;font-size:17px!important}
+#studio #homeSection .ms-shortcut strong{font-size:11px!important;line-height:1.15!important;overflow-wrap:anywhere!important;color:#f5f6ff!important}
+#studio #homeSection .ms-shortcut small{font-size:9px!important;line-height:1.2!important;color:#a8b4c9!important}
+#studio #homeSection .ms-shortcut-market>span{background:linear-gradient(135deg,#ff4b9a,#a54cff)!important}
+#studio #homeSection .ms-creditline{display:flex!important;justify-content:space-between!important;gap:8px!important;padding:9px 2px!important;color:#9facc2!important;font-size:11px!important}
+#studio #homeSection #msTopPicks{margin:3px 0 14px!important}
+#studio #homeSection .ms-picks-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+#studio #homeSection .ms-pick-card{min-width:0!important;overflow:hidden!important;background:#101b2c!important;border:1px solid #2a3852!important;border-radius:15px!important;color:#f5f6ff!important}
+#studio #homeSection .hm-meet{width:100%!important;box-sizing:border-box!important;background:#101a2b!important;border:1px solid #2a3852!important;border-radius:16px!important;color:#f5f6ff!important}
+#studio #homeSection .hm-meet-copy strong{color:#f5f6ff!important}
+#studio #homeSection .hm-meet-copy small{color:#a8b4c9!important}
+#studio #homeSection .hm-post,#studio .ms-post{
+  overflow:hidden!important;margin:12px 0!important;padding:0!important;background:linear-gradient(145deg,#101b2d,#0a1220)!important;
+  border:1px solid #293852!important;border-radius:18px!important;box-shadow:0 7px 24px rgba(0,0,0,.16)!important;color:#f5f6ff!important;
 }
-html.mx-light #mxBar button { color: #69758a !important; }
-html.mx-light #mxBar button.on { color: #7c3aed !important; }
-html.mx-light .mx-menu,
-html.mx-light .mx-menu.open {
-  background: #fff !important;
-  border-color: #e1e5ed !important;
-  box-shadow: 0 16px 40px rgba(25,39,67,.16) !important;
+#studio #homeSection .ms-post .hm-head{padding:13px 13px 8px!important}
+#studio #homeSection .ms-post .hm-title{padding:3px 13px 0!important;font-size:14px!important;color:#f5f6ff!important}
+#studio #homeSection .ms-post .hm-body{padding:0 13px 10px!important;color:#e0e7f4!important;font-size:14px!important;line-height:1.5!important}
+#studio #homeSection .ms-post .hm-counts{margin:0 13px!important;border-color:#26344b!important;color:#a8b4c9!important}
+#studio #homeSection .ms-post .hm-actions{display:flex!important;gap:3px!important;padding:5px 7px!important}
+#studio #homeSection .ms-post .hm-actions button{min-width:0!important;padding:10px 2px!important;color:#b8c4d8!important;font-size:12px!important}
+#studio #homeSection .ms-post .hm-actions button.on{color:#d4b4ff!important;background:rgba(149,82,245,.15)!important}
+#studio .ex-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+#studio .ex-card{min-width:0!important;min-height:112px!important;border-radius:16px!important;background:#101b2c!important;border:1px solid #293852!important;color:#f5f6ff!important}
+#studio .gs-chips{display:flex!important;gap:8px!important;overflow-x:auto!important;padding:4px 0 12px!important}
+#studio .gs-chip{flex:none!important;background:#111f33!important;color:#dce6f7!important;border:1px solid #2a3d5b!important;border-radius:999px!important}
+#studio .gs-chip.on{background:linear-gradient(110deg,#e64aa8,#8d4ef4)!important;color:#fff!important;border-color:transparent!important}
+#studio .gs-grid,#studio .mx-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+#studio .gs-card{min-width:0!important;overflow:hidden!important;padding:8px!important;background:#101b2c!important;border:1px solid #293852!important;border-radius:16px!important}
+#studio .gs-card img{width:100%!important;aspect-ratio:1/1!important;object-fit:cover!important;border-radius:11px!important}
+#studio .gs-name,#studio .gs-price,#studio .mx-name,#studio .mx-price{color:#f5f6ff!important;overflow-wrap:anywhere!important}
+#studio .gs-sub{color:#a8b4c9!important}
+#studio .primary,#studio .pt-btn,#studio .mx-btn,#studio .mx-notif-btn,#studio .mx-notif-read,.ch-go{
+  background:linear-gradient(110deg,#e84aa9,#8b4cf5)!important;color:#fff!important;border:0!important;border-radius:12px!important
 }
-html.mx-light .mx-menu button { color: #172033 !important; }
-html.mx-light #loginPanel.welcome-screen {
-  background: linear-gradient(145deg,#fff,#f3f0ff) !important;
-  border-color: #e5dcff !important;
+#studio input:not([type=checkbox]):not([type=radio]):not([type=range]),#studio textarea,#studio select{
+  max-width:100%!important;box-sizing:border-box!important;background:#101b2d!important;color:#f5f6ff!important;border:1px solid #2a3a55!important;border-radius:12px!important
 }
-html.mx-light #loginPanel .welcome-content h1,
-html.mx-light #loginPanel .welcome-content p,
-html.mx-light #loginPanel .entry-form label { color: #172033 !important; }
-html.mx-light #loginPanel .welcome-content h1 span { color: #7c3aed !important; }
-html.mx-light #loginPanel .intro,
-html.mx-light #loginPanel .fineprint { color: #687386 !important; }
-html.mx-light #loginPanel .entry-form {
-  background: #fff !important;
-  border-color: #e1e5ed !important;
+#studio #profileSection .md-profile-redesign,#studio .md-profile{overflow:hidden!important;background:#0d1728!important;border:1px solid #2a3852!important;border-radius:21px!important;color:#f5f6ff!important}
+#studio #profileSection .md-profile-cover{background:linear-gradient(120deg,#39206b,#8b42c6 55%,#d344a1)!important}
+#studio #profileSection .md-profile-stats .md-count{background:#111f33!important;border:1px solid #2a3852!important}
+#studio #profileSection .md-profile-stats .md-count strong{color:#d6b1ff!important}
+#studio #profileSection .md-profile-redesign .md-profile-bio{color:#dce4f3!important}
+#studio #messagesSection.mx-messages-fullscreen{position:relative!important;min-height:calc(100dvh - 70px)!important;padding:12px 12px calc(86px + env(safe-area-inset-bottom,0px))!important;background:#050914!important;color:#f5f6ff!important}
+#studio #messagesSection .mxmsg-thread-head,#studio #messagesSection .mxmsg-item{background:#101b2d!important;color:#f5f6ff!important;border-color:#2a3954!important;border-radius:14px!important}
+#studio #messagesSection .mxmsg-sub,#studio #messagesSection .mxmsg-time{color:#a8b4c9!important}
+#studio #messagesSection .mxmsg-compose{position:sticky!important;bottom:calc(72px + env(safe-area-inset-bottom,0px))!important;z-index:30!important;margin-top:12px!important;padding:9px!important;background:rgba(5,9,20,.97)!important;border:1px solid #293852!important;border-radius:18px!important;backdrop-filter:blur(18px)!important}
+#studio #messagesSection .mxmsg-compose textarea{min-height:44px!important;max-height:120px!important;background:#101b2d!important;color:#f5f6ff!important;border-radius:15px!important}
+#mxBar{
+  position:fixed!important;left:0!important;right:0!important;bottom:0!important;z-index:100!important;
+  display:flex!important;justify-content:space-around!important;align-items:center!important;gap:2px!important;
+  padding:6px 5px calc(6px + env(safe-area-inset-bottom,0px))!important;min-height:64px!important;
+  background:rgba(6,10,21,.97)!important;border-top:1px solid #293650!important;border-radius:0!important;
+  box-shadow:0 -8px 26px rgba(0,0,0,.25)!important;backdrop-filter:blur(20px)!important;
 }
-html.mx-light #loginPanel input { background: #f7f8fb !important; color: #172033 !important; }
-html.mx-light #studio .hm-story,
-html.mx-light #studio .hm-story * { color: #fff !important; }
-html.mx-light #studio .hm-actions button.on { color: #7c3aed !important; }
-@media (max-width: 420px) {
-  html.mx-light #studio .pane { border-radius: 18px !important; padding: 13px !important; }
+#mxBar button{flex:1!important;min-width:0!important;min-height:49px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;padding:3px 1px!important;color:#9ba9c0!important;font-size:10px!important;line-height:1.1!important}
+#mxBar button span{font-size:20px!important}
+#mxBar button.on{color:#d29bff!important}
+#studio #msQuickMenu{top:calc(64px + env(safe-area-inset-top,0px))!important;right:10px!important;left:auto!important;z-index:120!important;background:#101a2c!important;border:1px solid #2b3b57!important;border-radius:17px!important;box-shadow:0 18px 45px rgba(0,0,0,.45)!important}
+#studio #msQuickMenu button{width:100%!important;text-align:left!important;color:#f5f6ff!important;border-radius:11px!important}
+html.mx-light{color-scheme:light!important;background:#f2f4f9!important;--ms-text:#172033;--ms-muted:#68758a}
+html.mx-light body{color:#172033!important;background:#f2f4f9!important;background-image:none!important}
+html.mx-light .topbar{background:rgba(255,255,255,.96)!important;border-bottom:1px solid #e1e5ed!important;box-shadow:0 5px 20px rgba(25,39,67,.06)!important}
+html.mx-light #studio .pane,html.mx-light #studio .pt-card,html.mx-light #studio .sh-tile{background:#fff!important;color:#172033!important;border-color:#e1e5ed!important;box-shadow:0 5px 20px rgba(25,39,67,.05)!important}
+html.mx-light #studio #homeSection .ms-search,html.mx-light #studio #homeSection .ms-compose,html.mx-light #studio #homeSection .ms-pick-card,html.mx-light #studio #homeSection .hm-meet,html.mx-light #studio #homeSection .hm-post,html.mx-light #studio .ms-post,html.mx-light #studio .gs-card,html.mx-light #studio .ex-card,html.mx-light #studio #profileSection .md-profile-redesign,html.mx-light #studio .md-profile{background:#fff!important;color:#172033!important;border-color:#e1e5ed!important;box-shadow:0 5px 18px rgba(25,39,67,.06)!important}
+html.mx-light #studio #homeSection .ms-section-head strong,html.mx-light #studio #homeSection .ms-shortcut strong,html.mx-light #studio #homeSection .ms-post .hm-title,html.mx-light #studio #homeSection .ms-post .hm-body,html.mx-light #studio .hm-title,html.mx-light #studio .sh,html.mx-light #studio .sh strong,html.mx-light #studio .gs-name,html.mx-light #studio .gs-price,html.mx-light #studio .md-profile-redesign .md-profile-bio{color:#172033!important}
+html.mx-light #studio #homeSection .ms-shortcut{background:linear-gradient(150deg,#fff,#f4f1ff)!important;border-color:#e0d9f2!important}
+html.mx-light #studio #homeSection .ms-shortcut small,html.mx-light #studio #homeSection .ms-creditline,html.mx-light #studio .hm-sub,html.mx-light #studio .hm-counts,html.mx-light #studio .gs-sub{color:#68758a!important}
+html.mx-light #studio #homeSection .ms-compose .hm-pill,html.mx-light #studio #homeSection .ms-search input,html.mx-light #studio input:not([type=checkbox]):not([type=radio]):not([type=range]),html.mx-light #studio textarea,html.mx-light #studio select{background:#f5f7fb!important;color:#172033!important;border-color:#dce2ec!important}
+html.mx-light #studio #homeSection .ms-story{color:#4c566b!important}
+html.mx-light #studio #homeSection .ms-post .hm-actions button{color:#68758a!important}
+html.mx-light #studio #messagesSection.mx-messages-fullscreen,html.mx-light #studio #messagesSection .mxmsg-compose{background:#f2f4f9!important;color:#172033!important}
+html.mx-light #studio #messagesSection .mxmsg-item,html.mx-light #studio #messagesSection .mxmsg-thread-head{background:#fff!important;color:#172033!important;border-color:#e1e5ed!important}
+html.mx-light #mxBar{background:rgba(255,255,255,.97)!important;border-color:#e1e5ed!important;box-shadow:0 -5px 22px rgba(25,39,67,.08)!important}
+html.mx-light #mxBar button{color:#69758a!important}
+html.mx-light #mxBar button.on{color:#8b42df!important}
+html.mx-light #studio #msQuickMenu{background:#fff!important;border-color:#e1e5ed!important;box-shadow:0 18px 45px rgba(25,39,67,.16)!important}
+html.mx-light #studio #msQuickMenu button{color:#172033!important}
+@media(min-width:760px){
+  #studio #homeSection{max-width:720px!important;padding-left:18px!important;padding-right:18px!important}
+  #studio .gs-grid,#studio .mx-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 }
+@media(max-width:420px){
+  .topbar{min-height:60px!important;padding-top:8px!important;padding-bottom:8px!important}
+  #studio #homeSection{padding-left:9px!important;padding-right:9px!important}
+  #studio #homeSection .ms-home-shortcuts{gap:6px!important}
+  #studio #homeSection .ms-shortcut{min-height:83px!important;padding:9px 7px!important;border-radius:13px!important}
+  #studio #homeSection .ms-shortcut strong{font-size:10px!important}
+  #studio #homeSection .ms-shortcut small{font-size:8px!important}
+  #studio .gs-grid,#studio .mx-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:350px){
+  #studio #homeSection .ms-shortcut{padding:8px 5px!important}
+  #studio #homeSection .ms-shortcut strong{font-size:9px!important}
+  #mxBar button{font-size:9px!important}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
