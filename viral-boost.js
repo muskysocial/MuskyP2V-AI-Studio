@@ -343,7 +343,7 @@ function startViralBoost() {
         return;
       }
       const chunkSize = Number(result.chunk_size) || (10 * 1024 * 1024);
-      const chunkCount = Math.max(1, Math.floor(file.size / chunkSize));
+      const chunkCount = Math.max(1, Math.ceil(file.size / chunkSize));
       for (let chunkIndex = 0; chunkIndex < chunkCount; chunkIndex++) {
         const start = chunkIndex * chunkSize;
         const endExclusive = chunkIndex === chunkCount - 1 ? file.size : start + chunkSize;
