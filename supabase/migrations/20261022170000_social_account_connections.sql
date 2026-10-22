@@ -1,3 +1,8 @@
+-- Keep the creator's chosen content category with each private Viral Boost draft.
+alter table public.viral_campaigns
+  add column if not exists content_category text not null default 'other'
+  check (content_category in ('fashion','business','entertainment','education','food','travel','fitness','gaming','technology','music','other'));
+
 -- Store social OAuth connections server-side only. Tokens are encrypted by the Edge Function.
 create table if not exists public.social_connections (
   id uuid primary key default gen_random_uuid(),
