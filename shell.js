@@ -156,6 +156,37 @@ body.mx-chat-open #mxBar,body.mx-chat-open>.topbar{display:none!important}
 @media(min-width:700px){#studio .sh-grid{grid-template-columns:repeat(3,minmax(0,1fr))}#mxBar{left:50%;right:auto;bottom:14px;transform:translateX(-50%);width:min(720px,calc(100% - 48px));border:1px solid var(--sh-line);border-radius:18px;box-shadow:0 8px 32px #0002;overflow:hidden}}
 @media(min-width:1100px){#studio .sh-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:360px){#studio .sh-grid{grid-template-columns:minmax(0,1fr);gap:8px}#studio .sh-tile{padding:12px;font-size:calc(15px * var(--mx-font-scale,1))}}@media(min-width:361px) and (max-width:420px){#studio .sh-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#studio .sh-tile{padding:11px;font-size:calc(14px * var(--mx-font-scale,1))}}@media(max-width:420px){#mxBar button{font-size:calc(11px * var(--mx-font-scale,1));padding:7px 1px 6px}#mxBar button span{font-size:20px}}
+
+/* Settings overview refresh: scoped to this pane; keep existing controls wired. */
+#settingsSection .sh-settings{max-width:760px;margin:0 auto;padding:4px 0 18px}
+#settingsSection .sh-settings-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 20px}
+#settingsSection .sh-settings-head h2{font-size:clamp(27px,7vw,34px);letter-spacing:-.045em;margin:0 0 3px}
+#settingsSection .sh-settings-head p{margin:0;font-size:13px}
+#settingsSection .sh-settings-eyebrow{font-size:10px!important;font-weight:800;letter-spacing:.16em;color:var(--sh-blue)!important;margin-bottom:5px!important}
+#settingsSection .sh-settings-mark{display:grid;place-items:center;width:52px;height:52px;border-radius:17px;background:linear-gradient(145deg,#1877f2,#f45b9a);color:#fff;font-size:25px;flex-shrink:0}
+#settingsSection .sh-premium{display:flex;align-items:center;gap:12px;width:100%;padding:15px;border:0;border-radius:17px;background:linear-gradient(110deg,#1877f2,#7655df 68%,#f45b9a);color:#fff;text-align:left;margin:0 0 22px;box-shadow:0 8px 22px #1877f226}
+#settingsSection .sh-premium-icon{display:grid;place-items:center;width:42px;height:42px;flex:0 0 42px;border-radius:13px;background:#ffffff26;font-size:22px}
+#settingsSection .sh-premium span:nth-child(2),#settingsSection .sh-account-copy,#settingsSection .sh-settings-row span:nth-child(2){display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}
+#settingsSection .sh-premium strong,#settingsSection .sh-settings-row strong,#settingsSection .sh-account-copy strong,#settingsSection .sh-settings-preference strong{font-size:14px;color:inherit}
+#settingsSection .sh-premium small{font-size:11px;color:#ffffffd9!important}
+#settingsSection .sh-premium b,#settingsSection .sh-settings-row b{font-size:24px;font-weight:500;color:inherit}
+#settingsSection .sh-settings-group{margin:0 0 22px}
+#settingsSection .sh-settings-group h3{font-size:17px;margin:0 0 10px}
+#settingsSection .sh-account-card{display:flex;align-items:center;gap:11px;padding:13px;border:1px solid var(--sh-line);border-radius:15px;background:var(--sh-card);margin-bottom:9px;min-width:0}
+#settingsSection .sh-account-avatar{display:grid;place-items:center;width:43px;height:43px;flex:0 0 43px;border-radius:50%;background:#1877f21a;font-size:21px}
+#settingsSection .sh-account-copy strong{overflow-wrap:anywhere}
+#settingsSection .sh-account-copy small,#settingsSection .sh-settings-row small,#settingsSection .sh-settings-preference small{font-size:11px;color:var(--sh-sub)!important}
+#settingsSection .sh-account-card>button{border:0;background:transparent;color:var(--sh-blue);font-size:25px;padding:5px 9px}
+#settingsSection .sh-settings-row{display:flex;align-items:center;gap:12px;width:100%;min-width:0;padding:13px 3px;border:0;border-bottom:1px solid var(--sh-line);background:transparent;color:var(--sh-text);text-align:left}
+#settingsSection .sh-settings-row:last-child{border-bottom:0}
+#settingsSection .sh-settings-row-icon{display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px;border-radius:13px;background:color-mix(in srgb,var(--sh-blue) 12%,transparent);color:var(--sh-blue);font-size:21px}
+#settingsSection .sh-settings-preference{padding:13px 0;border-bottom:1px solid var(--sh-line)}
+#settingsSection .sh-settings-preference>div:first-child{display:flex;flex-direction:column;gap:3px;margin-bottom:9px}
+#settingsSection .sh-settings-preference .sh-row{margin:0;gap:6px}
+#settingsSection .sh-settings-preference .sh-row button{padding:10px 5px;font-size:13px}
+#settingsSection .sh-settings-version{text-align:center;font-size:11px;margin:0 0 12px}
+#settingsSection .sh-out{padding:13px;border-radius:12px}
+@media(max-width:420px){#settingsSection .sh-settings-row{gap:9px}#settingsSection .sh-settings-row-icon{width:36px;height:36px;flex-basis:36px}#settingsSection .sh-settings-preference .sh-row button{font-size:12px}}
 `;
 
 // id, icon, label, note
@@ -350,10 +381,20 @@ function init() {
   });
 
   const settings = mk("settingsSection",
-    "<h2>Settings</h2><h3>Account</h3><p id='shEmail'>Signed in</p><p id='shCred'></p>" +
-    "<h3>Appearance</h3><div class='sh-row' id='shTheme'><button data-theme='light'>Light</button><button data-theme='dark'>Dark</button></div>" +
-    "<h3>Text size</h3><div class='sh-row' id='shSize'><button data-size='1'>Normal</button><button data-size='1.1'>Comfortable</button><button data-size='1.2'>Large</button></div>" +
-    "<button class='sh-out' id='shOut'>Sign out</button>");
+    "<div class='sh sh-settings'>" +
+      "<div class='sh-settings-head'><div><p class='sh-settings-eyebrow'>YOUR SPACE</p><h2>Settings</h2><p>Make MuskySocials work for you.</p></div><span class='sh-settings-mark'>⚙</span></div>" +
+      "<button class='sh-premium' data-go='membershipSection'><span class='sh-premium-icon'>✦</span><span><strong>Unlock more with Membership</strong><small>Explore plans and creator benefits</small></span><b>›</b></button>" +
+      "<section class='sh-settings-group'><h3>Account</h3>" +
+        "<div class='sh-account-card'><span class='sh-account-avatar'>👤</span><span class='sh-account-copy'><strong id='shEmail'>Signed in</strong><small id='shCred'>Credits: …</small></span><button data-go='profileSection' aria-label='Open profile'>›</button></div>" +
+        "<button class='sh-settings-row' data-go='profileSection'><span class='sh-settings-row-icon'>♙</span><span><strong>Personal profile</strong><small>Profile details and account controls</small></span><b>›</b></button>" +
+        "<button class='sh-settings-row' data-go='notifSection'><span class='sh-settings-row-icon'>♧</span><span><strong>Notifications</strong><small>Review your latest account activity</small></span><b>›</b></button>" +
+        "<button class='sh-settings-row' data-go='contactSection'><span class='sh-settings-row-icon'>？</span><span><strong>Help & contact</strong><small>Get help with MuskySocials</small></span><b>›</b></button>" +
+        "<button class='sh-settings-row' data-go='privacySection'><span class='sh-settings-row-icon'>▣</span><span><strong>Privacy & safety</strong><small>Read privacy and safety information</small></span><b>›</b></button>" +
+      "</section>" +
+      "<section class='sh-settings-group'><h3>Appearance</h3><div class='sh-settings-preference'><div><strong>Theme</strong><small>Choose your preferred look</small></div><div class='sh-row' id='shTheme'><button data-theme='light'>Light</button><button data-theme='dark'>Dark</button></div></div>" +
+      "<div class='sh-settings-preference'><div><strong>Text size</strong><small>Make text easier to read</small></div><div class='sh-row' id='shSize'><button data-size='1'>Normal</button><button data-size='1.1'>Comfortable</button><button data-size='1.2'>Large</button></div></div></section>" +
+      "<p class='sh-settings-version'>MuskySocials · Account settings</p><button class='sh-out' id='shOut'>↪ &nbsp; Sign out</button>" +
+    "</div>");
 
   const name = () => (document.querySelector("#welcomeName") || {}).textContent || "creator";
   function renderHome() {
