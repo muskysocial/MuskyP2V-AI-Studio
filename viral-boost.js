@@ -23,7 +23,7 @@ function startViralBoost() {
       <h2>Viral Boost Studio 🚀</h2>
       <p class="vb-muted">Prepare stronger content and organize promotion campaigns in one place.</p>
     </div>
-    <div class="vb-info"><strong>What this does:</strong> prepare and save drafts for free. Promote Post charges 950 coins for a picture or 1,020 coins for a video and records a promotion request. Actual advertising delivery is not connected yet, so a request is not a live ad.</div>
+    <div class="vb-info"><strong>What this does:</strong> create and edit campaign drafts for free. Paid promotion is coming soon. No coins will be deducted until real advertising delivery is connected and verified.</div>
     <div class="vb-card">
       <h3>1. Add your content</h3>
       <label for="vbTitle">Campaign name</label>
@@ -359,34 +359,9 @@ function startViralBoost() {
   }
   $("vbSave").addEventListener("click", saveDraft);
 
-  async function requestPromotion(row, button) {
-    if (row.promotion_status && row.promotion_status !== "draft") {
-      return say("This promotion has already been requested. No additional coins were charged.", true);
-    }
-    const mediaType = row.media_type || ((row.content_type || "").startsWith("video/") ? "video" : "picture");
-    const cost = mediaType === "video" ? 1020 : 950;
-    if (!row.post_url && !row.asset_path) return say("Add a post link or upload a media file before promoting.", true);
-    if (!Array.isArray(row.platforms) || !row.platforms.length) return say("Edit this draft and choose at least one platform before promoting.", true);
-    const confirmed = confirm(
-      "Promote this " + mediaType + " post for " + cost.toLocaleString("en-NG") +
-      " coins? The coins will be deducted now and a promotion request recorded. Actual advertising delivery is not connected yet, so this will not create a live ad."
-    );
-    if (!confirmed) return;
-    button.disabled = true;
-    const oldText = button.textContent;
-    button.textContent = "Submitting…";
-    try {
-      const { data, error } = await sb.rpc("request_viral_campaign_promotion", { p_campaign_id: row.id });
-      if (error) throw error;
-      const result = Array.isArray(data) ? data[0] : data;
-      const charged = Number(result && result.cost || cost);
-      say("Promotion request recorded. " + charged.toLocaleString("en-NG") + " coins charged. Status: awaiting fulfillment; this is not a live advertisement.");
-      await loadDrafts();
-    } catch (error) {
-      say(String(error && error.message || "Could not submit the promotion request. No successful request was confirmed."), true);
-      button.disabled = false;
-      button.textContent = oldText;
-    }
+  async function requestPromotion() {
+    // Safety gate: real advertising fulfillment is not connected, so never charge coins.
+    say("Paid promotion is coming soon. Your coins have NOT been deducted. You can keep creating and editing drafts for free.");
   }
 
   async function openAsset(path, name) {
@@ -423,7 +398,7 @@ function startViralBoost() {
         (row.hashtags ? '<div class="vb-draft-copy">' + esc(row.hashtags) + '</div>' : '') +
         '<p class="vb-draft-meta">Type: ' + esc(row.media_type || ((row.content_type || "").startsWith("video/") ? "video" : "picture")) + (row.promotion_status && row.promotion_status !== "draft" ? " · Promotion: " + esc(row.promotion_status) + (row.promotion_cost ? " (" + esc(String(row.promotion_cost)) + " coins)" : "") : "") + '</p>' +
         (row.promotion_status && row.promotion_status !== "draft" ? '<p class="vb-small">Promotion requested. This is not a live advertisement; fulfillment still requires the promotion integration.</p>' : '') +
-        '<div class="vb-draft-actions">' + (row.promotion_status && row.promotion_status !== "draft" ? "" : '<button type="button" class="vb-btn secondary" data-vb-edit="' + esc(row.id) + '">Edit draft</button>') + (row.promotion_status && row.promotion_status !== "draft" ? "" : '<button type="button" class="vb-btn" data-vb-promote="' + esc(row.id) + '">Promote Post · ' + ((row.media_type || ((row.content_type || "").startsWith("video/") ? "video" : "picture")) === "video" ? "1,020" : "950") + ' coins</button>') + (row.asset_path ? '<button type="button" class="vb-btn secondary" data-vb-open="' + esc(row.id) + '">Open uploaded file</button>' : '') +
+        '<div class="vb-draft-actions">' + (row.promotion_status && row.promotion_status !== "draft" ? "" : '<button type="button" class="vb-btn secondary" data-vb-edit="' + esc(row.id) + '">Edit draft</button>') + (row.promotion_status && row.promotion_status !== "draft" ? "" : '<button type="button" class="vb-btn" data-vb-promote="' + esc(row.id) + '" disabled aria-disabled="true" title="Paid promotion will be enabled when advertising delivery is connected">Paid promotion · Coming soon</button>') + (row.asset_path ? '<button type="button" class="vb-btn secondary" data-vb-open="' + esc(row.id) + '">Open uploaded file</button>' : '') +
         '<button type="button" class="vb-btn secondary" data-vb-copy="' + esc(row.id) + '">Copy caption</button>' +
         (row.promotion_status && row.promotion_status !== "draft" ? "" : '<button type="button" class="vb-btn secondary" data-vb-delete="' + esc(row.id) + '">Delete draft</button>') + '</div>' +
         '<span hidden data-vb-path="' + esc(row.id) + '">' + esc(row.asset_path || "") + '</span></article>'
