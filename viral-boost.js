@@ -396,7 +396,7 @@ function startViralBoost() {
   });
   const query = new URLSearchParams(window.location.search);
   if (query.get("social_connect") === "tiktok_success") {
-    connectionMessage("TikTok connected successfully. Publishing will be enabled after the platform posting workflow is completed.");
+    connectionMessage("TikTok connected successfully. Review the account's posting settings, then choose a saved video draft to publish.");
     query.delete("social_connect");
     const cleanUrl = window.location.pathname + (query.toString() ? "?" + query.toString() : "") + window.location.hash;
     history.replaceState({}, "", cleanUrl);
