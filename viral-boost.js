@@ -49,6 +49,7 @@ function startViralBoost() {
       <h3>3. Connect your social accounts</h3>
       <p class="vb-muted">Connect accounts securely so supported platforms can receive posts directly after publishing is enabled.</p>
       <div id="vbConnectedAccounts" class="vb-connections"><p class="vb-small">Checking connected accounts…</p></div>
+      <input id="vbPublishFile" type="file" accept="video/mp4,video/webm,video/quicktime,video/x-m4v" hidden>
       <label for="vbTikTokPrivacy">TikTok audience privacy (loaded from your connected account)</label>
       <select id="vbTikTokPrivacy" class="vb-input" disabled><option value="">Connect TikTok to load options</option></select>
       <div class="vb-actions">
@@ -272,6 +273,65 @@ function startViralBoost() {
     }
   });
   $("vbRefreshConnections").addEventListener("click", loadConnections);
+  $("vbPublishFile").addEventListener("change", async () => {
+    const fileInput = $("vbPublishFile");
+    const campaignId = fileInput.dataset.campaignId;
+    const file = fileInput.files && fileInput.files[0];
+    fileInput.value = "";
+    if (!campaignId || !file) return;
+    const button = pane.querySelector('[data-vb-publish-tiktok="' + CSS.escape(campaignId) + '"]');
+    if (!button) return;
+    if (!/^video\/(mp4|webm|quicktime|x-m4v)$/i.test(file.type)) return say("Choose an MP4, WebM, or MOV video.", true);
+    if (file.size < 1 || file.size > 40 * 1024 * 1024) return say("Choose a video under 40 MB for direct TikTok publishing.", true);
+    if (!confirm("Post the selected video to " + (tikTokCreatorInfo?.creator_nickname || "your connected TikTok account") + "? Audience: " + $("vbTikTokPrivacy").selectedOptions[0].textContent + ". Choose the original video used in this draft. Continue?")) return;
+    button.disabled = true;
+    const oldLabel = button.textContent;
+    button.textContent = "Preparing TikTok post…";
+    try {
+      const result = await invokeSocial("publish-video", {
+        campaign_id: campaignId, privacy_level: $("vbTikTokPrivacy").value,
+        consent: true, video_size: file.size, video_type: file.type
+      });
+      if (result.publish_id) button.dataset.publishId = result.publish_id;
+      if (result.status !== "upload_ready" || !result.upload_url || !result.publish_id) {
+        button.textContent = result.status === "processing" ? "Check TikTok status" : oldLabel;
+        say(result.message || "TikTok did not prepare the upload.", result.status === "failed");
+        return;
+      }
+      const chunkSize = Number(result.chunk_size) || (10 * 1024 * 1024);
+      for (let start = 0; start < file.size; start += chunkSize) {
+        const part = file.slice(start, Math.min(start + chunkSize, file.size));
+        const end = start + part.size - 1;
+        const upload = await fetch(result.upload_url, {
+          method: "PUT",
+          headers: {
+            "Content-Type": file.type,
+            "Content-Range": "bytes " + start + "-" + end + "/" + file.size
+          },
+          body: part
+        });
+        if (!upload.ok) throw new Error("TikTok upload failed at video bytes " + start + "–" + end + ". Use Check TikTok status before trying again.");
+      }
+      button.textContent = "Checking TikTok…";
+      const status = await invokeSocial("publish-status", { publish_id: result.publish_id });
+      if (status.status === "published") {
+        button.textContent = "Published on TikTok";
+        say(status.message || "TikTok confirms the post was published.");
+      } else if (status.status === "failed") {
+        button.textContent = "TikTok post failed";
+        say(status.message || "TikTok reported a publishing failure.", true);
+      } else {
+        button.textContent = "Check TikTok status";
+        say("Video uploaded. TikTok is processing it; check again in a moment.");
+      }
+    } catch (error) {
+      button.textContent = button.dataset.publishId ? "Check TikTok status" : oldLabel;
+      say(String(error && error.message || "Could not upload the video to TikTok."), true);
+    } finally {
+      button.disabled = button.textContent === "Published on TikTok";
+    }
+  });
+
   $("vbConnectedAccounts").addEventListener("click", async event => {
     const button = event.target.closest("[data-vb-disconnect]");
     if (!button) return;
@@ -579,7 +639,11 @@ function startViralBoost() {
         if (!connectedAccounts.some(a => a.provider === "tiktok")) return say("Connect TikTok first.", true);
         if (!tikTokCreatorInfo || !$("vbTikTokPrivacy").value) return say("Refresh TikTok account settings before posting.", true);
         const checking = !!publishTikTok.dataset.publishId;
-        if (!checking && !confirm("Post this video to " + (tikTokCreatorInfo.creator_nickname || "your connected TikTok account") + "? Audience: " + $("vbTikTokPrivacy").selectedOptions[0].textContent + ". Continue?")) return;
+        if (!checking) {
+          $("vbPublishFile").dataset.campaignId = row.id;
+          $("vbPublishFile").click();
+          return;
+        }
         publishTikTok.disabled = true;
         const oldLabel = publishTikTok.textContent;
         publishTikTok.textContent = checking ? "Checking status…" : "Sending to TikTok…";
