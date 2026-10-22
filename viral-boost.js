@@ -23,7 +23,7 @@ function startViralBoost() {
       <h2>Viral Boost Studio 🚀</h2>
       <p class="vb-muted">Prepare stronger content and organize promotion campaigns in one place.</p>
     </div>
-    <div class="vb-info"><strong>What this does:</strong> create and edit campaign drafts for free. Paid promotion is coming soon. No coins will be deducted until real advertising delivery is connected and verified.</div>
+    <div class="vb-info"><strong>How Viral Boost works:</strong> create content for free, then publish to supported connected social accounts. External publishing does not cost MuskySocials coins. Posts appear in the MuskySocials feed only after the user purchases a paid feed-placement service. Paid feed placement remains disabled until it is ready.</div>
     <div class="vb-card">
       <h3>1. Add your content</h3>
       <label for="vbTitle">Campaign name</label>
@@ -34,8 +34,8 @@ function startViralBoost() {
       <label for="vbUrl">Or paste a post link (optional if you upload a file)</label>
       <input id="vbUrl" class="vb-input" type="url" maxlength="2000" placeholder="https://…">
       <label for="vbMediaType">Promotion type</label>
-      <select id="vbMediaType" class="vb-input"><option value="picture">Picture post — planned 950 coins</option><option value="video">Video post — planned 1,020 coins</option></select>
-      <p class="vb-small">Choose the type that matches your planned post. Drafts and editing are free. Paid promotion will be enabled after advertising delivery is connected; no coins are charged now.</p>
+      <select id="vbMediaType" class="vb-input"><option value="picture">MuskySocials feed placement — picture (planned 950 coins)</option><option value="video">MuskySocials feed placement — video (planned 1,020 coins)</option></select>
+      <p class="vb-small">These are planned prices for featuring a post in the MuskySocials feed, not for external ads. Saving a draft and publishing to a connected social account are separate from paid feed placement. No coins are charged now.</p>
       <p class="vb-small">Use content you own or have permission to promote. Uploaded files are private to your account.</p>
     </div>
     <div class="vb-card">
@@ -84,7 +84,7 @@ function startViralBoost() {
       <div class="vb-saved-head"><div><h3>Your saved drafts</h3><p class="vb-muted">Private to your account</p></div><button type="button" class="vb-btn secondary" id="vbRefresh">Refresh</button></div>
       <div id="vbDrafts"><p class="vb-muted">Sign in to view saved drafts.</p></div>
     </div>
-    <div class="vb-footnote">A campaign draft does not automatically publish content or buy advertising. Platform access and campaign launch features will be connected separately.</div>
+    <div class="vb-footnote">Publishing to an external account and paid placement in the MuskySocials feed are separate services. External publishing is available only for platforms whose official integrations and permissions are configured. A draft never appears in the public MuskySocials feed automatically.</div>
   `);
   window.shell.addItem(["viralBoostSection", "🚀", "Viral Boost", ""]);
   const $ = id => pane.querySelector("#" + id);
@@ -532,7 +532,7 @@ function startViralBoost() {
         (row.caption ? '<div class="vb-draft-copy">' + esc(row.caption) + '</div>' : '') +
         (row.hashtags ? '<div class="vb-draft-copy">' + esc(row.hashtags) + '</div>' : '') +
         '<p class="vb-draft-meta">Type: ' + esc(row.media_type || ((row.content_type || "").startsWith("video/") ? "video" : "picture")) + (row.promotion_status && row.promotion_status !== "draft" ? " · Promotion: " + esc(row.promotion_status) + (row.promotion_cost ? " (" + esc(String(row.promotion_cost)) + " coins)" : "") : "") + '</p>' +
-        (row.promotion_status && row.promotion_status !== "draft" ? '<p class="vb-small">Promotion requested. This is not a live advertisement; fulfillment still requires the promotion integration.</p>' : '') +
+        (row.promotion_status && row.promotion_status !== "draft" ? '<p class="vb-small">Feed placement requested. This post is not visible in the public MuskySocials feed until the paid placement service is enabled and fulfilled.</p>' : '') +
         '<div class="vb-draft-actions">' + (connectedAccounts.some(a => a.provider === "tiktok") && String(row.content_type || "").startsWith("video/") && row.asset_path ? '<button type="button" class="vb-btn" data-vb-publish-tiktok="' + esc(row.id) + '">Post video to TikTok</button>' : '') + (row.promotion_status && row.promotion_status !== "draft" ? "" : '<button type="button" class="vb-btn secondary" data-vb-edit="' + esc(row.id) + '">Edit draft</button>') + (row.promotion_status && row.promotion_status !== "draft" ? "" : '<button type="button" class="vb-btn" data-vb-promote="' + esc(row.id) + '" disabled aria-disabled="true" title="Paid promotion will be enabled when advertising delivery is connected">Paid promotion · Coming soon</button>') + (row.asset_path ? '<button type="button" class="vb-btn secondary" data-vb-open="' + esc(row.id) + '">Open uploaded file</button>' : '') +
         '<button type="button" class="vb-btn secondary" data-vb-copy="' + esc(row.id) + '">Copy caption</button>' +
         (row.promotion_status && row.promotion_status !== "draft" ? "" : '<button type="button" class="vb-btn secondary" data-vb-delete="' + esc(row.id) + '">Delete draft</button>') + '</div>' +
