@@ -377,7 +377,7 @@ html.mx-light #studio .ex-card b{color:#050505!important}
       const country = p.country ? "📍 " + esc(p.country) : "MuskySocials member";
       const bio = p.bio ? esc(p.bio) : "No bio added yet.";
       return '<article class="md-card">' +
-        '<button type="button" class="md-person" data-person="' + p.id + '" aria-label="View ' + esc(p.display_name) + " profile">" +
+        '<button type="button" class="md-person" data-person="' + p.id + '" aria-label="View ' + esc(p.display_name) + ' profile">' +
         personAvatar(p) + '<span class="md-person-copy"><strong>' + esc(p.display_name) + '</strong>' + verifiedMark(p) +
         '<small>' + country + '</small><span class="md-bio">' + bio + '</span></span></button>' +
         '<div class="md-card-footer"><span>👥 ' + Number(p.follower_count || 0) + ' followers</span>' +
