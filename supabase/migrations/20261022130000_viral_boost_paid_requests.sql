@@ -104,5 +104,5 @@ begin
 end;
 $function$;
 
-revoke all on function public.request_viral_campaign_promotion(uuid) from public;
+revoke all on function public.request_viral_campaign_promotion(uuid) from public, anon;
 grant execute on function public.request_viral_campaign_promotion(uuid) to authenticated;
