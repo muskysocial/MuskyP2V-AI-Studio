@@ -49,6 +49,8 @@ function startViralBoost() {
       <h3>3. Connect your social accounts</h3>
       <p class="vb-muted">Connect accounts securely so supported platforms can receive posts directly after publishing is enabled.</p>
       <div id="vbConnectedAccounts" class="vb-connections"><p class="vb-small">Checking connected accounts…</p></div>
+      <label for="vbTikTokPrivacy">TikTok audience privacy (loaded from your connected account)</label>
+      <select id="vbTikTokPrivacy" class="vb-input" disabled><option value="">Connect TikTok to load options</option></select>
       <div class="vb-actions">
         <button type="button" class="vb-btn" id="vbConnectTikTok">Connect TikTok</button>
         <button type="button" class="vb-btn secondary" id="vbRefreshConnections">Refresh connections</button>
@@ -90,6 +92,8 @@ function startViralBoost() {
   let previewUrl = null;
   let saving = false;
   let editingDraftId = null;
+  let connectedAccounts = [];
+  let tikTokCreatorInfo = null;
 
   const style = document.createElement("style");
   style.textContent = `
@@ -127,6 +131,12 @@ function startViralBoost() {
     #viralBoostSection .vb-draft-copy{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;margin:8px 0}
     #viralBoostSection .vb-draft-actions{display:flex;gap:8px;flex-wrap:wrap}
     #viralBoostSection .vb-footnote{font-size:12px;color:var(--sh-sub,#65676b);padding:6px 2px 20px;line-height:1.5}
+    #viralBoostSection .vb-connection{display:flex;align-items:center;gap:10px;border:1px solid var(--sh-line,#dadde1);border-radius:10px;padding:10px;margin:8px 0;min-width:0}
+    #viralBoostSection .vb-connection-avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;background:var(--sh-line,#dadde1);flex:none}
+    #viralBoostSection .vb-connection-copy{min-width:0;flex:1;overflow-wrap:anywhere}
+    #viralBoostSection .vb-connection-copy strong{display:block;font-size:13px}
+    #viralBoostSection .vb-connection-copy small{display:block;color:var(--sh-sub,#65676b);font-size:12px;margin-top:3px}
+    #viralBoostSection .vb-connection .vb-btn{padding:8px 10px;min-height:36px;font-size:12px;flex:none}
     #viralBoostSection .vb-connection{display:flex;align-items:center;gap:10px;border:1px solid var(--sh-line,#dadde1);border-radius:10px;padding:10px;margin:8px 0;min-width:0}
     #viralBoostSection .vb-connection-avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;background:var(--sh-line,#dadde1);flex:none}
     #viralBoostSection .vb-connection-copy{min-width:0;flex:1;overflow-wrap:anywhere}
@@ -198,7 +208,11 @@ function startViralBoost() {
     try {
       const result = await invokeSocial("list");
       const connections = Array.isArray(result.connections) ? result.connections : [];
+      connectedAccounts = connections;
       if (!connections.length) {
+        tikTokCreatorInfo = null;
+        $("vbTikTokPrivacy").disabled = true;
+        $("vbTikTokPrivacy").innerHTML = "<option value=''>Connect TikTok to load options</option>";
         box.innerHTML = "<p class='vb-small'>No social accounts connected yet.</p>";
         $("vbConnectTikTok").textContent = "Connect TikTok";
         return;
@@ -210,9 +224,36 @@ function startViralBoost() {
         const image = avatar ? "<img class='vb-connection-avatar' src='" + esc(avatar) + "' alt=''>" : "<span class='vb-connection-avatar' aria-hidden='true'></span>";
         return "<div class='vb-connection'>" + image + "<div class='vb-connection-copy'><strong>" + name + "</strong><small>" + provider + " · connected</small></div><button type='button' class='vb-btn secondary' data-vb-disconnect='" + provider + "'>Disconnect</button></div>";
       }).join("");
-      $("vbConnectTikTok").textContent = connections.some(a => a.provider === "tiktok") ? "Reconnect TikTok" : "Connect TikTok";
-      connectionMessage("Connected accounts loaded. Nothing has been published.");
+      const hasTikTok = connections.some(a => a.provider === "tiktok");
+      $("vbConnectTikTok").textContent = hasTikTok ? "Reconnect TikTok" : "Connect TikTok";
+      if (hasTikTok) {
+        try {
+          tikTokCreatorInfo = await invokeSocial("creator-info");
+          const privacy = Array.isArray(tikTokCreatorInfo.privacy_level_options) ? tikTokCreatorInfo.privacy_level_options : [];
+          const labels = { PUBLIC_TO_EVERYONE: "Everyone (public)", MUTUAL_FOLLOW_FRIENDS: "Friends / mutual followers", FOLLOWER_OF_CREATOR: "Followers", SELF_ONLY: "Only me" };
+          $("vbTikTokPrivacy").innerHTML = privacy.length
+            ? privacy.map(value => "<option value='" + esc(value) + "'>" + esc(labels[value] || value) + "</option>").join("")
+            : "<option value=''>No posting privacy options available</option>";
+          $("vbTikTokPrivacy").disabled = !privacy.length;
+          if (privacy.length) $("vbTikTokPrivacy").value = privacy[0];
+          connectionMessage("TikTok connected as " + (tikTokCreatorInfo.creator_nickname || "your account") + ". Review the audience setting before posting.");
+        } catch (error) {
+          tikTokCreatorInfo = null;
+          $("vbTikTokPrivacy").disabled = true;
+          $("vbTikTokPrivacy").innerHTML = "<option value=''>TikTok posting permissions need attention</option>";
+          connectionMessage(String(error && error.message || "Could not load TikTok posting settings."), true);
+        }
+      } else {
+        tikTokCreatorInfo = null;
+        $("vbTikTokPrivacy").disabled = true;
+        $("vbTikTokPrivacy").innerHTML = "<option value=''>Connect TikTok to load options</option>";
+        connectionMessage("Connected accounts loaded. Nothing has been published.");
+      }
+      await loadDrafts();
     } catch (error) {
+      connectedAccounts = [];
+      tikTokCreatorInfo = null;
+      $("vbTikTokPrivacy").disabled = true;
       box.innerHTML = "<p class='vb-small'>Account connection will be available after the secure service is deployed and configured.</p>";
       connectionMessage(String(error && error.message || "Could not load connected accounts."), true);
     }
@@ -492,7 +533,7 @@ function startViralBoost() {
         (row.hashtags ? '<div class="vb-draft-copy">' + esc(row.hashtags) + '</div>' : '') +
         '<p class="vb-draft-meta">Type: ' + esc(row.media_type || ((row.content_type || "").startsWith("video/") ? "video" : "picture")) + (row.promotion_status && row.promotion_status !== "draft" ? " · Promotion: " + esc(row.promotion_status) + (row.promotion_cost ? " (" + esc(String(row.promotion_cost)) + " coins)" : "") : "") + '</p>' +
         (row.promotion_status && row.promotion_status !== "draft" ? '<p class="vb-small">Promotion requested. This is not a live advertisement; fulfillment still requires the promotion integration.</p>' : '') +
-        '<div class="vb-draft-actions">' + (row.promotion_status && row.promotion_status !== "draft" ? "" : '<button type="button" class="vb-btn secondary" data-vb-edit="' + esc(row.id) + '">Edit draft</button>') + (row.promotion_status && row.promotion_status !== "draft" ? "" : '<button type="button" class="vb-btn" data-vb-promote="' + esc(row.id) + '" disabled aria-disabled="true" title="Paid promotion will be enabled when advertising delivery is connected">Paid promotion · Coming soon</button>') + (row.asset_path ? '<button type="button" class="vb-btn secondary" data-vb-open="' + esc(row.id) + '">Open uploaded file</button>' : '') +
+        '<div class="vb-draft-actions">' + (connectedAccounts.some(a => a.provider === "tiktok") && String(row.content_type || "").startsWith("video/") && row.asset_path ? '<button type="button" class="vb-btn" data-vb-publish-tiktok="' + esc(row.id) + '">Post video to TikTok</button>' : '') + (row.promotion_status && row.promotion_status !== "draft" ? "" : '<button type="button" class="vb-btn secondary" data-vb-edit="' + esc(row.id) + '">Edit draft</button>') + (row.promotion_status && row.promotion_status !== "draft" ? "" : '<button type="button" class="vb-btn" data-vb-promote="' + esc(row.id) + '" disabled aria-disabled="true" title="Paid promotion will be enabled when advertising delivery is connected">Paid promotion · Coming soon</button>') + (row.asset_path ? '<button type="button" class="vb-btn secondary" data-vb-open="' + esc(row.id) + '">Open uploaded file</button>' : '') +
         '<button type="button" class="vb-btn secondary" data-vb-copy="' + esc(row.id) + '">Copy caption</button>' +
         (row.promotion_status && row.promotion_status !== "draft" ? "" : '<button type="button" class="vb-btn secondary" data-vb-delete="' + esc(row.id) + '">Delete draft</button>') + '</div>' +
         '<span hidden data-vb-path="' + esc(row.id) + '">' + esc(row.asset_path || "") + '</span></article>'
@@ -530,7 +571,45 @@ function startViralBoost() {
     const open = event.target.closest("[data-vb-open]");
     const copy = event.target.closest("[data-vb-copy]");
     const del = event.target.closest("[data-vb-delete]");
+    const publishTikTok = event.target.closest("[data-vb-publish-tiktok]");
     const rows = pane._vbRows || [];
+    if (publishTikTok) {
+      const row = rows.find(r => r.id === publishTikTok.dataset.vbPublishTiktok);
+      if (row) {
+        if (!connectedAccounts.some(a => a.provider === "tiktok")) return say("Connect TikTok first.", true);
+        if (!tikTokCreatorInfo || !$("vbTikTokPrivacy").value) return say("Refresh TikTok account settings before posting.", true);
+        const checking = !!publishTikTok.dataset.publishId;
+        if (!checking && !confirm("Post this video to " + (tikTokCreatorInfo.creator_nickname || "your connected TikTok account") + "? Audience: " + $("vbTikTokPrivacy").selectedOptions[0].textContent + ". Continue?")) return;
+        publishTikTok.disabled = true;
+        const oldLabel = publishTikTok.textContent;
+        publishTikTok.textContent = checking ? "Checking status…" : "Sending to TikTok…";
+        try {
+          const result = checking
+            ? await invokeSocial("publish-status", { publish_id: publishTikTok.dataset.publishId })
+            : await invokeSocial("publish-video", { campaign_id: row.id, privacy_level: $("vbTikTokPrivacy").value, consent: true });
+          if (result.publish_id) publishTikTok.dataset.publishId = result.publish_id;
+          if (result.status === "processing" && result.publish_id) {
+            publishTikTok.textContent = "Check TikTok status";
+            say(result.message || "TikTok is processing the video. Check again in a moment.");
+          } else if (result.status === "published") {
+            publishTikTok.textContent = "Published on TikTok";
+            publishTikTok.disabled = true;
+            say(result.message || "TikTok confirms the post was published.");
+          } else if (result.status === "failed") {
+            publishTikTok.textContent = "TikTok post failed";
+            say(result.message || "TikTok reported a publishing failure. Review the draft before trying again.", true);
+          } else {
+            publishTikTok.textContent = oldLabel;
+            say(result.message || "TikTok returned a response.", result.status === "failed");
+          }
+        } catch (error) {
+          publishTikTok.textContent = oldLabel;
+          say(String(error && error.message || "Could not publish to TikTok."), true);
+        } finally {
+          if (publishTikTok.textContent !== "Published on TikTok") publishTikTok.disabled = false;
+        }
+      }
+    }
     if (edit) {
       const row = rows.find(r => r.id === edit.dataset.vbEdit);
       editDraft(row);
