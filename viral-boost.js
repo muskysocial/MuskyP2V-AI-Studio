@@ -226,6 +226,7 @@ function startViralBoost() {
         $("vbTikTokPrivacy").innerHTML = "<option value=''>Connect TikTok to load options</option>";
         box.innerHTML = "<p class='vb-small'>No social accounts connected yet.</p>";
         $("vbConnectTikTok").textContent = "Connect TikTok";
+        await loadDrafts();
         return;
       }
       box.innerHTML = connections.map(account => {
@@ -267,6 +268,7 @@ function startViralBoost() {
       $("vbTikTokPrivacy").disabled = true;
       box.innerHTML = "<p class='vb-small'>Account connection will be available after the secure service is deployed and configured.</p>";
       connectionMessage(String(error && error.message || "Could not load connected accounts."), true);
+      await loadDrafts();
     }
   }
   $("vbConnectTikTok").addEventListener("click", async () => {
