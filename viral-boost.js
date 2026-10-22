@@ -60,6 +60,7 @@ function startViralBoost() {
     </div>
     <div class="vb-actions vb-save-row">
       <button type="button" class="vb-btn" id="vbSave">Save promotion draft</button>
+      <button type="button" class="vb-btn secondary" id="vbCancelEdit" hidden>Cancel edit</button>
       <button type="button" class="vb-btn secondary" id="vbReset">Clear form</button>
     </div>
     <p id="vbStatus" class="vb-status" role="status" aria-live="polite"></p>
@@ -74,6 +75,7 @@ function startViralBoost() {
   let selectedFile = null;
   let previewUrl = null;
   let saving = false;
+  let editingDraftId = null;
 
   const style = document.createElement("style");
   style.textContent = `
@@ -98,6 +100,7 @@ function startViralBoost() {
     #viralBoostSection .vb-btn{border:0;border-radius:10px;background:var(--sh-blue,#1877f2);color:#fff;padding:11px 13px;font-weight:700;font-size:14px;min-height:42px}
     #viralBoostSection .vb-btn.secondary{background:transparent;border:1px solid var(--sh-line,#dadde1);color:var(--sh-text,#050505)}
     #viralBoostSection .vb-btn:disabled{opacity:.55;cursor:wait}
+    #viralBoostSection .vb-btn[hidden]{display:none!important}
     #viralBoostSection .vb-save-row .vb-btn:first-child{flex:1}
     #viralBoostSection .vb-status{font-size:13px;line-height:1.4;min-height:18px;color:var(--sh-sub,#65676b);overflow-wrap:anywhere}
     #viralBoostSection .vb-saved-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -254,14 +257,20 @@ function startViralBoost() {
     }
   });
 
-  $("vbReset").addEventListener("click", () => {
+  function resetEditor() {
     cleanupPreview();
-    $("vbFile").value = ""; $("vbTitle").value = ""; $("vbUrl").value = "";
+    $("vbFile").value = ""; $("vbFile").disabled = false;
+    $("vbTitle").value = ""; $("vbUrl").value = "";
     $("vbTopic").value = ""; $("vbCaption").value = ""; $("vbHashtags").value = "";
     pane.querySelectorAll('input[name="vbPlatform"]').forEach(el => el.checked = false);
     $("vbCopyStatus").textContent = "";
+    editingDraftId = null;
+    $("vbSave").textContent = "Save promotion draft";
+    $("vbCancelEdit").hidden = true;
     say("Form cleared.");
-  });
+  }
+  $("vbReset").addEventListener("click", resetEditor);
+  $("vbCancelEdit").addEventListener("click", resetEditor);
 
   function safeUrl(value) {
     if (!value) return "";
@@ -284,7 +293,8 @@ function startViralBoost() {
     const postUrl = safeUrl(postUrlRaw);
     const platforms = selectedPlatforms();
     if (!title) return say("Add a campaign name first.", true);
-    if (!selectedFile && !postUrl) return say("Upload an image/video or paste a valid post link.", true);
+    const editingRow = editingDraftId && (pane._vbRows || []).find(row => row.id === editingDraftId);
+    if (!selectedFile && !postUrl && !(editingRow && editingRow.asset_path)) return say("Upload an image/video or paste a valid post link.", true);
     if (postUrlRaw && !postUrl) return say("Enter a valid http:// or https:// post link.", true);
     if (!platforms.length) return say("Choose at least one social platform.", true);
     const caption = $("vbCaption").value.trim();
@@ -292,6 +302,7 @@ function startViralBoost() {
     const button = $("vbSave");
     saving = true; button.disabled = true; say("Saving your private campaign draft…");
     let path = null;
+    const saveId = editingDraftId;
     try {
       const userId = await getUserId();
       if (selectedFile) {
@@ -305,17 +316,29 @@ function startViralBoost() {
         });
         if (uploaded.error) throw new Error("Upload failed: " + uploaded.error.message + ". Check that the latest database migration is applied.");
       }
-      const { error } = await sb.from("viral_campaigns").insert({
-        user_id: userId, title, post_url: postUrl || null, platforms, caption, hashtags,
-        asset_path: path, original_file_name: selectedFile ? selectedFile.name : null,
-        content_type: selectedFile ? selectedFile.type : null, file_size: selectedFile ? selectedFile.size : null
-      });
-      if (error) {
-        if (path) await sb.storage.from(BUCKET).remove([path]);
-        throw new Error("Could not save draft: " + error.message);
+      if (saveId) {
+        const { data: updated, error } = await sb.from("viral_campaigns")
+          .update({ title, post_url: postUrl || null, platforms, caption, hashtags })
+          .eq("id", saveId).eq("user_id", userId).select("id").maybeSingle();
+        if (error || !updated) throw new Error("Could not update draft: " + (error && error.message || "draft not found or permission denied"));
+        editingDraftId = null;
+        $("vbSave").textContent = "Save promotion draft";
+        $("vbCancelEdit").hidden = true;
+        $("vbFile").disabled = false;
+        say("Draft changes saved. No coins were charged; nothing was published or promoted.");
+      } else {
+        const { error } = await sb.from("viral_campaigns").insert({
+          user_id: userId, title, post_url: postUrl || null, platforms, caption, hashtags,
+          asset_path: path, original_file_name: selectedFile ? selectedFile.name : null,
+          content_type: selectedFile ? selectedFile.type : null, file_size: selectedFile ? selectedFile.size : null
+        });
+        if (error) {
+          if (path) await sb.storage.from(BUCKET).remove([path]);
+          throw new Error("Could not save draft: " + error.message);
+        }
+        say("Draft saved. No coins were charged; no post was published or promoted.");
       }
-      say("Draft saved. No coins were charged; no post was published or promoted.");
-      cleanupPreview(); $("vbFile").value = "";
+      cleanupPreview(); $("vbFile").value = ""; $("vbTopic").value = "";
       await loadDrafts();
     } catch (error) {
       say(String(error && error.message || "Could not save this draft."), true);
@@ -357,7 +380,7 @@ function startViralBoost() {
         (row.original_file_name ? '<p class="vb-draft-meta">📎 ' + esc(row.original_file_name) + '</p>' : '') +
         (row.caption ? '<div class="vb-draft-copy">' + esc(row.caption) + '</div>' : '') +
         (row.hashtags ? '<div class="vb-draft-copy">' + esc(row.hashtags) + '</div>' : '') +
-        '<div class="vb-draft-actions">' + (row.asset_path ? '<button type="button" class="vb-btn secondary" data-vb-open="' + esc(row.id) + '">Open uploaded file</button>' : '') +
+        '<div class="vb-draft-actions"><button type="button" class="vb-btn secondary" data-vb-edit="' + esc(row.id) + '">Edit draft</button>' + (row.asset_path ? '<button type="button" class="vb-btn secondary" data-vb-open="' + esc(row.id) + '">Open uploaded file</button>' : '') +
         '<button type="button" class="vb-btn secondary" data-vb-copy="' + esc(row.id) + '">Copy caption</button>' +
         '<button type="button" class="vb-btn secondary" data-vb-delete="' + esc(row.id) + '">Delete draft</button></div>' +
         '<span hidden data-vb-path="' + esc(row.id) + '">' + esc(row.asset_path || "") + '</span></article>'
@@ -367,11 +390,36 @@ function startViralBoost() {
       box.textContent = String(error && error.message || "Please sign in to load your saved drafts.");
     }
   }
+  function editDraft(row) {
+    if (!row) return;
+    cleanupPreview();
+    $("vbFile").value = "";
+    $("vbFile").disabled = true;
+    $("vbTitle").value = row.title || "";
+    $("vbUrl").value = row.post_url || "";
+    $("vbTopic").value = "";
+    $("vbCaption").value = row.caption || "";
+    $("vbHashtags").value = row.hashtags || "";
+    pane.querySelectorAll('input[name="vbPlatform"]').forEach(el => {
+      el.checked = (row.platforms || []).includes(el.value);
+    });
+    editingDraftId = row.id;
+    $("vbSave").textContent = "Save changes";
+    $("vbCancelEdit").hidden = false;
+    $("vbCopyStatus").textContent = "Editing a saved draft. Its uploaded media will remain unchanged.";
+    say("Editing “" + row.title + "”. Update the details above, then save changes.");
+    $("vbTitle").scrollIntoView({ behavior: "smooth", block: "center" });
+  }
   pane.addEventListener("click", async event => {
+    const edit = event.target.closest("[data-vb-edit]");
     const open = event.target.closest("[data-vb-open]");
     const copy = event.target.closest("[data-vb-copy]");
     const del = event.target.closest("[data-vb-delete]");
     const rows = pane._vbRows || [];
+    if (edit) {
+      const row = rows.find(r => r.id === edit.dataset.vbEdit);
+      editDraft(row);
+    }
     if (open) {
       const row = rows.find(r => r.id === open.dataset.vbOpen);
       if (row && row.asset_path) {
