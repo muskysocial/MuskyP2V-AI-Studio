@@ -281,7 +281,7 @@ function init() {
     const file=pendingFile;
     if (file.size > 8*1024*1024) throw new Error("Attachments must be 8 MB or smaller for AI processing.");
     const allowed=["image/jpeg","image/png","image/webp","image/gif","application/pdf","text/plain","audio/webm","audio/ogg","audio/mp4","audio/mpeg","audio/wav"];
-    if (!allowed.includes(file.type)) throw new Error("Choose a photo, voice recording, PDF, TXT or Word document.");
+    if (!allowed.includes(file.type)) throw new Error("Choose a photo, voice recording, PDF or TXT document.");
     const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,"_").slice(-90) || "attachment";
     const path=userId+"/"+crypto.randomUUID()+"_"+safe;
     const {error}=await M.sb.storage.from("assistant-attachments").upload(path,file,{contentType:file.type,upsert:false});
@@ -336,7 +336,6 @@ function init() {
 
   chat.querySelector("#chBack").addEventListener("click", () => go("toolsHubSection"));
   loadHistory();
-  loadHistory();
   chat.querySelectorAll("[data-prompt]").forEach((card) => {
     card.addEventListener("click", () => {
       chIn.value = card.dataset.prompt || "";
@@ -344,12 +343,7 @@ function init() {
       sendChat();
     });
   });
-  chIn.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendChat();
-    }
-  });
+
   const settings = mk("settingsSection",
     "<h2>Settings</h2><h3>Account</h3><p id='shEmail'>Signed in</p><p id='shCred'></p>" +
     "<h3>Appearance</h3><div class='sh-row' id='shTheme'><button data-theme='light'>Light</button><button data-theme='dark'>Dark</button></div>" +
