@@ -186,3 +186,96 @@ main{width:min(100%,980px)!important;margin:0 auto!important;padding:16px 14px c
 }
 /* Honor reduced motion while keeping taps responsive. */
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+
+/* Target the real classes emitted by the current MuskySocials modules. */
+#studio #homeSection{max-width:980px!important;margin:0 auto!important;padding:12px 0 calc(104px + env(safe-area-inset-bottom,0px))!important}
+#studio #homeSection .ms-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:18px 2px 10px!important}
+#studio #homeSection .ms-section-head strong{color:var(--ms-text)!important;font-size:17px!important}
+#studio #homeSection .ms-section-head button{color:#bca1ff!important}
+#studio #homeSection .ms-search{background:#0b192b!important;border:1px solid var(--ms-border)!important;border-radius:16px!important}
+#studio #homeSection .ms-search .glass{color:#a7b5cc!important}
+#studio #homeSection .ms-search input{background:transparent!important;color:var(--ms-text)!important}
+#studio #homeSection .ms-search button{color:#c1a0ff!important}
+#studio #homeSection .ms-story-strip{gap:11px!important;padding:3px 2px 13px!important}
+#studio #homeSection .ms-story{color:#dfe7f8!important;flex-basis:68px!important;width:68px!important}
+#studio #homeSection .ms-story-ring{width:62px!important;height:62px!important;padding:3px!important;background:var(--ms-gradient)!important}
+#studio #homeSection .ms-story-ring>span,#studio #homeSection .ms-story-ring img{border:2px solid #081120!important}
+#studio #homeSection .hm-post{background:linear-gradient(145deg,#101d32,#091323)!important;border:1px solid var(--ms-border)!important;border-radius:19px!important;color:var(--ms-text)!important}
+#studio #homeSection .hm-head,#studio #homeSection .hm-body,#studio #homeSection .hm-title{color:var(--ms-text)!important}
+#studio #homeSection .hm-sub,#studio #homeSection .hm-meta{color:var(--ms-muted)!important}
+#studio #homeSection .hm-logo{background:var(--ms-gradient)!important;color:#fff!important}
+#studio #homeSection .hm-cbar{border-color:rgba(148,163,184,.18)!important}
+#studio #homeSection .hm-actions button{color:#b6c5dc!important;border-radius:12px!important}
+#studio #homeSection .hm-actions button:active{background:#172642!important}
+#studio #homeSection .hm-pill{background:#111f34!important;color:#dce6f7!important;border:1px solid #2a3d5b!important}
+#studio #homeSection .hm-meet{background:linear-gradient(145deg,#101d32,#091323)!important;border:1px solid var(--ms-border)!important;border-radius:17px!important;color:var(--ms-text)!important}
+#studio #homeSection .hm-meet-copy strong,#studio #homeSection .hm-meet-copy small{color:var(--ms-text)!important}
+#studio #homeSection .ex-grid{gap:11px!important}
+#studio #homeSection .ex-card{background:linear-gradient(145deg,#111f34,#091323)!important;border:1px solid var(--ms-border)!important;color:var(--ms-text)!important;border-radius:18px!important}
+#studio #homeSection .ex-card .ex-tag{background:rgba(139,92,246,.18)!important;color:#d6c5ff!important;border-color:rgba(177,137,255,.25)!important}
+#studio #homeSection .sh-grid{gap:11px!important}
+#studio .gs-chips{gap:8px!important;padding:4px 0 12px!important}
+#studio .gs-chip{background:#101f34!important;color:#dce6f7!important;border:1px solid #2a3d5b!important;border-radius:999px!important}
+#studio .gs-chip.on{background:var(--ms-gradient)!important;color:#fff!important;border-color:transparent!important}
+#studio .gs-card{padding:9px!important;min-width:0!important;overflow:hidden!important}
+#studio .gs-card img{aspect-ratio:1/1!important;object-fit:cover!important;border-radius:13px!important;background:#101a2c!important}
+#studio .gs-name,#studio .gs-price{color:#f5f7ff!important;overflow-wrap:anywhere}
+#studio .gs-sub{color:#a7b5cc!important;overflow-wrap:anywhere}
+#studio .gs-card .pt-btn{background:var(--ms-gradient)!important;color:#fff!important;border:0!important;border-radius:12px!important;min-height:42px!important}
+#studio #msQuickMenu{top:calc(68px + env(safe-area-inset-top,0px))!important;background:rgba(8,17,32,.98)!important;border:1px solid #2c3f60!important;border-radius:18px!important;box-shadow:0 18px 48px rgba(0,0,0,.48)!important;backdrop-filter:blur(22px)!important}
+#studio #msQuickMenu button{background:transparent!important;color:#edf2ff!important;border-radius:12px!important}
+#studio #msQuickMenu button:active{background:#172742!important}
+#studio .ms-top-menu{background:#111f34!important;color:#d0b8ff!important;border:1px solid #2b3e5e!important}
+#studio .ms-top-avatar{border-color:#d48aff!important;background:var(--ms-gradient)!important}
+#studio .mx-grid{gap:11px!important}
+#studio .mx-top{background:linear-gradient(125deg,rgba(236,78,172,.17),rgba(139,92,246,.18),rgba(29,188,244,.12))!important;border:1px solid #34466a!important;border-radius:20px!important}
+#studio .mx-name,#studio .mx-price{color:#f5f7ff!important}
+#studio .mx-badge{background:rgba(139,92,246,.18)!important;color:#d6c5ff!important;border:1px solid rgba(177,137,255,.24)!important}
+#messagesSection .mxmsg{color:var(--ms-text)!important}
+#messagesSection .mxmsg-head{border-bottom:1px solid rgba(148,163,184,.18)!important}
+#messagesSection .mxmsg-kicker{color:#c09cff!important}
+#messagesSection .mxmsg-sub,#messagesSection .mxmsg-time{color:var(--ms-muted)!important}
+#messagesSection .mxmsg-refresh,#messagesSection .mxmsg-back{background:#101f34!important;color:#f4f7ff!important;border:1px solid #2a3d5b!important;border-radius:13px!important}
+#messagesSection .mxmsg-row,#messagesSection .mxmsg-thread-head{background:linear-gradient(145deg,#101d32,#091323)!important;color:#f5f7ff!important;border:1px solid #293c5a!important;border-radius:17px!important}
+#messagesSection .mxmsg-row:active{background:#172742!important}
+#messagesSection .mxmsg-copy strong,#messagesSection .mxmsg-thread-person strong{color:#f5f7ff!important}
+#messagesSection .mxmsg-copy small,#messagesSection .mxmsg-privacy{color:#a7b5cc!important}
+#messagesSection .mxmsg-avatar{border:2px solid #9e78ff!important}
+#messagesSection .mxmsg-bubble{overflow-wrap:anywhere!important}
+#messagesSection .mxmsg-compose{border-top:1px solid rgba(148,163,184,.18)!important}
+#messagesSection .mxmsg-compose textarea{background:#0d192c!important;color:#f5f7ff!important;border:1px solid #2a3d5b!important;border-radius:15px!important}
+#messagesSection .mxmsg-send{background:var(--ms-gradient)!important;color:#fff!important;border:0!important;border-radius:13px!important}
+#settingsSection .sh-account-detail-card,#settingsSection .sh-account-detail-row,#settingsSection .sh-notif-card,#settingsSection .sh-notif-item{background:#0d192c!important;color:#f5f7ff!important;border-color:#2a3d5b!important}
+#settingsSection .sh-account-detail-copy strong,#settingsSection .sh-settings-row strong,#settingsSection .sh-settings-preference strong{color:#f5f7ff!important}
+#settingsSection .sh-account-detail-copy small,#settingsSection .sh-settings-row small,#settingsSection .sh-settings-preference small{color:#a7b5cc!important}
+#settingsSection .sh-settings-preference .sh-row button{background:#101f34!important;color:#e5ecfa!important;border:1px solid #2a3d5b!important;border-radius:11px!important}
+#settingsSection .sh-settings-preference .sh-row button.on{background:var(--ms-gradient)!important;color:#fff!important;border-color:transparent!important}
+#studio .sh-notif-item{background:#0d192c!important;border-color:#2a3d5b!important;color:#f5f7ff!important}
+#studio .sh-notif-copy strong{color:#f5f7ff!important}
+#studio .sh-notif-copy small{color:#a7b5cc!important}
+#studio .sh-notif-toggle{accent-color:#9b73ff!important}
+#studio .mx-chat-head{border-color:#293955!important}
+#studio .mx-chat-brand,#studio .mx-chat-welcome{color:#f5f7ff!important}
+#studio .mx-chat-prompt{background:#0d192c!important;color:#f5f7ff!important;border-color:#2a3d5b!important}
+#studio .mx-chat-prompts button,#studio .ch-tool{background:#101f34!important;color:#e4ebfa!important;border:1px solid #2a3d5b!important;border-radius:12px!important}
+#studio .ch-bar{background:#060c18!important;border-color:#293955!important}
+#studio .ch-bar textarea{background:#0d192c!important;color:#f5f7ff!important;border-color:#2a3d5b!important}
+#studio .ch-go{background:var(--ms-gradient)!important;color:#fff!important}
+#mxBar button{min-width:0!important;white-space:nowrap!important}
+#mxBar button.on{color:#c3a2ff!important}
+#mxBar button.on span{filter:drop-shadow(0 0 8px rgba(177,128,255,.3))}
+#loginPanel .welcome-content{width:min(100%,460px)!important}
+#loginPanel .orb-one{background:rgba(236,78,172,.14)!important}
+#loginPanel .orb-two{background:rgba(29,188,244,.12)!important}
+@media(max-width:480px){
+ #studio #homeSection{padding:8px 0 calc(94px + env(safe-area-inset-bottom,0px))!important}
+ #studio #homeSection .ms-story{flex-basis:64px!important;width:64px!important}
+ #studio #homeSection .ms-story-ring{width:58px!important;height:58px!important}
+ #studio #homeSection .ex-grid{gap:8px!important}
+ #studio .gs-card{padding:7px!important}
+ #studio .gs-card .pt-btn{font-size:12px!important;padding:10px 7px!important}
+ #studio #msQuickMenu{top:calc(62px + env(safe-area-inset-top,0px))!important}
+ #settingsSection .sh-account-detail-row{gap:9px!important;min-width:0!important}
+ #messagesSection .mxmsg-row{gap:10px!important;padding:11px!important}
+}
