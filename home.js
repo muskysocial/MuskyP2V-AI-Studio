@@ -414,7 +414,7 @@ html.mx-light body{background:#f7f8fc!important}
     paintFeed();
     fetchFeed(false);
     const search=q("#msSearchInput");
-    if(search) search.addEventListener("keydown",e=>{if(e.key==="Enter"&&search.value.trim()){window.shell.go("peopleSection");setTimeout(()=>{const target=q("#mdSearchInput")||q("#peopleSearch");if(target){target.value=search.value.trim();target.dispatchEvent(new Event("input",{bubbles:true}));}},150);}});
+    if(search) search.addEventListener("keydown",e=>{if(e.key==="Enter"&&search.value.trim()){window.shell.go("peopleSection");setTimeout(()=>{const target=q("#mdSearch")||q("#mdSearchInput")||q("#peopleSearch");if(target){target.value=search.value.trim();target.dispatchEvent(new Event("input",{bubbles:true}));}},150);}});
     const voice=q("#msVoiceSearch");
     if(voice) voice.addEventListener("click",()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast("Voice search isn't supported in this browser. You can type in search.");return;}const rec=new SR();rec.lang=navigator.language||"en-US";rec.onresult=e=>{if(search)search.value=e.results[0][0].transcript;};rec.onerror=()=>toast("Couldn't hear that. Please try again.");rec.start();});
     const watch=q("#msWatchStories");if(watch)watch.addEventListener("click",()=>go("peopleSection"));
