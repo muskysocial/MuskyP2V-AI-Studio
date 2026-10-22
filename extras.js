@@ -204,7 +204,15 @@ html.mx-light .topbar #xAv{color:#fff!important}
           ? "<button class='pf-row' id='pfSaved'><span>" + t + "</span><span>›</span></button>"
           : t === "🧾 My orders and activity"
             ? "<button class='pf-row' id='pfOrders'><span>" + t + "</span><span>›</span></button>"
-            : "<div class='pf-row off'><span>" + t + "</span><span class='pf-tag'>Soon</span></div>").join("") +
+            : t === "💳 Payment methods"
+              ? "<button class='pf-row' id='pfPayment'><span>" + t + "</span><span>›</span></button>"
+              : t === "🎁 Invite friends, earn credits"
+                ? "<button class='pf-row' id='pfInvite'><span>" + t + "</span><span>›</span></button>"
+                : t === "✅ Verified badge"
+                  ? "<button class='pf-row' id='pfVerified'><span>" + t + "</span><span>›</span></button>"
+                  : t === "⬇️ Download my data"
+                    ? "<button class='pf-row' id='pfExport'><span>" + t + "</span><span>›</span></button>"
+                    : "<div class='pf-row off'><span>" + t + "</span><span class='pf-tag'>Soon</span></div>").join("") +
     "<button class='pf-row' id='pfHelp'><span>💬 Help and support on WhatsApp</span><span>›</span></button>" +
     "<button class='pf-row' id='pfDel'><span>🗑️ Ask to delete my account</span><span>›</span></button>" +
     "<button class='pt-btn del' id='pfOut' style='width:100%;margin-top:14px'>Sign out</button>");
@@ -377,6 +385,113 @@ html.mx-light .topbar #xAv{color:#fff!important}
       msg.textContent = "Privacy preference saved.";
       save.disabled = false;
     });
+  });
+
+
+  // Payment methods: connect the existing checkout and account-specific payment history.
+  $p("pfPayment").addEventListener("click", async () => {
+    const body = document.createElement("div");
+    body.innerHTML = "<p>Payments are currently limited to Paystack test mode. Test payments do not move real money. No card details are stored by MuskySocials in this screen.</p><p id='pfPayMsg' role='status'>Loading your payment history…</p><div id='pfPayHistory'></div>";
+    const manage = document.createElement("button");
+    manage.type = "button"; manage.className = "pt-btn"; manage.style.width = "100%"; manage.textContent = "Open plans and payment checkout";
+    body.appendChild(manage);
+    settingsModal("pfPaymentModal", "Payment methods", body);
+    manage.addEventListener("click", () => {
+      document.querySelector("#pfPaymentModal")?.remove();
+      window.shell.go("membershipSection");
+    });
+    if (!uid) {
+      body.querySelector("#pfPayMsg").textContent = "Sign in to view your payment history.";
+      manage.disabled = true; return;
+    }
+    try {
+      const [payments, orders] = await Promise.all([
+        sb.from("payment_transactions").select("reference,plan_code,amount_kobo,currency,status,created_at,paid_at").eq("user_id", uid).order("created_at", { ascending: false }).limit(20),
+        sb.from("customer_orders").select("order_ref,item_name,amount,currency,payment_method,payment_status,status,created_at").eq("user_id", uid).order("created_at", { ascending: false }).limit(20),
+      ]);
+      if (payments.error && orders.error) throw payments.error;
+      const rows = [];
+      (payments.data || []).forEach((p) => rows.push({
+        when: p.created_at, title: p.plan_code || "Membership/coins",
+        amount: ((Number(p.amount_kobo) || 0) / 100).toLocaleString("en-NG", { style: "currency", currency: p.currency || "NGN" }),
+        status: p.status || "pending",
+      }));
+      (orders.data || []).forEach((p) => rows.push({
+        when: p.created_at, title: p.item_name || p.order_ref || "Order",
+        amount: Number(p.amount).toLocaleString("en-NG", { style: "currency", currency: p.currency || "NGN" }),
+        status: p.payment_status || p.status || "pending",
+      }));
+      rows.sort((a,b) => new Date(b.when) - new Date(a.when));
+      body.querySelector("#pfPayMsg").textContent = rows.length ? "Your recent payment records:" : "No payment records found for this account yet.";
+      body.querySelector("#pfPayHistory").innerHTML = rows.slice(0,20).map((r) =>
+        "<div class='pt-card'><strong>" + esc(r.title) + "</strong><p>" + esc(r.amount) + " · " + esc(r.status) + "</p><small>" + esc(r.when ? new Date(r.when).toLocaleString() : "") + "</small></div>"
+      ).join("");
+      if (payments.error || orders.error) body.querySelector("#pfPayMsg").textContent += " Some history could not be loaded.";
+    } catch (err) {
+      body.querySelector("#pfPayMsg").textContent = "Could not load payment history: " + (err.message || err);
+    }
+  });
+
+  // Export only records belonging to the currently authenticated account.
+  $p("pfExport").addEventListener("click", async () => {
+    if (!uid) return pmsg("Sign in first to download your data.");
+    const button = $p("pfExport");
+    button.disabled = true;
+    pmsg("Preparing your data export…");
+    const exportData = {
+      exported_at: new Date().toISOString(),
+      account: { id: uid, email: $p("pfEmail").textContent || null },
+      data: {},
+      export_warnings: [],
+    };
+    const ownQueries = [
+      ["profile", () => sb.from("profiles").select("id,display_name,email,bio,country,whatsapp,avatar_path,created_at,role,credits,daily_credits,paid_coins").eq("id", uid).maybeSingle()],
+      ["payment_transactions", () => sb.from("payment_transactions").select("*").eq("user_id", uid).order("created_at", { ascending: false })],
+      ["subscriptions", () => sb.from("user_subscriptions").select("*").eq("user_id", uid).order("started_at", { ascending: false })],
+      ["coin_ledger", () => sb.from("coin_ledger").select("*").eq("user_id", uid).order("created_at", { ascending: false })],
+      ["saved_items", () => sb.from("saved_items").select("*").eq("user_id", uid).order("created_at", { ascending: false })],
+      ["customer_orders", () => sb.from("customer_orders").select("*").eq("user_id", uid).order("created_at", { ascending: false })],
+      ["user_activity", () => sb.from("user_activity").select("*").eq("user_id", uid).order("created_at", { ascending: false })],
+      ["notifications", () => sb.from("notifications").select("*").eq("user_id", uid).order("created_at", { ascending: false })],
+      ["comments", () => sb.from("post_comments").select("*").eq("user_id", uid).order("created_at", { ascending: false })],
+      ["likes", () => sb.from("post_likes").select("*").eq("user_id", uid).order("created_at", { ascending: false })],
+    ];
+    try {
+      for (const [name, query] of ownQueries) {
+        const result = await query();
+        if (result.error) {
+          exportData.export_warnings.push(name + ": " + result.error.message);
+          continue;
+        }
+        exportData.data[name] = result.data;
+      }
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "muskysocials-my-data-" + new Date().toISOString().slice(0,10) + ".json";
+      document.body.appendChild(link); link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      pmsg(exportData.export_warnings.length
+        ? "Your export downloaded, but some tables were unavailable. See export_warnings inside the file."
+        : "Your data export has downloaded.");
+    } catch (err) {
+      pmsg("Could not create your export: " + (err.message || err));
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  // These two paid/referral actions remain gated until their reward rules are approved.
+  $p("pfVerified").addEventListener("click", () => {
+    const body = document.createElement("div");
+    body.innerHTML = "<p>Verified badge is a paid feature. Its price has not been configured yet, so no coins or money will be taken.</p><p>Once the price is approved, this screen will let you submit a verification request and track its review status.</p>";
+    settingsModal("pfVerifiedModal", "Verified badge", body);
+  });
+  $p("pfInvite").addEventListener("click", () => {
+    const body = document.createElement("div");
+    body.innerHTML = "<p>Invite friends and earn coins when eligible new members join.</p><p>The referral reward amount and eligibility rules have not been configured yet, so this screen will not issue unverified rewards.</p><p>Once the reward rules are approved, each account will receive a referral link and a reward history.</p>";
+    settingsModal("pfInviteModal", "Invite friends, earn credits", body);
   });
 
   $p("pfMfa").addEventListener("click", () => {
