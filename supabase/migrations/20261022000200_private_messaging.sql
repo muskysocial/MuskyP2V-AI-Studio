@@ -73,6 +73,7 @@ using (
 )
 with check (
   sender_id <> (select auth.uid())
+  and read_at is not null
   and exists (
     select 1 from public.conversations c
     where c.id = conversation_id and ((select auth.uid()) = c.user_a or (select auth.uid()) = c.user_b)
@@ -128,3 +129,9 @@ revoke all on function public.handle_direct_message_insert() from public, anon, 
 drop trigger if exists direct_message_after_insert on public.direct_messages;
 create trigger direct_message_after_insert after insert on public.direct_messages
 for each row execute function public.handle_direct_message_insert();
+
+
+-- The notifications table validates type values; explicitly permit private-message alerts.
+alter table public.notifications drop constraint if exists notifications_type_check;
+alter table public.notifications add constraint notifications_type_check
+  check (type = any (array['system','account','credits','order','payment','premium','social','security','message']::text[]));
