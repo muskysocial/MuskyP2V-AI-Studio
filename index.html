@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#070b14"><meta name="description" content="MuskySocials — connect with people, share posts, and explore creator tools.">
   <link rel="manifest" href="./manifest.json?v=20261022-ui10">
-  <title>MuskySocials</title><link rel="stylesheet" href="style.css?v=20261022-ui10">
+  <title>MuskySocials</title><link rel="stylesheet" href="style.css?v=20261022-privacy-safety">
   <link rel="stylesheet" href="social-theme.css?v=20261022-ui10">
 </head>
 <body>
@@ -78,7 +78,32 @@
 
       <section id="plansSection" class="pane" hidden><div class="section-heading"><div><p class="eyebrow">COINS & PLANS</p><h2>Demo packages</h2></div></div><p class="muted">These are ideas only. Payments and coin crediting are not active.</p><div class="plan-grid"><article class="plan"><h3>Starter</h3><p class="price">₦1,500</p><p>200 coins</p></article><article class="plan"><h3>Creator</h3><p class="price">₦3,000</p><p>420 coins</p></article><article class="plan"><h3>Pro</h3><p class="price">₦5,000</p><p>750 coins</p></article></div><div class="notice"><span>ⓘ</span><p>Packages are not for sale yet. Secure account and payment setup must come first.</p></div></section>
 
-      <section id="privacySection" class="pane" hidden><div class="section-heading"><div><p class="eyebrow">YOUR SAFETY</p><h2>Privacy basics</h2></div></div><ul class="privacy-list"><li>Camera and microphone are requested only when you tap their controls.</li><li>Local camera and voice previews stay in your browser unless you choose to upload them to an external tool.</li><li>This preview name is not a real account, and demo coins have no cash value.</li><li>Never put passwords, secret API keys or payment keys in public website files.</li><li>Use photos and voices you own or have permission to use.</li></ul></section>
+      <section id="privacySection" class="pane" hidden>
+        <div class="ps-hero">
+          <div class="ps-hero-top"><span class="ps-shield">🛡️</span><span class="ps-eyebrow">YOUR SPACE · YOUR CHOICES</span></div>
+          <h2>Privacy &amp; Safety</h2>
+          <p>Simple ways to protect your account, understand your choices, and use MuskySocials more safely.</p>
+          <div class="ps-hero-foot"><span class="ps-live-dot"></span><span>Safety centre</span><span class="ps-hero-sep">•</span><span>Helpful guidance, not a security audit</span></div>
+        </div>
+        <div class="ps-section-title"><div><p class="eyebrow">QUICK CONTROLS</p><h3>Manage your account</h3></div><span class="ps-section-mark">↗</span></div>
+        <div class="ps-action-grid">
+          <button type="button" class="ps-action" data-go="accountSettingsSection"><span class="ps-action-icon ps-blue">👤</span><span><strong>Account details</strong><small>Review sign-in email and account shortcuts</small></span><b>›</b></button>
+          <button type="button" class="ps-action" data-go="profileSection"><span class="ps-action-icon ps-pink">✎</span><span><strong>Profile &amp; password</strong><small>Update your profile using existing controls</small></span><b>›</b></button>
+          <button type="button" class="ps-action" data-go="notificationPreferencesSection"><span class="ps-action-icon ps-blue">🔔</span><span><strong>Notification choices</strong><small>Review preferences saved on this device</small></span><b>›</b></button>
+          <button type="button" class="ps-action" data-go="contactSection"><span class="ps-action-icon ps-pink">✉</span><span><strong>Get help</strong><small>Contact the team about a privacy concern</small></span><b>›</b></button>
+        </div>
+        <div class="ps-section-title"><div><p class="eyebrow">STAY IN CONTROL</p><h3>Privacy essentials</h3></div></div>
+        <div class="ps-info-card">
+          <div class="ps-info-row"><span class="ps-info-icon">🔑</span><div><strong>Keep sign-in details private</strong><p>Use a unique password, never share verification codes, and avoid entering passwords into links sent by strangers.</p></div></div>
+          <div class="ps-info-row"><span class="ps-info-icon">📷</span><div><strong>Check before sharing media</strong><p>Only upload photos, videos, documents, or voice recordings you intend to share with the selected feature.</p></div></div>
+          <div class="ps-info-row"><span class="ps-info-icon">🎙️</span><div><strong>Device permissions</strong><p>Camera and microphone access should begin only when you use the relevant controls. You can review or revoke site permissions in your browser settings.</p></div></div>
+          <div class="ps-info-row"><span class="ps-info-icon">🌐</span><div><strong>External AI tools</strong><p>Some creator tools open third-party services. Those services may receive media you choose to submit and have their own privacy terms.</p></div></div>
+        </div>
+        <div class="ps-warning">
+          <span class="ps-warning-icon">!</span><div><strong>Know what is and isn't available</strong><p>This screen provides guidance and shortcuts; it does not itself change account visibility, block/report users, export your data, or delete your account. Contact support for help with a privacy request. Do not share passwords or payment secrets in a support message.</p><button type="button" data-go="contactSection">Contact support&nbsp; ›</button></div>
+        </div>
+        <p class="ps-footnote">Privacy settings can vary by feature. Notification preferences currently save on this device and do not yet control server-side delivery.</p>
+      </section>
     </section>
   </main><script>window.setTimeout(function(){document.documentElement.classList.remove("app-booting");},10000);</script><script src="script.js?v=20261022-ui10"></script>
   <script type="module" src="headswap.js?v=20261022-ui10"></script>
