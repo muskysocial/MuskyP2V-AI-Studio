@@ -49,7 +49,7 @@ function startViralBoost() {
       <h3>3. Connect your social accounts</h3>
       <p class="vb-muted">Connect accounts securely so supported platforms can receive posts directly after publishing is enabled.</p>
       <div id="vbConnectedAccounts" class="vb-connections"><p class="vb-small">Checking connected accounts…</p></div>
-      <input id="vbPublishFile" type="file" accept="video/mp4,video/webm,video/quicktime,video/x-m4v" hidden>
+      <input id="vbPublishFile" type="file" accept="video/mp4,video/webm,video/quicktime" hidden>
       <label for="vbTikTokPrivacy">TikTok audience privacy (loaded from your connected account)</label>
       <select id="vbTikTokPrivacy" class="vb-input" disabled><option value="">Connect TikTok to load options</option></select>
       <div class="vb-actions">
@@ -293,7 +293,7 @@ function startViralBoost() {
     if (!campaignId || !file) return;
     const button = pane.querySelector('[data-vb-publish-tiktok="' + CSS.escape(campaignId) + '"]');
     if (!button) return;
-    if (!/^video\/(mp4|webm|quicktime|x-m4v)$/i.test(file.type)) return say("Choose an MP4, WebM, or MOV video.", true);
+    if (!/^video\/(mp4|webm|quicktime)$/i.test(file.type)) return say("Choose an MP4, WebM, or MOV video.", true);
     if (file.size < 1 || file.size > 40 * 1024 * 1024) return say("Choose a video under 40 MB for direct TikTok publishing.", true);
     try {
       const videoUrl = URL.createObjectURL(file);
@@ -325,8 +325,11 @@ function startViralBoost() {
         return;
       }
       const chunkSize = Number(result.chunk_size) || (10 * 1024 * 1024);
-      for (let start = 0; start < file.size; start += chunkSize) {
-        const part = file.slice(start, Math.min(start + chunkSize, file.size));
+      const chunkCount = Math.max(1, Math.floor(file.size / chunkSize));
+      for (let chunkIndex = 0; chunkIndex < chunkCount; chunkIndex++) {
+        const start = chunkIndex * chunkSize;
+        const endExclusive = chunkIndex === chunkCount - 1 ? file.size : start + chunkSize;
+        const part = file.slice(start, endExclusive);
         const end = start + part.size - 1;
         const upload = await fetch(result.upload_url, {
           method: "PUT",
