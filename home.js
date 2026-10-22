@@ -236,10 +236,10 @@ html.mx-light body{background:#f7f8fc!important}
     const brand=topbar.querySelector(".brand");if(brand)topbar.insertBefore(menu,brand);
     const actions=topbar.querySelector(".top-actions");
     if(actions&&!q("#msTopAvatar")){const avatar=document.createElement("button");avatar.id="msTopAvatar";avatar.className="ms-top-avatar";avatar.type="button";avatar.setAttribute("aria-label","Open your profile");avatar.textContent="M";actions.appendChild(avatar);avatar.addEventListener("click",()=>window.shell.go("profileSection"));}
-    const quick=document.createElement("div");quick.id="msQuickMenu";quick.innerHTML='<button data-msgo="homeSection">🏠 Home</button><button data-msgo="peopleSection">👥 Friends & Discover</button><button data-msgo="notifSection">♡ Activity</button><button data-msgo="profileSection">👤 My profile</button><button data-msgo="shopSection">🛍 Shop</button><button data-msgo="settingsSection">⚙ Settings</button>';
+    const quick=document.createElement("div");quick.id="msQuickMenu";quick.innerHTML='<button data-msgo="homeSection">🏠 Home</button><button data-msgo="peopleSection">👥 Friends & Discover</button><button data-msgo="notifSection">♡ Activity</button><button data-msgo="messagesSection">💬 Messages</button><button data-msgo="profileSection">👤 My profile</button><button data-msgo="shopSection">🛍 Shop</button><button data-msgo="settingsSection">⚙ Settings</button>';
     document.body.appendChild(quick);
     menu.addEventListener("click",()=>quick.classList.toggle("open"));
-    quick.addEventListener("click",e=>{const b=e.target.closest("[data-msgo]");if(!b)return;quick.classList.remove("open");window.shell.go(b.dataset.msgo);});
+    quick.addEventListener("click",e=>{const b=e.target.closest("[data-msgo]");if(!b)return;quick.classList.remove("open");if(b.dataset.msgo==="messagesSection"&&window.muskyMessaging)return window.muskyMessaging.inbox();window.shell.go(b.dataset.msgo);});
     document.addEventListener("click",e=>{if(!quick.contains(e.target)&&e.target!==menu)quick.classList.remove("open");});
   }
 
@@ -591,8 +591,8 @@ html.mx-light body{background:#f7f8fc!important}
       '<div class="md-counts md-profile-stats"><div class="md-count"><strong>' + Number(p.follower_count || 0).toLocaleString() + '</strong><span>Followers</span></div>' +
       '<div class="md-count"><strong>' + Number(p.following_count || 0).toLocaleString() + '</strong><span>Following</span></div></div>' +
       '<div class="md-actions md-profile-actions"><button type="button" class="pt-btn md-follow' + (following ? " is-following" : "") + '" data-profile-follow="' + esc(p.id) + '">' +
-      (following ? "✓ Following · Unfollow" : "+ Follow") + '</button><button type="button" class="pt-btn md-message-button" data-message-soon="' + esc(p.id) + '">✉ Message</button></div>' +
-      '<div class="md-profile-note"><span aria-hidden="true">🔒</span><span>Private messaging is not available yet. Follow this member to stay connected.</span></div>' +
+      (following ? "✓ Following · Unfollow" : "+ Follow") + '</button><button type="button" class="pt-btn md-message-button" data-message="' + esc(p.id) + '">✉ Message</button></div>' +
+      '<div class="md-profile-note"><span aria-hidden="true">🔒</span><span>Start a private conversation with this member. Only the conversation participants can read the messages.</span></div>' +
       '</div></article>';
   }
 
@@ -649,8 +649,8 @@ html.mx-light body{background:#f7f8fc!important}
       const t = e.target;
       const follow = t.closest("[data-profile-follow]");
       if (follow) return toggleFollow(follow.dataset.profileFollow);
-      const message = t.closest("[data-message-soon]");
-      if (message) toast("Private messaging is coming soon. You can follow this member for now.");
+      const message = t.closest("[data-message]");
+      if (message) { if (window.muskyMessaging) return window.muskyMessaging.open(message.dataset.message); toast("Messaging is loading. Please try again in a moment."); }
     });
   }
   document.addEventListener("click", (e) => {
