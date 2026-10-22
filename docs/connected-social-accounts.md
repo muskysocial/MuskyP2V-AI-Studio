@@ -4,6 +4,12 @@ This integration starts with TikTok account authorization. The browser never rec
 
 ## Required TikTok developer setup
 
+Before submitting the app, publish and review the MuskySocials policy pages:
+- Privacy policy: `https://muskysocial.github.io/MuskyP2V-AI-Studio/privacy.html`
+- Terms of service: `https://muskysocial.github.io/MuskyP2V-AI-Studio/terms.html`
+
+Both pages currently contain a support-contact placeholder. Replace it with a real support email and review the wording before publishing these URLs in TikTok Developer settings. TikTok also requires app URL details and URL ownership verification for relevant features.
+
 1. Create a TikTok for Developers app and add the Content Posting API.
 2. Enable Direct Post and request the `user.info.basic` and `video.publish` scopes.
 3. Set the Redirect URI to the exact value used for `TIKTOK_REDIRECT_URI`, for example:
