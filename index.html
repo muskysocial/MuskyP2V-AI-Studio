@@ -93,6 +93,16 @@
         .catch(error => console.error(
           "Service worker registration failed:", error
         ));
+      let reloadedForController = false;
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (reloadedForController) return;
+        reloadedForController = true;
+        try {
+          if (sessionStorage.getItem("musky-sw-reloaded-v5") === "1") return;
+          sessionStorage.setItem("musky-sw-reloaded-v5", "1");
+        } catch {}
+        location.reload();
+      });
     });
   }
 </script>
