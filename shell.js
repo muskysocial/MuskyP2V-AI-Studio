@@ -19,6 +19,10 @@ html.mx-light{--sh-card:#fff;--sh-text:#050505;--sh-sub:#65676b;--sh-line:#dadde
 body{padding-bottom:0}
 #studio nav.tabs,#studio .notice,#studio .hello-row,#studio .chat-prompt,#authOut{display:none!important}
 #mxBar{position:fixed;left:0;right:0;bottom:0;z-index:70;display:none;background:var(--sh-card);border-top:1px solid var(--sh-line);padding-bottom:env(safe-area-inset-bottom,0px)}
+#mxBackNav{display:none;align-items:center;padding:10px 12px 4px;max-width:1000px;margin:0 auto;width:100%;box-sizing:border-box}
+#mxBackButton{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid var(--sh-line);border-radius:999px;background:var(--sh-card);color:var(--sh-text);font:inherit;font-size:16px;font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.08);cursor:pointer;touch-action:manipulation}
+#mxBackButton:focus-visible{outline:3px solid var(--sh-blue);outline-offset:2px}
+#mxBackButton .mx-back-arrow{font-size:22px;line-height:1}
 #mxBar button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 6px;border:0;background:none;color:var(--sh-sub);font-size:calc(12px * var(--mx-font-scale,1));overflow-wrap:anywhere}
 #mxBar button span{font-size:22px;line-height:1.1}
 #mxBar button.on{color:var(--sh-blue);font-weight:700}
@@ -372,8 +376,38 @@ function init() {
     .map(([id, i, l]) => '<button data-go="' + id + '"><span>' + i + "</span>" + l + "</button>").join("");
   document.body.appendChild(bar);
 
-  function go(id) {
+  // Global in-app back navigation: remember section transitions and provide Home as fallback.
+  const backNav = document.createElement("div");
+  backNav.id = "mxBackNav";
+  backNav.innerHTML = '<button type="button" id="mxBackButton" aria-label="Go back to the previous screen"><span class="mx-back-arrow" aria-hidden="true">←</span><span>Go back</span></button>';
+  studio.insertBefore(backNav, studio.querySelector(".pane") || footer);
+  const backButton = backNav.querySelector("#mxBackButton");
+  let currentPaneId = null;
+  const navigationStack = [];
+  function updateBackButton() {
+    const isHome = currentPaneId === "homeSection";
+    backNav.style.display = (!studio.hidden && currentPaneId && !isHome) ? "flex" : "none";
+  }
+  function goBack() {
+    let previous = navigationStack.pop();
+    while (previous && !document.getElementById(previous)) previous = navigationStack.pop();
+    if (!previous || previous === currentPaneId) previous = "homeSection";
+    go(previous, { fromBack: true });
+  }
+  backButton.addEventListener("click", goBack);
+
+  function go(id, options = {}) {
     if (!document.getElementById(id)) return;
+    if (currentPaneId && currentPaneId !== id) {
+      if (!options.fromBack && id !== "homeSection") {
+        navigationStack.push(currentPaneId);
+        if (navigationStack.length > 30) navigationStack.shift();
+      } else if (id === "homeSection" && !options.fromBack) {
+        navigationStack.length = 0;
+      }
+    }
+    currentPaneId = id;
+    updateBackButton();
     if (id === "homeSection") renderHome();
     if (id === "settingsSection") renderSettings();
     studio.querySelectorAll(".pane").forEach((p) => {
@@ -425,6 +459,7 @@ function init() {
   function sync() {
     const open = !studio.hidden;
     bar.style.display = open ? "flex" : "none";
+    updateBackButton();
     // Add space for the fixed bar only when real content already needs scrolling.
     // Short/empty sections therefore do not create a blank scroll area.
     document.body.classList.remove("mx-app-open");
