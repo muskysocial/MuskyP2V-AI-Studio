@@ -157,7 +157,7 @@ function initPrivateMessaging() {
     } catch (error) {
       console.error("Could not load private messages:", error);
       say("Your inbox could not load. Please refresh and try again.");
-      content.innerHTML = '<div class="mxmsg-empty"><b>We couldn't load your inbox</b><p>Check your connection and try again. Your messages remain protected by account-level access rules.</p></div>';
+      content.innerHTML = '<div class="mxmsg-empty"><b>We could not load your inbox</b><p>Check your connection and try again. Your messages remain protected by account-level access rules.</p></div>';
     } finally {
       busy = false;
     }
