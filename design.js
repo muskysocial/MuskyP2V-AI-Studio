@@ -145,7 +145,7 @@ function start() {
   const st = document.createElement("style");
   st.textContent = `
 .ds-note{font-size:13px;padding:10px;border-radius:10px;border:1px solid var(--sh-line,#dadde1);margin:8px 0}
-.ds-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ds-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ds-grid>*{min-width:0}.ds-card .pt-btn{white-space:normal;overflow-wrap:anywhere;min-height:42px}.ds-download-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.ds-download-row .pt-btn{flex:1;min-width:min(100%,145px)}.ds-note{font-size:clamp(12px,1.5vw,14px);line-height:1.45}.ds-t{font-size:clamp(13px,1.8vw,16px)}@media(max-width:360px){.ds-grid{grid-template-columns:minmax(0,1fr);gap:8px}.ds-card{min-width:0}.ds-download-row{flex-direction:column}.ds-download-row .pt-btn{width:100%}}@media(min-width:760px){.ds-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(min-width:1100px){.ds-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .ds-card{margin:0!important;padding:8px!important}
 .ds-card img{width:100%;display:block;border-radius:8px;background:#e4e6eb}
 .ds-t{font-weight:700;margin-top:6px;overflow-wrap:anywhere}
@@ -226,8 +226,9 @@ html.mx-light #studio .ds-req{color:#d93025!important}
       curCfg.fields.map((f) => "<label class='ds-lbl'>" + esc(f.label) + (f.required ? " <span class='ds-req'>*</span>" : " (optional)") + "</label>" +
         (f.type === "multiline" ? "<textarea class='pt-in' rows='3' maxlength='600' data-fid='" + f.id + "' placeholder='" + esc(f.placeholder || "") + "'></textarea>"
           : "<input class='pt-in' maxlength='120' data-fid='" + f.id + "' placeholder='" + esc(f.placeholder || "") + "'>")).join("") +
-      "<div style='display:flex;gap:8px;margin-top:12px'><button class='pt-btn' id='dsPng' style='flex:1'>Download PNG</button>" +
-      "<button class='pt-btn' id='dsJpg' style='flex:1'>Download JPG</button></div><p class='pt-msg' id='dsEMsg'></p>";
+      "<p class='ds-s'>Viewing and editing are free. Each successful download costs 100 coins.</p>" +
+      "<div class='ds-download-row'><button class='pt-btn' id='dsPng' style='flex:1'>Download PNG · 100 coins</button>" +
+      "<button class='pt-btn' id='dsJpg' style='flex:1'>Download JPG · 100 coins</button></div><p class='pt-msg' id='dsEMsg'></p>";
     redraw();
   }
   function redraw() {
@@ -262,26 +263,72 @@ html.mx-light #studio .ds-req{color:#d93025!important}
       redraw();
     } catch { msg.textContent = "That picture could not be read. Try a JPG or PNG."; }
   });
-  function download(type) {
+  let downloadPending = false;
+  async function download(type) {
     const msg = editBox.querySelector("#dsEMsg");
     const c = editBox.querySelector("#dsCanvas");
-    for (const f of curCfg.fields) if (f.required && !String(values[f.id] || "").trim()) return (msg.textContent = "Please fill in: " + f.label);
-    if (curCfg.photo && curCfg.photo.required && !photo) return (msg.textContent = "Please add a photo.");
-    redraw();
-    msg.textContent = "Preparing your download…";
+    const buttons = [editBox.querySelector("#dsPng"), editBox.querySelector("#dsJpg")].filter(Boolean);
+    if (downloadPending) return;
+    for (const f of curCfg.fields) {
+      if (f.required && !String(values[f.id] || "").trim()) {
+        msg.textContent = "Please fill in: " + f.label;
+        return;
+      }
+    }
+    if (curCfg.photo && curCfg.photo.required && !photo) {
+      msg.textContent = "Please add a photo.";
+      return;
+    }
+    if (!window.musky || typeof window.musky.spend !== "function" || typeof window.musky.session !== "function") {
+      msg.textContent = "Your account is not ready. Please refresh and sign in again.";
+      return;
+    }
+
+    downloadPending = true;
+    buttons.forEach((button) => { button.disabled = true; });
+    let objectUrl = "";
+    let charged = false;
     try {
-      c.toBlob((blob) => {
-        if (!blob) { msg.textContent = "Could not create the file. Try again."; return; }
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = (cur.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "design") + (type === "image/png" ? ".png" : ".jpg");
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-        msg.textContent = "Downloaded. Remember: sample for learning only.";
-      }, type, 0.92);
-    } catch (err) { msg.textContent = "Could not export this design (" + (err.name || "error") + "). Try again, or tell the admin."; }
+      const session = await window.musky.session();
+      if (!session) throw new Error("Sign in required. Please sign in before downloading.");
+      redraw();
+      msg.textContent = "Preparing your file…";
+      const blob = await new Promise((resolve, reject) => {
+        try {
+          c.toBlob((value) => value ? resolve(value) : reject(new Error("Could not create the file. Try again.")), type, 0.92);
+        } catch (error) { reject(error); }
+      });
+      objectUrl = URL.createObjectURL(blob);
+      msg.textContent = "Checking your balance…";
+      await window.musky.spend(100);
+      charged = true;
+
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = (cur.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "design") + (type === "image/png" ? ".png" : ".jpg");
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      msg.textContent = "Download started. 100 coins deducted. Remember: sample for learning only.";
+      setTimeout(() => { try { URL.revokeObjectURL(objectUrl); } catch {} }, 5000);
+      objectUrl = "";
+    } catch (error) {
+      if (objectUrl) { try { URL.revokeObjectURL(objectUrl); } catch {} }
+      const message = String(error && error.message || "");
+      if (charged) {
+        msg.textContent = "100 coins were deducted, but the browser could not start the download. Please try again and contact support if this repeats.";
+      } else if (/not enough credits|insufficient|credit/i.test(message)) {
+        msg.textContent = "You need 100 coins to download this design. No coins were deducted; add coins and try again.";
+      } else if (/sign in required|session/i.test(message)) {
+        msg.textContent = "Please sign in again before downloading. No coins were deducted.";
+      } else {
+        msg.textContent = "Could not download this design. No coins were deducted. " + (message || "Please try again.");
+      }
+    } finally {
+      downloadPending = false;
+      buttons.forEach((button) => { button.disabled = false; });
+    }
   }
   pane.addEventListener("click", (e) => {
     const c = e.target.closest("[data-cat]");
