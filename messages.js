@@ -82,7 +82,9 @@ function initPrivateMessaging() {
   let userId = null;
   let currentConversationId = null;
   let currentPeer = null;
-  let busy = false;\n  let threadBusy = false;\n  let threadRefreshTimer = null;
+  let busy = false;
+  let threadBusy = false;
+  let threadRefreshTimer = null;
 
   const safeTime = (value) => {
     if (!value) return "";
