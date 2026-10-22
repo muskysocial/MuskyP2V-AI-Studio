@@ -97,6 +97,21 @@ html.mx-light .mx-btn:disabled{background:#e4e6eb!important;color:#8a8d91!import
 #studio .ch-log{min-height:0}
 #studio .ch-bar{align-items:stretch}
 #studio .ch-bar textarea{min-width:0}
+#studio #chatSection.mx-chat-fullscreen{
+  position:fixed!important;inset:0!important;z-index:80!important;
+  width:100vw!important;max-width:none!important;height:100vh;height:100dvh!important;
+  margin:0!important;padding:calc(env(safe-area-inset-top,0px) + 12px) 12px calc(env(safe-area-inset-bottom,0px) + 12px)!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+  display:flex!important;flex-direction:column!important;overflow:hidden!important;
+  background:var(--sh-card)!important;
+}
+#studio #chatSection.mx-chat-fullscreen h2{flex:0 0 auto;margin:0 0 12px;padding:4px 0 10px;border-bottom:1px solid var(--sh-line)}
+#studio #chatSection.mx-chat-fullscreen .ch-log{flex:1 1 auto;min-height:0!important;overflow-y:auto;overscroll-behavior:contain;margin:0 0 10px;padding:4px 0 12px}
+#studio #chatSection.mx-chat-fullscreen .ch-bar{flex:0 0 auto;align-items:flex-end;padding-bottom:2px}
+#studio #chatSection.mx-chat-fullscreen .ch-bar textarea{resize:none;max-height:28dvh;min-height:48px}
+#studio #chatSection.mx-chat-fullscreen>small{flex:0 0 auto;margin-top:8px;font-size:10px;line-height:1.35}
+body.mx-chat-open #mxBar{display:none!important}
+@media(min-width:700px){#studio #chatSection.mx-chat-fullscreen{padding:20px max(20px,calc((100vw - 900px)/2)) 18px!important}}
 #mxBar{padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(min-width:700px){#studio .sh-grid{grid-template-columns:repeat(3,minmax(0,1fr))}#mxBar{left:50%;right:auto;bottom:14px;transform:translateX(-50%);width:min(720px,calc(100% - 48px));border:1px solid var(--sh-line);border-radius:18px;box-shadow:0 8px 32px #0002;overflow:hidden}}
 @media(min-width:1100px){#studio .sh-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
@@ -238,6 +253,8 @@ function init() {
       toolsHubSection: ["toolsHubSection", "videoSection", "headswapSection", "chatSection", "voiceCloneSection", "voiceSection", "cameraSection", "viralBoostSection", "creditSection"],
       profileSection: ["profileSection", "settingsSection", "adminSection", "membershipSection"],
     };
+    chat.classList.toggle("mx-chat-fullscreen", id === "chatSection");
+    document.body.classList.toggle("mx-chat-open", id === "chatSection");
     const active = Object.keys(GROUPS).find((k) => GROUPS[k].includes(id)) || "homeSection";
     bar.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.go === active));
     window.scrollTo({ top: 0 });
