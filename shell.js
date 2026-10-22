@@ -1,46 +1,48 @@
 // MuskySocials app shell v1: light Facebook-style look, bigger text,
 // bottom bar, Menu grid, Settings. Loaded from index.html after auth.js.
 const KEY = "musky-settings";
-const DEFAULTS = { theme: "light", size: 1.25 };
+const DEFAULTS = { theme: "light", size: 1 };
 const S = (() => {
   try { return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(KEY) || "{}") }; } catch { return { ...DEFAULTS }; }
 })();
+if (![1, 1.1, 1.2].includes(Number(S.size))) S.size = 1;
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} };
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 function apply() {
   document.documentElement.classList.toggle("mx-light", S.theme === "light");
-  document.body.style.zoom = S.size; // scales all text and layout, including older parts of the site
+  document.documentElement.style.setProperty("--mx-font-scale", String(S.size));
 }
 
 const CSS = `
 :root{--sh-card:#0b1530;--sh-text:#e6ecff;--sh-sub:#9fb4f0;--sh-line:#1b2a52;--sh-blue:#6ea0ff}
 html.mx-light{--sh-card:#fff;--sh-text:#050505;--sh-sub:#65676b;--sh-line:#dadde1;--sh-blue:#1877f2}
-body{padding-bottom:84px}
+body{padding-bottom:0}
 #studio nav.tabs,#studio .notice,#studio .hello-row,#studio .chat-prompt,#authOut{display:none!important}
 #mxBar{position:fixed;left:0;right:0;bottom:0;z-index:70;display:none;background:var(--sh-card);border-top:1px solid var(--sh-line);padding-bottom:env(safe-area-inset-bottom,0px)}
-#mxBar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 6px;border:0;background:none;color:var(--sh-sub);font-size:12px}
+#mxBar button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 6px;border:0;background:none;color:var(--sh-sub);font-size:calc(12px * var(--mx-font-scale,1));overflow-wrap:anywhere}
 #mxBar button span{font-size:22px;line-height:1.1}
 #mxBar button.on{color:var(--sh-blue);font-weight:700}
-.sh{color:var(--sh-text);font-size:16px}
-.sh h2{margin:0 0 10px;font-size:22px}
+.sh{color:var(--sh-text);font-size:calc(16px * var(--mx-font-scale,1));min-width:0;overflow-wrap:anywhere}
+.sh h2{margin:0 0 10px;font-size:calc(22px * var(--mx-font-scale,1))}
 .sh p,.sh small{color:var(--sh-sub)}
 .sh-bal{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px;border:1px solid var(--sh-line);border-radius:14px;background:var(--sh-card);margin-bottom:14px}
-.sh-bal strong{display:block;font-size:26px;color:var(--sh-text)}
+.sh-bal strong{display:block;font-size:calc(26px * var(--mx-font-scale,1));color:var(--sh-text)}
 .sh-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.sh-tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px;border:1px solid var(--sh-line);border-radius:14px;background:var(--sh-card);color:var(--sh-text);font-size:16px;font-weight:600;text-align:left}
+.sh-tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px;border:1px solid var(--sh-line);border-radius:14px;background:var(--sh-card);color:var(--sh-text);font-size:calc(16px * var(--mx-font-scale,1));font-weight:600;text-align:left;min-width:0;overflow-wrap:anywhere}
 .sh-tile .ico{font-size:26px}
-.sh-tile small{font-weight:400;font-size:12px}
+.sh-tile small{font-weight:400;font-size:calc(12px * var(--mx-font-scale,1))}
 .sh-row{display:flex;gap:8px;margin:8px 0 16px}
-.sh-row button,.sh-out{flex:1;padding:12px 6px;border-radius:10px;border:1px solid var(--sh-line);background:var(--sh-card);color:var(--sh-text);font-size:15px}
+.sh-row button,.sh-out{flex:1;min-width:0;padding:12px 6px;border-radius:10px;border:1px solid var(--sh-line);background:var(--sh-card);color:var(--sh-text);font-size:calc(15px * var(--mx-font-scale,1))}
 .sh-row button.on{background:var(--sh-blue);border-color:var(--sh-blue);color:#fff;font-weight:700}
 .sh-out{width:100%;margin-top:6px;color:#d93025;font-weight:600}
-.sh h3{margin:14px 0 4px;font-size:16px}
+.sh h3{margin:14px 0 4px;font-size:calc(16px * var(--mx-font-scale,1))}
 .ch-log{display:flex;flex-direction:column;gap:8px;min-height:40vh;margin-bottom:10px}
-.ch-b{max-width:88%;padding:10px 12px;border-radius:16px;white-space:pre-wrap;line-height:1.4;font-size:16px}
+.ch-b{max-width:88%;padding:10px 12px;border-radius:16px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.4;font-size:calc(16px * var(--mx-font-scale,1))}
 .ch-me{align-self:flex-end;background:var(--sh-blue);color:#fff}
 .ch-ai{align-self:flex-start;background:var(--sh-line);color:var(--sh-text)}
 .ch-bar{display:flex;gap:8px;align-items:flex-end}
-.ch-bar textarea{flex:1;padding:10px;border-radius:12px;border:1px solid var(--sh-line);background:var(--sh-card);color:var(--sh-text);font-size:16px;resize:none}
-.ch-go{padding:12px 16px;border:0;border-radius:12px;background:var(--sh-blue);color:#fff;font-weight:700;font-size:16px}
+.ch-bar textarea{flex:1;min-width:0;padding:10px;border-radius:12px;border:1px solid var(--sh-line);background:var(--sh-card);color:var(--sh-text);font-size:calc(16px * var(--mx-font-scale,1));resize:vertical}
+.ch-go{padding:12px 16px;border:0;border-radius:12px;background:var(--sh-blue);color:#fff;font-weight:700;font-size:calc(16px * var(--mx-font-scale,1))}
 .ch-go:disabled{opacity:.5}
 /* Light, Facebook-like look for the older parts of the site */
 html.mx-light body{background:#f0f2f5!important;color:#050505!important;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif!important}
@@ -187,7 +189,7 @@ function init() {
   const settings = mk("settingsSection",
     "<h2>Settings</h2><h3>Account</h3><p id='shEmail'>Signed in</p><p id='shCred'></p>" +
     "<h3>Appearance</h3><div class='sh-row' id='shTheme'><button data-theme='light'>Light</button><button data-theme='dark'>Dark</button></div>" +
-    "<h3>Text size</h3><div class='sh-row' id='shSize'><button data-size='1.1'>Normal</button><button data-size='1.25'>Large</button><button data-size='1.4'>Extra large</button></div>" +
+    "<h3>Text size</h3><div class='sh-row' id='shSize'><button data-size='1'>Normal</button><button data-size='1.1'>Comfortable</button><button data-size='1.2'>Large</button></div>" +
     "<button class='sh-out' id='shOut'>Sign out</button>");
 
   const name = () => (document.querySelector("#welcomeName") || {}).textContent || "creator";
@@ -260,6 +262,7 @@ function init() {
   function sync() {
     const open = !studio.hidden;
     bar.style.display = open ? "flex" : "none";
+    document.body.classList.toggle("mx-app-open", open);
     if (open && !started) { started = true; go("homeSection"); }
     if (open && old && !old.hidden) {
       old.hidden = true;
