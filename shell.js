@@ -207,7 +207,7 @@ function init() {
     "<button type='button' class='mx-chat-prompt' data-prompt='Show me which MuskySocials tools I can use and how to get started with them.'><span class='mx-chat-art tools' aria-hidden='true'>✨</span><strong>Explore tools</strong><small>Find the right AI tool</small></button>" +
     "</div></div>" +
     "<div class='mx-chat-log' id='chLog' hidden></div>" +
-    "<div id='chPending' class='ch-pending' hidden></div><div class='ch-bar'><div class='ch-tools'><button type='button' class='ch-tool' id='chAttach' aria-label='Attach photo or document'>＋</button><input id='chFile' type='file' accept='image/*,.pdf,.txt,.doc,.docx' hidden><button type='button' class='ch-tool' id='chVoice' aria-label='Voice input'>🎙</button></div><textarea id='chIn' rows='1' maxlength='1000' placeholder='Message Musky Assistant…' aria-label='Message Musky Assistant'></textarea>" +
+    "<div id='chPending' class='ch-pending' hidden></div><div class='ch-bar'><div class='ch-tools'><button type='button' class='ch-tool' id='chAttach' aria-label='Attach photo or document'>＋</button><input id='chFile' type='file' accept='image/*,audio/*,.pdf,.txt,.doc,.docx' hidden><button type='button' class='ch-tool' id='chVoice' aria-label='Voice input'>🎙</button></div><textarea id='chIn' rows='1' maxlength='1000' placeholder='Message Musky Assistant…' aria-label='Message Musky Assistant'></textarea>" +
     "<button class='ch-go' id='chGo' aria-label='Send message'>↑</button></div><small class='mx-chat-note'>AI can make mistakes. Never share passwords or private information.</small>");
   document.body.appendChild(chat);
   let hist = [];
@@ -280,8 +280,8 @@ function init() {
     if (!pendingFile) return null;
     const file=pendingFile;
     if (file.size > 15*1024*1024) throw new Error("Attachments must be 15 MB or smaller.");
-    const allowed=["image/jpeg","image/png","image/webp","image/gif","application/pdf","text/plain","application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
-    if (!allowed.includes(file.type)) throw new Error("Choose a JPG, PNG, WebP, GIF, PDF, TXT or Word document.");
+    const allowed=["image/jpeg","image/png","image/webp","image/gif","application/pdf","text/plain","application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document","audio/webm","audio/ogg","audio/mp4","audio/mpeg","audio/wav"];
+    if (!allowed.includes(file.type)) throw new Error("Choose a photo, voice recording, PDF, TXT or Word document.");
     const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,"_").slice(-90) || "attachment";
     const path=userId+"/"+crypto.randomUUID()+"_"+safe;
     const {error}=await M.sb.storage.from("assistant-attachments").upload(path,file,{contentType:file.type,upsert:false});
@@ -296,7 +296,7 @@ function init() {
     let attachment=null; let content=text;
     try {
       if (pendingFile) { attachment=await uploadPending(M,session.user.id); pendingFile=null; updatePending(); }
-      if (!content && attachment) content=attachment.type.startsWith("image/") ? "Please look at the attached photo and help me understand it." : "Please read and help me with the attached document.";
+      if (!content && attachment) content=attachment.type.startsWith("image/") ? "Please look at the attached photo and help me understand it." : attachment.type.startsWith("audio/") ? "Please transcribe and respond to the attached voice note." : "Please read and help me with the attached document.";
       await saveMessage("user",content,attachment);
       bubble("user",content,attachment ? {attachment_path:attachment.path,attachment_name:attachment.name,attachment_type:attachment.type} : null);
       chIn.value=""; hist.push({role:"user",content});
@@ -312,68 +312,30 @@ function init() {
   chGo.addEventListener("click",sendChat);
   chat.querySelector("#chAttach").addEventListener("click",()=>chFile.click());
   chFile.addEventListener("change",()=>{pendingFile=chFile.files?.[0]||null;chFile.value="";updatePending();});
-  chVoice.addEventListener("click",()=>{
-    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    if(!SR){bubble("assistant","Voice input is not supported in this browser. You can still type or attach a photo or document.");return;}
-    if(recognition){recognition.stop();return;}
-    recognition=new SR();recognition.lang=navigator.language||"en-US";recognition.interimResults=true;recognition.continuous=false;
-    chVoice.textContent="■";chVoice.setAttribute("aria-label","Stop voice input");
-    recognition.onresult=(event)=>{let transcript="";for(let i=0;i<event.results.length;i++)transcript+=event.results[i][0].transcript;chIn.value=transcript;};
-    recognition.onerror=()=>{bubble("assistant","Voice input stopped. You can type your message instead.");};
-    recognition.onend=()=>{recognition=null;chVoice.textContent="🎙";chVoice.setAttribute("aria-label","Voice input");chIn.focus();};
-    try{recognition.start();}catch{recognition=null;chVoice.textContent="🎙";}
+  let recorder=null, recordingChunks=[];
+  chVoice.addEventListener("click",async()=>{
+    if(recorder && recorder.state==="recording"){recorder.stop();return;}
+    if(!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder){bubble("assistant","Voice recording is not supported by this browser. Please attach an audio file or type your message.");return;}
+    try{
+      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      const mime=["audio/webm;codecs=opus","audio/webm","audio/mp4"].find((t)=>MediaRecorder.isTypeSupported(t));
+      recorder=mime?new MediaRecorder(stream,{mimeType:mime}):new MediaRecorder(stream);
+      recordingChunks=[];
+      recorder.ondataavailable=(e)=>{if(e.data&&e.data.size)recordingChunks.push(e.data);};
+      recorder.onstop=()=>{
+        stream.getTracks().forEach((track)=>track.stop());
+        const blob=new Blob(recordingChunks,{type:recorder.mimeType||"audio/webm"});
+        const ext=blob.type.includes("mp4")?"m4a":blob.type.includes("ogg")?"ogg":"webm";
+        if(blob.size){pendingFile=new File([blob],"voice-note-"+Date.now()+"."+ext,{type:blob.type});updatePending();}
+        recorder=null;chVoice.textContent="🎙";chVoice.setAttribute("aria-label","Record voice note");
+      };
+      recorder.start();chVoice.textContent="■";chVoice.setAttribute("aria-label","Stop voice note");
+    }catch(e){bubble("assistant","Microphone access was not available. Allow microphone permission and try again.");chVoice.textContent="🎙";}
   });
   chIn.addEventListener("keydown",(e)=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendChat();}});
 
-  const chLog = chat.querySelector("#chLog");
-  const chWelcome = chat.querySelector("#chWelcome");
-  const chIn = chat.querySelector("#chIn");
-  const chGo = chat.querySelector("#chGo");
-  const bubble = (role, text) => {
-    chWelcome.hidden = true;
-    chLog.hidden = false;
-    const d = document.createElement("div");
-    d.className = "ch-b " + (role === "user" ? "ch-me" : "ch-ai");
-    d.textContent = text;
-    chLog.appendChild(d);
-    chLog.scrollTop = chLog.scrollHeight;
-    return d;
-  };
-  async function sendChat() {
-    const text = chIn.value.trim();
-    if (!text) return;
-    const M = window.musky;
-    if (!M || !(await M.session())) { bubble("assistant", "Please sign in to use the chat."); return; }
-    chIn.value = "";
-    chGo.disabled = true;
-    bubble("user", text);
-    hist.push({ role: "user", content: text });
-    const wait = bubble("assistant", "…");
-    try {
-      const { data, error } = await M.sb.functions.invoke(CHAT_FN, { body: { messages: hist.slice(-10) } });
-      if (error) {
-        let msg = "AI chat is not ready yet. Try again later.";
-        try {
-          const j = await error.context.json();
-          msg = j.error || msg;
-          if (typeof j.credits === "number") M.setBadge(j.credits);
-        } catch {}
-        wait.textContent = msg;
-        hist.pop();
-      } else {
-        wait.textContent = data.reply;
-        hist.push({ role: "assistant", content: data.reply });
-        if (typeof data.credits === "number") M.setBadge(data.credits);
-      }
-    } catch {
-      wait.textContent = "Could not reach the AI. Check your internet and try again.";
-      hist.pop();
-    }
-    chGo.disabled = false;
-    chLog.scrollTop = chLog.scrollHeight;
-  }
-  chGo.addEventListener("click", sendChat);
   chat.querySelector("#chBack").addEventListener("click", () => go("toolsHubSection"));
+  loadHistory();
   loadHistory();
   chat.querySelectorAll("[data-prompt]").forEach((card) => {
     card.addEventListener("click", () => {
@@ -431,6 +393,7 @@ function init() {
       profileSection: ["profileSection", "settingsSection", "adminSection", "membershipSection"],
     };
     chat.classList.toggle("mx-chat-fullscreen", id === "chatSection");
+    if (id === "chatSection") loadHistory();
     document.body.classList.toggle("mx-chat-open", id === "chatSection");
     const active = Object.keys(GROUPS).find((k) => GROUPS[k].includes(id)) || "homeSection";
     bar.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.go === active));
