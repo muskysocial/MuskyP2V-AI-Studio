@@ -223,7 +223,7 @@ function init() {
       exploreSection: ["exploreSection", "datingSection", "designSection", "aitoolsSection", "librarySection", "shopSection", "socialsSection", "askazaSection", "aboutSection", "contactSection", "privacySection", "docsSection"],
       jobsSection: ["jobsSection"],
       toolsHubSection: ["toolsHubSection", "videoSection", "headswapSection", "chatSection", "voiceCloneSection", "voiceSection", "cameraSection", "creditSection"],
-      profileSection: ["profileSection", "settingsSection", "adminSection"],
+      profileSection: ["profileSection", "settingsSection", "adminSection", "membershipSection"],
     };
     const active = Object.keys(GROUPS).find((k) => GROUPS[k].includes(id)) || "homeSection";
     bar.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.go === active));
