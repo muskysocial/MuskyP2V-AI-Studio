@@ -187,6 +187,28 @@ body.mx-chat-open #mxBar,body.mx-chat-open>.topbar{display:none!important}
 #settingsSection .sh-settings-version{text-align:center;font-size:11px;margin:0 0 12px}
 #settingsSection .sh-out{padding:13px;border-radius:12px}
 @media(max-width:420px){#settingsSection .sh-settings-row{gap:9px}#settingsSection .sh-settings-row-icon{width:36px;height:36px;flex-basis:36px}#settingsSection .sh-settings-preference .sh-row button{font-size:12px}}
+/* Account details screen */
+#accountSettingsSection .sh-account-settings{max-width:720px;margin:0 auto;padding:4px 0 24px}
+#accountSettingsSection .sh-account-settings-head{margin:4px 0 18px}
+#accountSettingsSection .sh-account-settings-head h2{font-size:clamp(27px,7vw,34px);letter-spacing:-.045em;margin:0 0 5px}
+#accountSettingsSection .sh-account-settings-head p{font-size:13px;line-height:1.5;margin:0}
+#accountSettingsSection .sh-account-identity{display:flex;align-items:center;gap:13px;padding:17px;border-radius:18px;background:linear-gradient(120deg,#1877f2,#6aa8ff 60%,#f45b9a);color:white;margin-bottom:16px}
+#accountSettingsSection .sh-account-identity-icon{display:grid;place-items:center;width:48px;height:48px;flex:0 0 48px;border-radius:50%;background:#ffffff2b;border:1px solid #ffffff70;font-size:23px}
+#accountSettingsSection .sh-account-identity-copy{min-width:0;display:flex;flex-direction:column;gap:4px}
+#accountSettingsSection .sh-account-identity-copy strong{font-size:14px;overflow-wrap:anywhere}
+#accountSettingsSection .sh-account-identity-copy small{font-size:11px;opacity:.9}
+#accountSettingsSection .sh-account-detail-card{border:1px solid var(--sh-line);border-radius:16px;background:var(--sh-card);padding:4px 15px;margin-bottom:15px}
+#accountSettingsSection .sh-account-detail-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--sh-line)}
+#accountSettingsSection .sh-account-detail-row:last-child{border-bottom:0}
+#accountSettingsSection .sh-account-detail-icon{display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px;border-radius:12px;background:color-mix(in srgb,var(--sh-blue) 11%,transparent);font-size:19px}
+#accountSettingsSection .sh-account-detail-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}
+#accountSettingsSection .sh-account-detail-copy strong{font-size:13px;color:var(--sh-text)}
+#accountSettingsSection .sh-account-detail-copy small{font-size:11px;line-height:1.4;color:var(--sh-sub);overflow-wrap:anywhere}
+#accountSettingsSection .sh-account-detail-row button{border:1px solid var(--sh-line);border-radius:10px;padding:8px 10px;background:var(--sh-card);color:var(--sh-text);font-size:12px;font-weight:700}
+#accountSettingsSection .sh-account-security-note{padding:13px;border-radius:12px;background:color-mix(in srgb,var(--sh-blue) 8%,var(--sh-card));font-size:12px;line-height:1.5;color:var(--sh-sub)}
+#accountSettingsSection .sh-account-detail-actions{display:flex;gap:9px;flex-wrap:wrap;margin:15px 0}
+#accountSettingsSection .sh-account-detail-actions button{flex:1;min-width:145px;padding:12px;border:1px solid var(--sh-line);border-radius:12px;background:var(--sh-card);color:var(--sh-text);font-weight:700}
+#accountSettingsSection .sh-account-detail-actions button.primary{background:#1877f2;color:#fff;border-color:#1877f2}
 /* Notification preferences are separate from the activity inbox. */
 #notificationPreferencesSection .sh-notif-settings{max-width:720px;margin:0 auto;padding:4px 0 24px}
 #notificationPreferencesSection .sh-notif-head{margin:4px 0 18px}
@@ -408,6 +430,7 @@ function init() {
       "<button class='sh-premium' data-go='membershipSection'><span class='sh-premium-icon'>✦</span><span><strong>Unlock more with Membership</strong><small>Explore plans and creator benefits</small></span><b>›</b></button>" +
       "<section class='sh-settings-group'><h3>Account</h3>" +
         "<div class='sh-account-card'><span class='sh-account-avatar'>👤</span><span class='sh-account-copy'><strong id='shEmail'>Signed in</strong><small id='shCred'>Credits: …</small></span><button data-go='profileSection' aria-label='Open profile'>›</button></div>" +
+        "<button class='sh-settings-row' data-go='accountSettingsSection'><span class='sh-settings-row-icon'>◎</span><span><strong>Account details</strong><small>Email, account status, and security shortcuts</small></span><b>›</b></button>" +
         "<button class='sh-settings-row' data-go='profileSection'><span class='sh-settings-row-icon'>♙</span><span><strong>Personal profile</strong><small>Profile details and account controls</small></span><b>›</b></button>" +
         "<button class='sh-settings-row' data-go='notificationPreferencesSection'><span class='sh-settings-row-icon'>♧</span><span><strong>Notification preferences</strong><small>Choose which activity updates you want to track</small></span><b>›</b></button>" +
         "<button class='sh-settings-row' data-go='notifSection'><span class='sh-settings-row-icon'>◉</span><span><strong>Activity inbox</strong><small>Review your latest account activity</small></span><b>›</b></button>" +
@@ -419,6 +442,19 @@ function init() {
       "<p class='sh-settings-version'>MuskySocials · Account settings</p><button class='sh-out' id='shOut'>↪ &nbsp; Sign out</button>" +
     "</div>");
 
+  const accountSettings = mk("accountSettingsSection",
+    "<div class='sh sh-account-settings'>" +
+      "<div class='sh-account-settings-head'><p class='sh-settings-eyebrow'>ACCOUNT CENTRE</p><h2>Account details</h2><p>Review your sign-in email and jump to the controls for your profile and password.</p></div>" +
+      "<div class='sh-account-identity'><span class='sh-account-identity-icon'>👤</span><span class='sh-account-identity-copy'><strong id='shAccountEmail'>Loading account…</strong><small id='shAccountStatus'>Checking sign-in status</small></span></div>" +
+      "<div class='sh-account-detail-card'>" +
+        "<div class='sh-account-detail-row'><span class='sh-account-detail-icon'>✉️</span><span class='sh-account-detail-copy'><strong>Sign-in email</strong><small id='shAccountEmailDetail'>Loading email address…</small></span></div>" +
+        "<div class='sh-account-detail-row'><span class='sh-account-detail-icon'>🪪</span><span class='sh-account-detail-copy'><strong>Profile information</strong><small>Update your display name, bio, country, and contact details.</small></span><button type='button' data-go='profileSection'>Open</button></div>" +
+        "<div class='sh-account-detail-row'><span class='sh-account-detail-icon'>🔒</span><span class='sh-account-detail-copy'><strong>Password and sign-in</strong><small>Use the existing password controls in your profile settings.</small></span><button type='button' data-go='profileSection'>Manage</button></div>" +
+        "<div class='sh-account-detail-row'><span class='sh-account-detail-icon'>🛡️</span><span class='sh-account-detail-copy'><strong>Privacy and safety</strong><small>Review the available privacy and safety information.</small></span><button type='button' data-go='privacySection'>Review</button></div>" +
+      "</div>" +
+      "<div class='sh-account-security-note'>For your safety, this screen never asks you to enter your current password. Password changes remain in your existing profile screen and use the app's existing authentication flow. Two-factor authentication and device-session management are not being enabled by this design update.</div>" +
+      "<div class='sh-account-detail-actions'><button type='button' data-go='profileSection'>Open personal profile</button><button type='button' class='primary' data-go='settingsSection'>Back to settings</button></div>" +
+    "</div>");
   const NOTIF_PREF_KEY = "musky-notification-preferences";
   const NOTIF_DEFAULTS = { followers: true, socialActivity: true, accountUpdates: true, productNews: false };
   const readNotifPrefs = () => {
@@ -452,6 +488,24 @@ function init() {
     settings.querySelector("#shCred").textContent = "Credits: " + (credits === null ? "…" : credits);
     settings.querySelectorAll("#shTheme button").forEach((b) => b.classList.toggle("on", b.dataset.theme === S.theme));
     settings.querySelectorAll("#shSize button").forEach((b) => b.classList.toggle("on", +b.dataset.size === S.size));
+  }
+  function renderAccountSettings() {
+    const emailTop = accountSettings.querySelector("#shAccountEmail");
+    const emailDetail = accountSettings.querySelector("#shAccountEmailDetail");
+    const status = accountSettings.querySelector("#shAccountStatus");
+    emailTop.textContent = "Signed-in account";
+    emailDetail.textContent = "Loading email address…";
+    status.textContent = "Checking sign-in status";
+    Promise.resolve(window.musky && window.musky.session()).then((s) => {
+      const email = s && s.user && s.user.email;
+      emailTop.textContent = email || "Account";
+      emailDetail.textContent = email || "Email address unavailable";
+      status.textContent = s && s.user ? "Your account is signed in" : "No active session detected";
+    }).catch(() => {
+      emailTop.textContent = "Account";
+      emailDetail.textContent = "Could not load email address";
+      status.textContent = "Account status unavailable";
+    });
   }
   function renderNotificationPreferences() {
     notificationPreferences.querySelectorAll("[data-notif-pref]").forEach((input) => {
@@ -504,6 +558,7 @@ function init() {
     updateBackButton();
     if (id === "homeSection") renderHome();
     if (id === "settingsSection") renderSettings();
+    if (id === "accountSettingsSection") renderAccountSettings();
     if (id === "notificationPreferencesSection") renderNotificationPreferences();
     studio.querySelectorAll(".pane").forEach((p) => {
       const hide = p.id !== id;
