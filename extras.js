@@ -149,6 +149,41 @@ function start() {
 #xLang{padding:5px 6px;border-radius:8px;border:1px solid var(--sh-line,#ccd0d5);background:var(--sh-card,#fff);color:var(--sh-text,#050505);font-size:13px}
 #xAv{width:34px;height:34px;border-radius:50%;border:0;background:var(--sh-blue,#1877f2);color:#fff;font-weight:700;font-size:15px}
 .xs{padding-bottom:10px}
+/* Own-profile visual refresh; preserve every existing account control and handler. */
+#profileSection .pt>h2{font-size:27px;letter-spacing:-.04em;margin:4px 0 16px}
+#profileSection .pf-hero{overflow:hidden;padding:0!important;border-radius:22px!important;border:1px solid rgba(24,119,242,.15)!important;box-shadow:0 12px 34px rgba(31,65,112,.08)}
+#profileSection .pf-cover{height:100px;padding:17px 18px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(120deg,#1877f2 0%,#6aa8ff 50%,#f45b9a 100%);color:#fff}
+#profileSection .pf-cover-mark{display:grid;place-items:center;width:42px;height:42px;border:1px solid rgba(255,255,255,.65);border-radius:14px;background:rgba(255,255,255,.18);font-weight:900;font-size:22px}
+#profileSection .pf-cover-caption{max-width:160px;text-align:right;font-size:11px;font-weight:800;letter-spacing:.03em}
+#profileSection .pf-hero-body{padding:0 18px 18px}
+#profileSection .pf-identity{display:flex;align-items:center;gap:13px;margin-top:-30px;position:relative;text-align:left}
+#profileSection .pf-av{flex:none;width:78px;height:78px;border:4px solid var(--sh-card,#fff);box-shadow:0 4px 15px rgba(15,40,80,.13);margin:0;border-radius:50%;background-color:#1877f2;background-position:center;background-size:cover;font-size:30px}
+#profileSection .pf-identity-copy{min-width:0;padding-top:30px}
+#profileSection #pfName{font-size:21px;letter-spacing:-.025em;overflow-wrap:anywhere}
+#profileSection #pfRole{display:inline-block;margin:4px 0 0}
+#profileSection .pf-profile-email{margin:12px 0 4px!important;color:var(--sh-sub,#65676b);font-size:12px;overflow-wrap:anywhere}
+#profileSection .pf-profile-bio{margin:6px 0 8px!important;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+#profileSection .pf-meta-pill{display:inline-flex;margin-top:5px;padding:7px 10px;border:1px solid var(--sh-line);border-radius:10px;background:rgba(24,119,242,.055);font-size:11px;font-weight:700;color:var(--sh-sub)}
+#profileSection .pf-hero-actions{display:flex;gap:8px;margin-top:13px}
+#profileSection .pf-hero-actions button{flex:1;min-height:40px;border-radius:12px}
+#profileSection .pf-highlight-card{margin:14px 0;padding:15px;border:1px solid var(--sh-line);border-radius:18px;background:var(--sh-card)}
+#profileSection .pf-highlight-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+#profileSection .pf-highlight-head strong{font-size:15px}
+#profileSection .pf-highlight-head span{font-size:11px;color:var(--sh-sub)}
+#profileSection .pf-highlight-row{display:flex;gap:16px;overflow-x:auto;padding:2px 0 5px}
+#profileSection .pf-highlight{flex:none;width:66px;text-align:center;color:var(--sh-sub);font-size:11px}
+#profileSection .pf-highlight-ring{width:58px;height:58px;margin:0 auto 6px;padding:3px;display:grid;place-items:center;border:2px solid #f45b9a;border-radius:50%;background:var(--sh-card)}
+#profileSection .pf-highlight-ring span{width:100%;height:100%;display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,rgba(24,119,242,.12),rgba(244,91,154,.12));font-size:21px;color:#1877f2}
+#profileSection .pf-content-preview{margin:14px 0 16px;padding:15px;border:1px solid var(--sh-line);border-radius:18px;background:var(--sh-card)}
+#profileSection .pf-content-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-bottom:1px solid var(--sh-line);margin:-3px 0 13px}
+#profileSection .pf-content-tabs span{padding:9px 3px;text-align:center;font-size:11px;font-weight:750;color:var(--sh-sub)}
+#profileSection .pf-content-tabs span:first-child{color:#1877f2;border-bottom:2px solid #1877f2}
+#profileSection .pf-post-empty{min-height:88px;display:grid;place-items:center;text-align:center;color:var(--sh-sub);font-size:12px;line-height:1.5}
+#profileSection .pf-post-empty strong{display:block;color:var(--sh-text);font-size:14px;margin-bottom:3px}
+#profileSection .pf-group{margin-top:22px}
+#profileSection .pf-d{border-radius:13px;margin:7px 0;padding:0 12px;background:var(--sh-card);border:1px solid var(--sh-line)}
+#profileSection .pf-d summary{font-weight:700}
+@media(max-width:420px){#profileSection .pf-cover{height:86px;padding:14px}#profileSection .pf-hero-body{padding:0 13px 14px}#profileSection .pf-av{width:68px;height:68px;font-size:26px}#profileSection #pfName{font-size:19px}#profileSection .pf-highlight-card,#profileSection .pf-content-preview{padding:12px}}
 .pf-av{width:96px;height:96px;border-radius:50%;margin:0 auto 10px;background:var(--sh-blue,#1877f2) center/cover;color:#fff;font-size:40px;font-weight:700;display:flex;align-items:center;justify-content:center}
 .pf-tag{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--sh-line,#dadde1);color:var(--sh-sub,#65676b)}
 .pf-group{margin:16px 0 4px;font-size:13px;font-weight:700;color:var(--sh-sub,#65676b);text-transform:uppercase;letter-spacing:.04em}
@@ -172,14 +207,21 @@ html.mx-light .topbar #xAv{color:#fff!important}
 
   // ---------------- Profile screen (Facebook-style settings list)
   const prof = mkPane("profileSection",
-    "<h2>Profile</h2>" +
-    "<div class='pt-card' style='text-align:center'><div id='pfAv' class='pf-av'>?</div>" +
-    "<button class='pt-btn' id='pfPhotoBtn'>Change photo</button><input id='pfPhoto' type='file' accept='image/*' hidden>" +
-    "<div style='margin-top:10px'><strong id='pfName'></strong> <span id='pfRole' class='pf-tag'></span></div>" +
-    "<p id='pfEmail' style='margin:2px 0'></p><p id='pfBio' style='margin:2px 0'></p><p id='pfMeta' style='margin:2px 0'></p>" +
-    "<p class='pt-msg' id='pfMsg'></p></div>" +
+    "<h2>My profile</h2>" +
+    "<div class='pt-card pf-hero'><div class='pf-cover'><span class='pf-cover-mark'>M</span><span class='pf-cover-caption'>YOUR SPACE · YOUR STORY</span></div>" +
+    "<div class='pf-hero-body'><div class='pf-identity'><div id='pfAv' class='pf-av'>?</div><div class='pf-identity-copy'><strong id='pfName'>Your profile</strong><br><span id='pfRole' class='pf-tag'></span></div></div>" +
+    "<p id='pfBio' class='pf-profile-bio'>Add a little about yourself.</p><p id='pfEmail' class='pf-profile-email'></p>" +
+    "<div id='pfMeta' class='pf-meta-pill'>Loading your account…</div>" +
+    "<div class='pf-hero-actions'><button class='pt-btn' id='pfPhotoBtn'>📷 Change photo</button><button class='pt-btn' type='button' id='pfEditOpen'>✏️ Edit profile</button></div>" +
+    "<input id='pfPhoto' type='file' accept='image/*' hidden><p class='pt-msg' id='pfMsg'></p></div></div>" +
+    "<section class='pf-highlight-card'><div class='pf-highlight-head'><strong>Highlights</strong><span>Personal moments</span></div>" +
+    "<div class='pf-highlight-row'><div class='pf-highlight'><div class='pf-highlight-ring'><span>＋</span></div>Add highlight</div>" +
+    "<div class='pf-highlight'><div class='pf-highlight-ring'><span>◷</span></div>Stories</div><div class='pf-highlight'><div class='pf-highlight-ring'><span>♡</span></div>Favorites</div></div>" +
+    "<p style='margin:8px 0 0;color:var(--sh-sub);font-size:11px'>Highlights are a visual preview for now; story saving is not enabled yet.</p></section>" +
+    "<section class='pf-content-preview'><div class='pf-content-tabs'><span>▦ Posts</span><span>▶ Reels</span><span>▣ Tagged</span></div>" +
+    "<div class='pf-post-empty'><div><strong>Your posts will live here</strong>Member post publishing and personal photo grids are not connected yet.</div></div></section>" +
     "<div class='pf-group'>Account</div>" +
-    "<details class='pf-d'><summary>✏️ Edit profile</summary>" +
+    "<details class='pf-d' id='pfEditDetails'><summary>✏️ Edit profile details</summary>" +
     "<input id='pfIn' class='pt-in' maxlength='40' placeholder='Display name'>" +
     "<textarea id='pfBioIn' class='pt-in' rows='2' maxlength='160' placeholder='About you (optional)'></textarea>" +
     "<input id='pfCountry' class='pt-in' maxlength='60' placeholder='Country (optional)'>" +
@@ -191,33 +233,38 @@ html.mx-light .topbar #xAv{color:#fff!important}
     "<button class='pt-btn' id='pfPass'>Change password</button></details>" +
     "<button class='pf-row' data-go='settingsSection'><span>🎨 Appearance and text size</span><span>›</span></button>" +
     "<div class='pf-group'>Account features</div>" +
-"<button class='pf-row' data-go='notifSection'><span>🔔 Notifications</span><span>›</span></button>" +
-["🛡️ Two-factor sign-in", "📱 Devices and active sessions", "👁️ Who can see my profile", "🔖 Saved items",
- "🧾 My orders and activity", "💳 Payment methods", "🎁 Invite friends, earn credits", "✅ Verified badge", "⬇️ Download my data"]
-  .map((t) => t === "🛡️ Two-factor sign-in"
-    ? "<button class='pf-row' id='pfMfa'><span>" + t + "</span><span class='pf-tag'>Set up</span></button>"
-    : t === "📱 Devices and active sessions"
-      ? "<button class='pf-row' id='pfDevices'><span>" + t + "</span><span>›</span></button>"
-      : t === "👁️ Who can see my profile"
-        ? "<button class='pf-row' id='pfPrivacy'><span>" + t + "</span><span>›</span></button>"
-        : t === "🔖 Saved items"
-          ? "<button class='pf-row' id='pfSaved'><span>" + t + "</span><span>›</span></button>"
-          : t === "🧾 My orders and activity"
-            ? "<button class='pf-row' id='pfOrders'><span>" + t + "</span><span>›</span></button>"
-            : t === "💳 Payment methods"
-              ? "<button class='pf-row' id='pfPayment'><span>" + t + "</span><span>›</span></button>"
-              : t === "🎁 Invite friends, earn credits"
-                ? "<button class='pf-row' id='pfInvite'><span>" + t + "</span><span>›</span></button>"
-                : t === "✅ Verified badge"
-                  ? "<button class='pf-row' id='pfVerified'><span>" + t + "</span><span>›</span></button>"
-                  : t === "⬇️ Download my data"
-                    ? "<button class='pf-row' id='pfExport'><span>" + t + "</span><span>›</span></button>"
-                    : "<div class='pf-row off'><span>" + t + "</span><span class='pf-tag'>Soon</span></div>").join("") +
+    "<button class='pf-row' data-go='notifSection'><span>🔔 Notifications</span><span>›</span></button>" +
+    ["🛡️ Two-factor sign-in", "📱 Devices and active sessions", "👁️ Who can see my profile", "🔖 Saved items",
+     "🧾 My orders and activity", "💳 Payment methods", "🎁 Invite friends, earn credits", "✅ Verified badge", "⬇️ Download my data"]
+      .map((t) => t === "🛡️ Two-factor sign-in"
+        ? "<button class='pf-row' id='pfMfa'><span>" + t + "</span><span class='pf-tag'>Set up</span></button>"
+        : t === "📱 Devices and active sessions"
+          ? "<button class='pf-row' id='pfDevices'><span>" + t + "</span><span>›</span></button>"
+          : t === "👁️ Who can see my profile"
+            ? "<button class='pf-row' id='pfPrivacy'><span>" + t + "</span><span>›</span></button>"
+            : t === "🔖 Saved items"
+              ? "<button class='pf-row' id='pfSaved'><span>" + t + "</span><span>›</span></button>"
+              : t === "🧾 My orders and activity"
+                ? "<button class='pf-row' id='pfOrders'><span>" + t + "</span><span>›</span></button>"
+                : t === "💳 Payment methods"
+                  ? "<button class='pf-row' id='pfPayment'><span>" + t + "</span><span>›</span></button>"
+                  : t === "🎁 Invite friends, earn credits"
+                    ? "<button class='pf-row' id='pfInvite'><span>" + t + "</span><span>›</span></button>"
+                    : t === "✅ Verified badge"
+                      ? "<button class='pf-row' id='pfVerified'><span>" + t + "</span><span>›</span></button>"
+                      : t === "⬇️ Download my data"
+                        ? "<button class='pf-row' id='pfExport'><span>" + t + "</span><span>›</span></button>"
+                        : "<div class='pf-row off'><span>" + t + "</span><span class='pf-tag'>Soon</span></div>").join("") +
     "<button class='pf-row' id='pfBadgeAdmin' hidden><span>🛡️ Review verified badge requests</span><span>›</span></button>" +
     "<button class='pf-row' id='pfHelp'><span>💬 Help and support on WhatsApp</span><span>›</span></button>" +
     "<button class='pf-row' id='pfDel'><span>🗑️ Ask to delete my account</span><span>›</span></button>" +
     "<button class='pt-btn del' id='pfOut' style='width:100%;margin-top:14px'>Sign out</button>");
   const $p = (id) => prof.querySelector("#" + id);
+  $p("pfEditOpen").addEventListener("click", () => {
+    const details = $p("pfEditDetails");
+    details.open = !details.open;
+    if (details.open) details.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
   const WA = "2349041259863";
   let uid = null;
   let stamp = Date.now();
