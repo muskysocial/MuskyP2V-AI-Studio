@@ -273,14 +273,19 @@ function init() {
   function sync() {
     const open = !studio.hidden;
     bar.style.display = open ? "flex" : "none";
-    document.body.classList.toggle("mx-app-open", open);
+    // Add space for the fixed bar only when real content already needs scrolling.
+    // Short/empty sections therefore do not create a blank scroll area.
+    document.body.classList.remove("mx-app-open");
+    const needsBottomSpace = open && document.documentElement.scrollHeight > window.innerHeight;
+    document.body.classList.toggle("mx-app-open", needsBottomSpace);
     if (open && !started) { started = true; go("homeSection"); }
     if (open && old && !old.hidden) {
       old.hidden = true;
       if (![...studio.querySelectorAll(".pane")].some((p) => !p.hidden)) go("homeSection");
     }
   }
-  new MutationObserver(sync).observe(studio, { subtree: true, attributes: true, attributeFilter: ["hidden"] });
+  new MutationObserver(sync).observe(studio, { subtree: true, childList: true, attributes: true, attributeFilter: ["hidden"] });
+  window.addEventListener("resize", sync, { passive: true });
   sync();
 
   // Lets other scripts (portal.js, feed.js, shop.js) add Home tiles and bottom-bar buttons.
