@@ -45,8 +45,19 @@ function startViralBoost() {
         ${PLATFORMS.map(p => '<label class="vb-platform"><input type="checkbox" name="vbPlatform" value="' + p + '"><span>' + p + '</span></label>').join("")}
       </div>
     </div>
+    <div class="vb-card vb-connect-card">
+      <h3>3. Connect your social accounts</h3>
+      <p class="vb-muted">Connect accounts securely so supported platforms can receive posts directly after publishing is enabled.</p>
+      <div id="vbConnectedAccounts" class="vb-connections"><p class="vb-small">Checking connected accounts…</p></div>
+      <div class="vb-actions">
+        <button type="button" class="vb-btn" id="vbConnectTikTok">Connect TikTok</button>
+        <button type="button" class="vb-btn secondary" id="vbRefreshConnections">Refresh connections</button>
+      </div>
+      <p id="vbConnectionStatus" class="vb-status" role="status" aria-live="polite"></p>
+      <p class="vb-small">Instagram, Facebook, YouTube and other connections will appear when their official publishing integrations are configured. Connecting an account does not post anything by itself. You will review and confirm every post.</p>
+    </div>
     <div class="vb-card">
-      <h3>3. Prepare your caption</h3>
+      <h3>4. Prepare your caption</h3>
       <label for="vbTopic">What is the content about?</label>
       <input id="vbTopic" class="vb-input" maxlength="240" placeholder="e.g. New sneaker collection, comedy skit, food recipe">
       <label for="vbCaption">Caption</label>
@@ -116,6 +127,12 @@ function startViralBoost() {
     #viralBoostSection .vb-draft-copy{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;margin:8px 0}
     #viralBoostSection .vb-draft-actions{display:flex;gap:8px;flex-wrap:wrap}
     #viralBoostSection .vb-footnote{font-size:12px;color:var(--sh-sub,#65676b);padding:6px 2px 20px;line-height:1.5}
+    #viralBoostSection .vb-connection{display:flex;align-items:center;gap:10px;border:1px solid var(--sh-line,#dadde1);border-radius:10px;padding:10px;margin:8px 0;min-width:0}
+    #viralBoostSection .vb-connection-avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;background:var(--sh-line,#dadde1);flex:none}
+    #viralBoostSection .vb-connection-copy{min-width:0;flex:1;overflow-wrap:anywhere}
+    #viralBoostSection .vb-connection-copy strong{display:block;font-size:13px}
+    #viralBoostSection .vb-connection-copy small{display:block;color:var(--sh-sub,#65676b);font-size:12px;margin-top:3px}
+    #viralBoostSection .vb-connection .vb-btn{padding:8px 10px;min-height:36px;font-size:12px;flex:none}
     @media(min-width:560px){#viralBoostSection .vb-platforms{grid-template-columns:repeat(3,minmax(0,1fr))}}
     html.mx-light #viralBoostSection .vb-input{background:#fff!important;color:#050505!important}
     html.mx-light #viralBoostSection .vb-btn.secondary{color:#050505!important}
@@ -159,6 +176,83 @@ function startViralBoost() {
     if (!$("vbTitle").value.trim()) $("vbTitle").value = file.name.replace(/\.[^.]+$/, "").slice(0, 120);
     say("Preview ready. Your file stays on this device until you save the draft.");
   });
+
+  async function invokeSocial(action, extra = {}) {
+    const { data, error } = await sb.functions.invoke("social-connections", { body: { action, ...extra } });
+    if (error) {
+      let message = error.message || "Social account service is not available yet.";
+      try { const body = await error.context.json(); if (body.error) message = body.error; } catch {}
+      throw new Error(message);
+    }
+    if (data && data.error) throw new Error(data.error);
+    return data || {};
+  }
+  function connectionMessage(message, bad = false) {
+    const el = $("vbConnectionStatus");
+    el.textContent = message;
+    el.style.color = bad ? "#c62828" : "var(--sh-sub,#65676b)";
+  }
+  async function loadConnections() {
+    const box = $("vbConnectedAccounts");
+    box.textContent = "Checking connected accounts…";
+    try {
+      const result = await invokeSocial("list");
+      const connections = Array.isArray(result.connections) ? result.connections : [];
+      if (!connections.length) {
+        box.innerHTML = "<p class='vb-small'>No social accounts connected yet.</p>";
+        $("vbConnectTikTok").textContent = "Connect TikTok";
+        return;
+      }
+      box.innerHTML = connections.map(account => {
+        const name = esc(account.display_name || account.provider);
+        const provider = esc(account.provider || "");
+        const avatar = safeUrl(account.avatar_url || "");
+        const image = avatar ? "<img class='vb-connection-avatar' src='" + esc(avatar) + "' alt=''>" : "<span class='vb-connection-avatar' aria-hidden='true'></span>";
+        return "<div class='vb-connection'>" + image + "<div class='vb-connection-copy'><strong>" + name + "</strong><small>" + provider + " · connected</small></div><button type='button' class='vb-btn secondary' data-vb-disconnect='" + provider + "'>Disconnect</button></div>";
+      }).join("");
+      $("vbConnectTikTok").textContent = connections.some(a => a.provider === "tiktok") ? "Reconnect TikTok" : "Connect TikTok";
+      connectionMessage("Connected accounts loaded. Nothing has been published.");
+    } catch (error) {
+      box.innerHTML = "<p class='vb-small'>Account connection will be available after the secure service is deployed and configured.</p>";
+      connectionMessage(String(error && error.message || "Could not load connected accounts."), true);
+    }
+  }
+  $("vbConnectTikTok").addEventListener("click", async () => {
+    const button = $("vbConnectTikTok");
+    button.disabled = true;
+    connectionMessage("Preparing secure TikTok authorization…");
+    try {
+      const result = await invokeSocial("start", { provider: "tiktok" });
+      if (!result.authorize_url || !/^https:\/\/www\.tiktok\.com\//i.test(result.authorize_url)) throw new Error("TikTok returned an invalid authorization link.");
+      window.location.assign(result.authorize_url);
+    } catch (error) {
+      connectionMessage(String(error && error.message || "Could not connect TikTok."), true);
+      button.disabled = false;
+    }
+  });
+  $("vbRefreshConnections").addEventListener("click", loadConnections);
+  $("vbConnectedAccounts").addEventListener("click", async event => {
+    const button = event.target.closest("[data-vb-disconnect]");
+    if (!button) return;
+    const provider = button.dataset.vbDisconnect;
+    if (!confirm("Disconnect " + provider + " from MuskySocials?")) return;
+    button.disabled = true;
+    try {
+      await invokeSocial("disconnect", { provider });
+      connectionMessage("Account disconnected.");
+      await loadConnections();
+    } catch (error) {
+      connectionMessage(String(error && error.message || "Could not disconnect account."), true);
+      button.disabled = false;
+    }
+  });
+  const query = new URLSearchParams(window.location.search);
+  if (query.get("social_connect") === "tiktok_success") {
+    connectionMessage("TikTok connected successfully. Publishing will be enabled after the platform posting workflow is completed.");
+    query.delete("social_connect");
+    const cleanUrl = window.location.pathname + (query.toString() ? "?" + query.toString() : "") + window.location.hash;
+    history.replaceState({}, "", cleanUrl);
+  }
 
   function selectedPlatforms() {
     return Array.from(pane.querySelectorAll('input[name="vbPlatform"]:checked')).map(el => el.value);
@@ -469,4 +563,5 @@ function startViralBoost() {
   onShow(pane, loadDrafts);
   // The first visit triggers the same owner-only query as later visits.
   loadDrafts();
+  loadConnections();
 }
