@@ -213,6 +213,7 @@ html.mx-light .topbar #xAv{color:#fff!important}
                   : t === "⬇️ Download my data"
                     ? "<button class='pf-row' id='pfExport'><span>" + t + "</span><span>›</span></button>"
                     : "<div class='pf-row off'><span>" + t + "</span><span class='pf-tag'>Soon</span></div>").join("") +
+    "<button class='pf-row' id='pfBadgeAdmin' hidden><span>🛡️ Review verified badge requests</span><span>›</span></button>" +
     "<button class='pf-row' id='pfHelp'><span>💬 Help and support on WhatsApp</span><span>›</span></button>" +
     "<button class='pf-row' id='pfDel'><span>🗑️ Ask to delete my account</span><span>›</span></button>" +
     "<button class='pt-btn del' id='pfOut' style='width:100%;margin-top:14px'>Sign out</button>");
@@ -237,6 +238,7 @@ html.mx-light .topbar #xAv{color:#fff!important}
     const credits = await window.musky.credits();
     $p("pfName").textContent = name;
     $p("pfRole").textContent = (d.role === "admin" ? "Admin" : "Client") + (d.is_verified ? " · Verified ✓" : "");
+    $p("pfBadgeAdmin").hidden = d.role !== "admin";
     $p("pfEmail").textContent = s.user.email;
     $p("pfBio").textContent = d.bio || "";
     $p("pfMeta").textContent = "Credits: " + (credits === null ? "…" : credits) +
@@ -445,7 +447,7 @@ html.mx-light .topbar #xAv{color:#fff!important}
       export_warnings: [],
     };
     const ownQueries = [
-      ["profile", () => sb.from("profiles").select("id,display_name,email,bio,country,whatsapp,avatar_path,created_at,role,credits,daily_credits,paid_coins").eq("id", uid).maybeSingle()],
+      ["profile", () => sb.from("profiles").select("id,display_name,email,bio,country,whatsapp,avatar_path,created_at,role,credits,daily_credits,paid_coins,referral_code,referred_by,is_verified").eq("id", uid).maybeSingle()],
       ["payment_transactions", () => sb.from("payment_transactions").select("*").eq("user_id", uid).order("created_at", { ascending: false })],
       ["subscriptions", () => sb.from("user_subscriptions").select("*").eq("user_id", uid).order("started_at", { ascending: false })],
       ["coin_ledger", () => sb.from("coin_ledger").select("*").eq("user_id", uid).order("created_at", { ascending: false })],
@@ -544,6 +546,65 @@ html.mx-light .topbar #xAv{color:#fff!important}
         btn.disabled = false;
       }
     });
+  });
+
+  // Admin-only review queue. Database RLS remains the authorization boundary.
+  $p("pfBadgeAdmin").addEventListener("click", async () => {
+    const body = document.createElement("div");
+    body.innerHTML = "<p>Approve a badge only after checking the member's details. Rejecting a request automatically refunds 7,000 coins.</p><p id='pfBadgeAdminMsg' class='pt-msg' role='status'>Loading requests…</p><div id='pfBadgeAdminRows'></div>";
+    settingsModal("pfBadgeAdminModal", "Review verified badge requests", body);
+    const msg = body.querySelector("#pfBadgeAdminMsg");
+    const rowsEl = body.querySelector("#pfBadgeAdminRows");
+    async function loadPending() {
+      msg.textContent = "Loading pending requests…";
+      rowsEl.replaceChildren();
+      const { data: requests, error } = await sb.from("verified_badge_requests")
+        .select("id,user_id,coins_paid,status,created_at").eq("status", "pending")
+        .order("created_at", { ascending: true }).limit(100);
+      if (error) { msg.textContent = "Could not load requests: " + error.message; return; }
+      if (!requests || !requests.length) { msg.textContent = "There are no pending badge requests."; return; }
+      const ids = [...new Set(requests.map((r) => r.user_id))];
+      const { data: profiles, error: profilesError } = await sb.from("profiles")
+        .select("id,display_name,email").in("id", ids);
+      const profileById = new Map((profiles || []).map((p) => [p.id, p]));
+      msg.textContent = requests.length + " pending request(s).";
+      if (profilesError) msg.textContent += " Some member names could not be loaded.";
+      requests.forEach((request) => {
+        const profile = profileById.get(request.user_id) || {};
+        const card = document.createElement("div");
+        card.className = "pt-card";
+        const title = document.createElement("strong");
+        title.textContent = profile.display_name || profile.email || request.user_id;
+        const detail = document.createElement("p");
+        detail.textContent = "7,000 coins · " + new Date(request.created_at).toLocaleString();
+        const actions = document.createElement("div");
+        actions.style.cssText = "display:flex;gap:8px;margin-top:8px";
+        const approve = document.createElement("button");
+        approve.type = "button"; approve.className = "pt-btn"; approve.textContent = "Approve";
+        const reject = document.createElement("button");
+        reject.type = "button"; reject.className = "pt-btn"; reject.textContent = "Reject";
+        reject.style.background = "#a61b1b";
+        async function review(status, button) {
+          if (!window.confirm((status === "approved" ? "Approve" : "Reject and refund") + " this verified badge request?")) return;
+          approve.disabled = reject.disabled = true;
+          msg.textContent = "Saving review…";
+          const { error: reviewError } = await sb.from("verified_badge_requests")
+            .update({ status }).eq("id", request.id).eq("status", "pending");
+          if (reviewError) {
+            msg.textContent = "Could not save the review: " + reviewError.message;
+            approve.disabled = reject.disabled = false;
+            return;
+          }
+          await loadPending();
+        }
+        approve.addEventListener("click", () => review("approved", approve));
+        reject.addEventListener("click", () => review("rejected", reject));
+        actions.append(approve, reject);
+        card.append(title, detail, actions);
+        rowsEl.appendChild(card);
+      });
+    }
+    await loadPending();
   });
 
   // Referral links and reward history. Rewards are issued by database triggers only
