@@ -71,3 +71,44 @@ body.mx-app-open{padding-bottom:calc(68px + env(safe-area-inset-bottom,0px))}
   .preview-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
   .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+
+/* Privacy & Safety — mobile-first account guidance */
+#privacySection{padding:0 0 17px;overflow:hidden}
+#privacySection .ps-hero{position:relative;isolation:isolate;overflow:hidden;margin:0 0 23px;padding:22px 18px 18px;border-radius:18px;background:linear-gradient(135deg,#172f5c 0%,#182348 52%,#3a1d43 100%);border:1px solid #5872ac55}
+#privacySection .ps-hero:after{content:"";position:absolute;z-index:-1;width:190px;height:190px;border-radius:50%;right:-72px;top:-94px;background:radial-gradient(circle,#f45b9a48,transparent 70%)}
+#privacySection .ps-hero-top{display:flex;align-items:center;gap:9px;margin-bottom:17px}
+#privacySection .ps-shield{display:grid;place-items:center;width:39px;height:39px;border-radius:13px;background:#ffffff16;font-size:20px}
+#privacySection .ps-eyebrow{font-size:9px;letter-spacing:.16em;font-weight:850;color:#c4d6ff}
+#privacySection .ps-hero h2{font-size:clamp(25px,6vw,31px);line-height:1.1;letter-spacing:-.04em;margin:0 0 10px;color:#fff}
+#privacySection .ps-hero>p{max-width:420px;font-size:12px;line-height:1.65;color:#d3def8;margin:0}
+#privacySection .ps-hero-foot{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-top:18px;color:#c4d6f4;font-size:9px}
+#privacySection .ps-live-dot{width:7px;height:7px;border-radius:50%;background:#6fe0b1;box-shadow:0 0 9px #6fe0b177}
+#privacySection .ps-hero-sep{color:#f58cba}
+#privacySection .ps-section-title{display:flex;align-items:center;justify-content:space-between;margin:0 2px 12px}
+#privacySection .ps-section-title .eyebrow{margin-bottom:4px;font-size:9px}
+#privacySection .ps-section-title h3{margin:0;font-size:17px;letter-spacing:-.02em}
+#privacySection .ps-section-mark{color:#f58cba;font-size:20px}
+#privacySection .ps-action-grid{display:grid;grid-template-columns:1fr;gap:9px;margin-bottom:24px}
+#privacySection .ps-action{display:flex;align-items:center;gap:11px;min-width:0;width:100%;padding:12px;text-align:left;border:1px solid #293956;border-radius:15px;background:linear-gradient(110deg,#101a2e,#0b1120);color:var(--text)}
+#privacySection .ps-action:focus-visible,#privacySection .ps-warning button:focus-visible{outline:2px solid #9dbbff;outline-offset:3px}
+#privacySection .ps-action-icon{display:grid;place-items:center;flex:0 0 39px;width:39px;height:39px;border-radius:12px;font-size:17px}
+#privacySection .ps-blue{background:#1a3762;color:#bed4ff}
+#privacySection .ps-pink{background:#4a2340;color:#ffb9d5}
+#privacySection .ps-action>span:nth-child(2){display:flex;flex:1;flex-direction:column;gap:3px;min-width:0}
+#privacySection .ps-action strong{font-size:12px}
+#privacySection .ps-action small{font-size:10px;line-height:1.45;color:var(--muted)}
+#privacySection .ps-action b{color:#a9c5ff;font-size:20px;font-weight:500}
+#privacySection .ps-info-card{overflow:hidden;border:1px solid #263653;border-radius:16px;background:#0a1120;margin-bottom:15px}
+#privacySection .ps-info-row{display:flex;align-items:flex-start;gap:12px;padding:14px 13px}
+#privacySection .ps-info-row+.ps-info-row{border-top:1px solid #202e48}
+#privacySection .ps-info-icon{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border-radius:11px;background:#152440;font-size:16px}
+#privacySection .ps-info-row strong{display:block;font-size:12px;margin:1px 0 4px}
+#privacySection .ps-info-row p{font-size:10px;line-height:1.65;color:#aebbd3;margin:0}
+#privacySection .ps-warning{display:flex;align-items:flex-start;gap:11px;padding:14px;border:1px solid #6d466055;border-radius:15px;background:linear-gradient(120deg,#25182a,#171426);margin-top:15px}
+#privacySection .ps-warning-icon{display:grid;place-items:center;flex:0 0 27px;width:27px;height:27px;border-radius:50%;background:#f45b9a22;color:#ff9ec7;font-weight:900}
+#privacySection .ps-warning strong{display:block;font-size:12px;color:#ffe4f0}
+#privacySection .ps-warning p{font-size:10px;line-height:1.65;color:#c9b9cb;margin:5px 0 10px}
+#privacySection .ps-warning button{border:1px solid #a84e7d66;border-radius:10px;background:#55213f;color:#ffd8e8;padding:9px 11px;font-size:11px;font-weight:750}
+#privacySection .ps-footnote{font-size:9px;line-height:1.6;color:#8292ae;margin:14px 3px 0}
+@media(min-width:520px){#privacySection .ps-action-grid{grid-template-columns:1fr 1fr}#privacySection .ps-hero{padding:25px}#privacySection .ps-info-row{padding:16px}}
