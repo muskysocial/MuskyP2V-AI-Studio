@@ -13,8 +13,10 @@ This integration starts with TikTok account authorization. The browser never rec
    - `TIKTOK_CLIENT_KEY`
    - `TIKTOK_CLIENT_SECRET`
    - `TIKTOK_REDIRECT_URI` (must exactly match the TikTok app setting)
-   - `SOCIAL_TOKEN_ENCRYPTION_KEY` (base64 encoding of 32 cryptographically random bytes)
+   - `SOCIAL_TOKEN_ENCRYPTION_KEY` (base64 encoding of 32 cryptographically random bytes; generate locally with `openssl rand -base64 32`)
    - `MUSKYSOCIALS_APP_URL` (optional; defaults to the GitHub Pages app URL)
+
+Never paste the client secret or encryption key into chat, GitHub, or frontend JavaScript. Add them only through the Supabase Edge Function Secrets dashboard. The exact TikTok redirect URI must match in both the TikTok developer console and the Supabase secret.
 
 The existing Supabase URL and server key are supplied by Supabase's Edge Function environment.
 
