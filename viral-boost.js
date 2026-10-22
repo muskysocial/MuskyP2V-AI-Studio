@@ -51,11 +51,12 @@ function startViralBoost() {
       <label for="vbHashtags">Hashtags</label>
       <textarea id="vbHashtags" class="vb-input" rows="2" maxlength="700" placeholder="#YourTopic #Creator"></textarea>
       <div class="vb-actions">
-        <button type="button" class="vb-btn secondary" id="vbIdeas">Suggest caption + hashtags</button>
-        <button type="button" class="vb-btn" id="vbCopy">Copy content</button>
+        <button type="button" class="vb-btn" id="vbAiIdeas">✨ Generate AI caption + hashtags</button>
+        <button type="button" class="vb-btn secondary" id="vbIdeas">Quick ideas</button>
+        <button type="button" class="vb-btn secondary" id="vbCopy">Copy content</button>
       </div>
       <p id="vbCopyStatus" class="vb-status" role="status"></p>
-      <p class="vb-small">Suggestions are rule-based starting points, not an AI prediction of virality. Edit them to fit your audience.</p>
+      <p class="vb-small">AI suggestions use Musky Assistant. They can help with wording but cannot guarantee reach or virality. Quick ideas work as a simple fallback.</p>
     </div>
     <div class="vb-actions vb-save-row">
       <button type="button" class="vb-btn" id="vbSave">Save promotion draft</button>
@@ -179,6 +180,65 @@ function startViralBoost() {
     $("vbHashtags").value = Array.from(tags).slice(0, 12).join(" ");
     $("vbCopyStatus").textContent = "Caption and hashtag ideas are ready. Adjust them for your audience.";
   }
+  async function generateAiIdeas() {
+    const topic = $("vbTopic").value.trim();
+    const title = $("vbTitle").value.trim();
+    const base = topic || title;
+    if (!base) {
+      $("vbCopyStatus").textContent = "Enter a campaign name or describe your content first.";
+      $("vbTopic").focus();
+      return;
+    }
+    const platforms = selectedPlatforms();
+    const existingCaption = $("vbCaption").value.trim();
+    const prompt = [
+      "You are the social media copywriter for MuskySocials.",
+      "Create one natural, engaging caption and 5-10 relevant hashtags for a creator's post.",
+      "Do not promise viral reach, fake results, or use misleading claims. Avoid generic engagement bait.",
+      "Keep the caption concise and adapt it for the selected platforms.",
+      "Return exactly this format, without markdown fences:",
+      "CAPTION:",
+      "(caption text)",
+      "",
+      "HASHTAGS:",
+      "(space-separated hashtags)",
+      "",
+      "Campaign/content topic: " + base,
+      "Platforms: " + (platforms.length ? platforms.join(", ") : "General social media"),
+      existingCaption ? "Existing caption to improve: " + existingCaption : "No existing caption; write a fresh one."
+    ].join("\n");
+    const button = $("vbAiIdeas");
+    button.disabled = true;
+    const oldLabel = button.textContent;
+    button.textContent = "Generating…";
+    $("vbCopyStatus").textContent = "Asking Musky Assistant for caption ideas…";
+    try {
+      const { data, error } = await sb.functions.invoke("rapid-function", {
+        body: { messages: [{ role: "user", content: prompt }] }
+      });
+      if (error) throw error;
+      const reply = String(data && data.reply || "").trim();
+      if (!reply) throw new Error("The AI returned an empty reply.");
+      const captionMatch = reply.match(/CAPTION\s*:\s*([\s\S]*?)(?=\n\s*HASHTAGS\s*:|$)/i);
+      const hashtagsMatch = reply.match(/HASHTAGS\s*:\s*([\s\S]*)$/i);
+      if (captionMatch && captionMatch[1].trim()) {
+        $("vbCaption").value = captionMatch[1].trim();
+        $("vbHashtags").value = hashtagsMatch ? hashtagsMatch[1].trim() : "";
+      } else {
+        const lines = reply.split("\n");
+        const tagLines = lines.filter(line => /(^|\s)#[\p{L}\p{N}_]+/u.test(line));
+        $("vbCaption").value = lines.filter(line => !tagLines.includes(line)).join("\n").trim() || reply;
+        $("vbHashtags").value = tagLines.join(" ").trim();
+      }
+      $("vbCopyStatus").textContent = "AI caption ready. Review it and edit anything that doesn't fit your post.";
+    } catch (error) {
+      $("vbCopyStatus").textContent = "AI caption unavailable: " + String(error && error.message || "please try again") + " Quick ideas are available as a fallback.";
+    } finally {
+      button.disabled = false;
+      button.textContent = oldLabel;
+    }
+  }
+  $("vbAiIdeas").addEventListener("click", generateAiIdeas);
   $("vbIdeas").addEventListener("click", makeIdeas);
   $("vbCopy").addEventListener("click", async () => {
     const content = [$("vbCaption").value.trim(), $("vbHashtags").value.trim()].filter(Boolean).join("\n\n");
