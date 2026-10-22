@@ -203,5 +203,7 @@ html.mx-light #studio .pt p,html.mx-light #studio .pt .pt-msg{color:#65676b!impo
     .catch(() => DEFAULTS)
     .then((list) => (Array.isArray(list) ? list : DEFAULTS)
       .filter((m) => typeof m === "string" && /^\.\/[A-Za-z0-9_-]+\.js$/.test(m))
-      .forEach((m) => import(m).catch(() => {})));
+      .forEach((m) => import(m).catch((error) => {
+        console.error("MuskySocials module failed to load:", m, error);
+      })));
 }
