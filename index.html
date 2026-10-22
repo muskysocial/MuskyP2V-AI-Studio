@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#070b14"><meta name="description" content="MuskySocials — connect with people, share posts, and explore creator tools.">
-  <link rel="manifest" href="./manifest.json">
-  <title>MuskySocials</title><link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="social-theme.css">
+  <link rel="manifest" href="./manifest.json?v=20261022-ui10">
+  <title>MuskySocials</title><link rel="stylesheet" href="style.css?v=20261022-ui10">
+  <link rel="stylesheet" href="social-theme.css?v=20261022-ui10">
 </head>
 <body>
   <header class="topbar">
@@ -80,16 +80,16 @@
 
       <section id="privacySection" class="pane" hidden><div class="section-heading"><div><p class="eyebrow">YOUR SAFETY</p><h2>Privacy basics</h2></div></div><ul class="privacy-list"><li>Camera and microphone are requested only when you tap their controls.</li><li>Local camera and voice previews stay in your browser unless you choose to upload them to an external tool.</li><li>This preview name is not a real account, and demo coins have no cash value.</li><li>Never put passwords, secret API keys or payment keys in public website files.</li><li>Use photos and voices you own or have permission to use.</li></ul></section>
     </section>
-  </main><script>window.setTimeout(function(){document.documentElement.classList.remove("app-booting");},10000);</script><script src="script.js"></script>
-  <script type="module" src="headswap.js"></script>
-  <script type="module" src="auth.js"></script>
-  <script type="module" src="shell.js"></script>
-  <script type="module" src="portal.js"></script>
+  </main><script>window.setTimeout(function(){document.documentElement.classList.remove("app-booting");},10000);</script><script src="script.js?v=20261022-ui10"></script>
+  <script type="module" src="headswap.js?v=20261022-ui10"></script>
+  <script type="module" src="auth.js?v=20261022-ui10"></script>
+  <script type="module" src="shell.js?v=20261022-ui10"></script>
+  <script type="module" src="portal.js?v=20261022-ui10"></script>
 
 <script>
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" })
+      navigator.serviceWorker.register("./sw.js?v=20261022-ui10", { updateViaCache: "none" })
         .then(registration => registration.update())
         .catch(error => console.error(
           "Service worker registration failed:", error
@@ -99,7 +99,7 @@
         if (reloadedForController) return;
         reloadedForController = true;
         try {
-          if (sessionStorage.getItem("musky-sw-reloaded-v5") === "1") return;
+          if (sessionStorage.getItem("musky-sw-reloaded-v10") === "1") return;
           sessionStorage.setItem("musky-sw-reloaded-v5", "1");
         } catch {}
         location.reload();

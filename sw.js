@@ -1,4 +1,4 @@
-const CACHE_NAME = "musky-p2v-v9";
+const CACHE_NAME = "musky-p2v-v10";
 const APP_SHELL = ["./", "./index.html", "./manifest.json"];
 
 self.addEventListener("install", (event) => {
