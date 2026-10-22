@@ -488,11 +488,14 @@ html.mx-light .topbar #xAv{color:#fff!important}
 
   // Verified badge: charge through a server-side RPC, then submit a review request.
   $p("pfVerified").addEventListener("click", async () => {
+    const badgeCost = Number(window.muskyPaidPricing && window.muskyPaidPricing.verifiedBadge && window.muskyPaidPricing.verifiedBadge.cost) || 7000;
+    const badgeCostText = badgeCost.toLocaleString("en-NG");
     const body = document.createElement("div");
-    body.innerHTML = "<p>A verified badge request costs <strong>7,000 coins</strong>. The badge appears after an admin approves your request. If a request is rejected, the coins are refunded automatically.</p><p id='pfBadgeMsg' class='pt-msg' role='status'>Checking your badge status…</p><div id='pfBadgeHistory'></div><button id='pfBadgeRequest' type='button' class='pt-btn' style='width:100%'>Pay 7,000 coins and submit request</button>";
+    body.innerHTML = "<p>A verified badge request costs <strong>" + badgeCostText + " coins</strong>. The badge appears after an admin approves your request. If a request is rejected, the coins are refunded automatically.</p><p id='pfBadgeMsg' class='pt-msg' role='status'>Checking your badge status…</p><div id='pfBadgeHistory'></div><button id='pfBadgeRequest' type='button' class='pt-btn' style='width:100%'></button>";
     settingsModal("pfVerifiedModal", "Verified badge", body);
     const msg = body.querySelector("#pfBadgeMsg");
     const btn = body.querySelector("#pfBadgeRequest");
+    btn.textContent = "Pay " + badgeCostText + " coins and submit request";
     if (!uid) { msg.textContent = "Sign in to request a verified badge."; btn.disabled = true; return; }
     btn.disabled = true;
     try {
@@ -536,7 +539,7 @@ html.mx-light .topbar #xAv{color:#fff!important}
         }
         const balance = await window.musky.credits();
         if (balance !== null) window.musky.setBadge(balance);
-        msg.textContent = "Request submitted. 7,000 coins were deducted. Your request is pending admin review.";
+        msg.textContent = "Request submitted. " + badgeCostText + " coins were deducted. Your request is pending admin review.";
         body.querySelector("#pfBadgeHistory").insertAdjacentHTML("afterbegin", "<div class='pt-card'><strong>pending</strong><p>7,000 coins · just now</p></div>");
       } catch (err) {
         const message = String(err && err.message || err);
