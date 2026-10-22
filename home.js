@@ -677,6 +677,7 @@ html.mx-light body{background:#f7f8fc!important}
     ["jobsSection", "💼", "Apply for Jobs", "Admin-posted job openings.", "Open", "17,153,142"],
     ["designSection", "🎓", "Educational Design Studio", "Practice templates for design learning.", "Open", "106,90,205"],
     ["aitoolsSection", "✨", "AI Tools Library", "Image, video and voice tools for creators.", "Coming soon", "24,119,242"],
+    ["createPostSection", "✍️", "Create a post", "Share photos, videos, updates and stories with your community.", "Coming soon", "139,92,246"],
     ["librarySection", "📚", "Community Library", "Guides, tutorials and downloads.", "Open", "15,155,142"],
   ];
   const MORE = [["shopSection", "🎁", "Gift shop"], ["socialsSection", "🛍️", "MuskySocials accounts"], ["askazaSection", "💱", "Ask 4 Aza"],
@@ -714,7 +715,8 @@ html.mx-light body{background:#f7f8fc!important}
   mkPane("jobsSection", "<p>Loading job listings...</p>");
   soon("designSection", "🎓", "Educational Design Studio", "Practice templates for learning graphic design, such as CVs, business cards, flyers, invitations and social posts.",
     ["Every template is marked as a sample for learning", "Invented names and details only", "No ID cards, tickets, boarding passes or official documents"], "exploreSection");
-  soon("aitoolsSection", "✨", "AI Tools Library", "A guide to AI tools for images, photo editing, video, voice, hairstyles and clothing, backgrounds and enhancement.",
+  soon("createPostSection", "✍️", "Create a post", "The full post publishing studio is coming soon. Your existing feed, reactions, comments and sharing remain available.", ["Photo and video posts", "Captions, hashtags and audience controls", "Preview before publishing"], "homeSection");
+   soon("aitoolsSection", "✨", "AI Tools Library", "A guide to AI tools for images, photo editing, video, voice, hairstyles and clothing, backgrounds and enhancement.",
     ["Official links only", "Free tier or paid, and limits, shown only when confirmed", "Meanwhile, try the tools on the Tools tab"], "toolsHubSection");
   if (!home.hidden) window.shell.renderHome(); // the old tile Home may already be showing
 }

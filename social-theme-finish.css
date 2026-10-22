@@ -1,0 +1,127 @@
+/* MuskySocials theme finishing layer.
+   Keeps the existing brand/logo and app logic untouched. Theme selection remains
+   controlled by shell.js via html.mx-light; this layer fixes the redesign's
+   dark-mode declarations that previously overrode the Light setting. */
+:root { color-scheme: dark; }
+html.mx-light { color-scheme: light !important; background: #f0f2f5 !important; }
+html.mx-light body {
+  color: #172033 !important;
+  background: #f0f2f5 !important;
+  background-image: none !important;
+}
+html.mx-light .topbar {
+  background: rgba(255,255,255,.96) !important;
+  border-bottom: 1px solid #e2e5eb !important;
+  box-shadow: 0 4px 18px rgba(20,35,65,.06) !important;
+}
+html.mx-light .topbar .brand strong,
+html.mx-light .topbar .mk-name { color: #172033 !important; }
+html.mx-light .topbar .brand small,
+html.mx-light .topbar .mk-txt small,
+html.mx-light .topbar .top-actions { color: #687386 !important; }
+html.mx-light main { background: transparent !important; }
+html.mx-light #studio .pane {
+  color: #172033 !important;
+  background: #fff !important;
+  border-color: #e1e5ed !important;
+  box-shadow: 0 5px 22px rgba(25,39,67,.07) !important;
+}
+html.mx-light #studio .sh,
+html.mx-light #studio .sh h2,
+html.mx-light #studio .sh h3,
+html.mx-light #studio .sh strong,
+html.mx-light #studio .hm-title,
+html.mx-light #studio .gs-name,
+html.mx-light #studio .gs-price,
+html.mx-light #studio .ms-post .ms-author strong,
+html.mx-light #studio .ms-post .hm-title,
+html.mx-light #studio .ms-post .hm-body,
+html.mx-light #studio .ex-card,
+html.mx-light #studio .ex-card b { color: #172033 !important; }
+html.mx-light #studio .sh p,
+html.mx-light #studio .sh small,
+html.mx-light #studio .hm-sub,
+html.mx-light #studio .hm-counts,
+html.mx-light #studio .hm-meta,
+html.mx-light #studio .gs-sub,
+html.mx-light #studio .muted,
+html.mx-light #studio .status,
+html.mx-light #studio .ms-handle,
+html.mx-light #studio .ms-post .hm-actions button { color: #687386 !important; }
+html.mx-light #studio .sh-tile,
+html.mx-light #studio .pt-card,
+html.mx-light #studio .hm-post,
+html.mx-light #studio .ex-card,
+html.mx-light #studio .gs-card,
+html.mx-light #studio .mx-notif-item,
+html.mx-light #studio .mxmsg-item,
+html.mx-light #studio .sh-bal,
+html.mx-light #studio .sh-account-card,
+html.mx-light #studio .sh-account-detail-card,
+html.mx-light #studio .hm-comp,
+html.mx-light #studio .ms-post {
+  background: #fff !important;
+  color: #172033 !important;
+  border-color: #e1e5ed !important;
+  box-shadow: 0 4px 16px rgba(25,39,67,.06) !important;
+}
+html.mx-light #studio .hm-pill,
+html.mx-light #studio .gs-chip,
+html.mx-light #studio .secondary,
+html.mx-light #studio .ghost,
+html.mx-light #studio .sh-row button,
+html.mx-light #studio .sh-out {
+  background: #f0f2f5 !important;
+  color: #273348 !important;
+  border-color: #dce1e9 !important;
+}
+html.mx-light #studio input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html.mx-light #studio textarea,
+html.mx-light #studio select {
+  background: #f7f8fb !important;
+  color: #172033 !important;
+  border-color: #dce1e9 !important;
+}
+html.mx-light #studio .primary,
+html.mx-light #studio .primary *,
+html.mx-light #studio .pt-btn,
+html.mx-light #studio .mx-btn,
+html.mx-light #studio .mx-notif-btn,
+html.mx-light #studio .mx-notif-read,
+html.mx-light .ch-go,
+html.mx-light #mxBar button.on { color: #fff !important; }
+html.mx-light #mxBar {
+  background: rgba(255,255,255,.97) !important;
+  border-color: #e1e5ed !important;
+  box-shadow: 0 -5px 22px rgba(25,39,67,.08) !important;
+}
+html.mx-light #mxBar button { color: #69758a !important; }
+html.mx-light #mxBar button.on { color: #7c3aed !important; }
+html.mx-light .mx-menu,
+html.mx-light .mx-menu.open {
+  background: #fff !important;
+  border-color: #e1e5ed !important;
+  box-shadow: 0 16px 40px rgba(25,39,67,.16) !important;
+}
+html.mx-light .mx-menu button { color: #172033 !important; }
+html.mx-light #loginPanel.welcome-screen {
+  background: linear-gradient(145deg,#fff,#f3f0ff) !important;
+  border-color: #e5dcff !important;
+}
+html.mx-light #loginPanel .welcome-content h1,
+html.mx-light #loginPanel .welcome-content p,
+html.mx-light #loginPanel .entry-form label { color: #172033 !important; }
+html.mx-light #loginPanel .welcome-content h1 span { color: #7c3aed !important; }
+html.mx-light #loginPanel .intro,
+html.mx-light #loginPanel .fineprint { color: #687386 !important; }
+html.mx-light #loginPanel .entry-form {
+  background: #fff !important;
+  border-color: #e1e5ed !important;
+}
+html.mx-light #loginPanel input { background: #f7f8fb !important; color: #172033 !important; }
+html.mx-light #studio .hm-story,
+html.mx-light #studio .hm-story * { color: #fff !important; }
+html.mx-light #studio .hm-actions button.on { color: #7c3aed !important; }
+@media (max-width: 420px) {
+  html.mx-light #studio .pane { border-radius: 18px !important; padding: 13px !important; }
+}
