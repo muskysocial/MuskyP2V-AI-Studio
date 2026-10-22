@@ -31,7 +31,7 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
 
   const isAppDocument = request.mode === "navigate" ||
-    /\\.(?:html|css|js|json|webmanifest)$/i.test(url.pathname);
+    /\.(?:html|css|js|json|webmanifest)$/i.test(url.pathname);
 
   if (isAppDocument) {
     // Network first prevents stale HTML or scripts from resurrecting the old UI.
