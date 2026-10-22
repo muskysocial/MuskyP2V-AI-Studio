@@ -61,6 +61,16 @@ function startViralBoost() {
     </div>
     <div class="vb-card">
       <h3>4. Prepare your caption</h3>
+      <label for="vbCategory">Content category</label>
+      <select id="vbCategory" class="vb-input">
+        <option value="">Choose a category</option>
+        <option value="fashion">Fashion & beauty</option><option value="business">Business & products</option>
+        <option value="entertainment">Entertainment & comedy</option><option value="education">Education & tutorials</option>
+        <option value="food">Food & cooking</option><option value="travel">Travel & lifestyle</option>
+        <option value="fitness">Fitness & wellness</option><option value="gaming">Gaming</option>
+        <option value="technology">Technology</option><option value="music">Music & dance</option>
+        <option value="other">Other</option>
+      </select>
       <label for="vbTopic">What is the content about?</label>
       <input id="vbTopic" class="vb-input" maxlength="240" placeholder="e.g. New sneaker collection, comedy skit, food recipe">
       <label for="vbCaption">Caption</label>
@@ -375,7 +385,7 @@ function startViralBoost() {
   function makeIdeas() {
     const topic = $("vbTopic").value.trim();
     const title = $("vbTitle").value.trim();
-    const base = topic || title || "my latest content";
+    const base = topic || title || $("vbCategory").selectedOptions[0]?.textContent || "my latest content";
     const lower = base.toLowerCase();
     const tags = new Set(["#MuskySocials", "#ForYou"]);
     const categories = [
@@ -402,7 +412,8 @@ function startViralBoost() {
   async function generateAiIdeas() {
     const topic = $("vbTopic").value.trim();
     const title = $("vbTitle").value.trim();
-    const base = topic || title;
+    const category = $("vbCategory").value;
+    const base = topic || title || category;
     if (!base) {
       $("vbCopyStatus").textContent = "Enter a campaign name or describe your content first.";
       $("vbTopic").focus();
@@ -423,6 +434,7 @@ function startViralBoost() {
       "(space-separated hashtags)",
       "",
       "Campaign/content topic: " + base,
+      "Category: " + (category || "not selected"),
       "Platforms: " + (platforms.length ? platforms.join(", ") : "General social media"),
       existingCaption ? "Existing caption to improve: " + existingCaption : "No existing caption; write a fresh one."
     ].join("\n");
@@ -478,7 +490,7 @@ function startViralBoost() {
     $("vbFile").value = ""; $("vbFile").disabled = false;
     $("vbMediaType").disabled = false;
     $("vbTitle").value = ""; $("vbUrl").value = "";
-    $("vbTopic").value = ""; $("vbCaption").value = ""; $("vbHashtags").value = "";
+    $("vbCategory").value = ""; $("vbTopic").value = ""; $("vbCaption").value = ""; $("vbHashtags").value = "";
     pane.querySelectorAll('input[name="vbPlatform"]').forEach(el => el.checked = false);
     $("vbCopyStatus").textContent = "";
     editingDraftId = null;
@@ -514,6 +526,7 @@ function startViralBoost() {
     if (!selectedFile && !postUrl && !(editingRow && editingRow.asset_path)) return say("Upload an image/video or paste a valid post link.", true);
     if (postUrlRaw && !postUrl) return say("Enter a valid http:// or https:// post link.", true);
     if (!platforms.length) return say("Choose at least one social platform.", true);
+    const category = $("vbCategory").value || "other";
     const caption = $("vbCaption").value.trim();
     const hashtags = $("vbHashtags").value.trim();
     const button = $("vbSave");
@@ -535,7 +548,7 @@ function startViralBoost() {
       }
       if (saveId) {
         const { data: updated, error } = await sb.from("viral_campaigns")
-          .update({ title, post_url: postUrl || null, platforms, caption, hashtags, media_type: $("vbMediaType").value })
+          .update({ title, post_url: postUrl || null, platforms, caption, hashtags, media_type: $("vbMediaType").value, content_category: category })
           .eq("id", saveId).eq("user_id", userId).select("id").maybeSingle();
         if (error || !updated) throw new Error("Could not update draft: " + (error && error.message || "draft not found or permission denied"));
         editingDraftId = null;
@@ -546,7 +559,7 @@ function startViralBoost() {
       } else {
         const { error } = await sb.from("viral_campaigns").insert({
           user_id: userId, title, post_url: postUrl || null, platforms, caption, hashtags,
-          media_type: $("vbMediaType").value,
+          media_type: $("vbMediaType").value, content_category: category,
           asset_path: path, original_file_name: selectedFile ? selectedFile.name : null,
           content_type: selectedFile ? selectedFile.type : null, file_size: selectedFile ? selectedFile.size : null
         });
@@ -594,13 +607,13 @@ function startViralBoost() {
     try {
       const userId = await getUserId();
       const { data, error } = await sb.from("viral_campaigns")
-        .select("id,title,post_url,platforms,caption,hashtags,asset_path,original_file_name,content_type,media_type,promotion_status,promotion_cost,created_at")
+        .select("id,title,post_url,platforms,caption,hashtags,content_category,asset_path,original_file_name,content_type,media_type,promotion_status,promotion_cost,created_at")
         .eq("user_id", userId).order("created_at", { ascending: false }).limit(20);
       if (error) throw error;
       if (!data || !data.length) { box.innerHTML = "<p class='vb-muted'>No saved drafts yet. Create your first one above.</p>"; return; }
       box.innerHTML = data.map(row =>
         '<article class="vb-draft"><div class="vb-draft-title">' + esc(row.title) + '</div>' +
-        '<div class="vb-draft-meta">' + esc(formatDate(row.created_at)) + ' · ' + esc((row.platforms || []).join(", ") || "No platform") + '</div>' +
+        '<div class="vb-draft-meta">' + esc(formatDate(row.created_at)) + ' · ' + esc((row.platforms || []).join(", ") || "No platform") + ' · ' + esc(row.content_category || "other") + '</div>' +
         (row.post_url ? '<p><a href="' + esc(row.post_url) + '" target="_blank" rel="noopener noreferrer">Open original post ↗</a></p>' : '') +
         (row.original_file_name ? '<p class="vb-draft-meta">📎 ' + esc(row.original_file_name) + '</p>' : '') +
         (row.caption ? '<div class="vb-draft-copy">' + esc(row.caption) + '</div>' : '') +
@@ -626,6 +639,7 @@ function startViralBoost() {
     $("vbTitle").value = row.title || "";
     $("vbUrl").value = row.post_url || "";
     $("vbMediaType").value = row.media_type || ((row.content_type || "").startsWith("video/") ? "video" : "picture");
+    $("vbCategory").value = row.content_category || "other";
     $("vbTopic").value = "";
     $("vbCaption").value = row.caption || "";
     $("vbHashtags").value = row.hashtags || "";
