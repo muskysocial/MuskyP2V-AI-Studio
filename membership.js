@@ -62,6 +62,7 @@ function startMembership() {
     { code: "platinum_yearly", name: "Platinum", price: "₦18,000", period: "per year", coins: "Included-tool access", tag: "Paid tier 4 · Maximum", bullets: ["365-day membership period", "Unlimited access to included tools", "Chargeable actions still deduct coins"] }
   ];
   const $ = (id) => pane.querySelector("#" + id);
+  let checkoutReady = false;
   const say = (message, bad) => {
     const el = $("memMessage");
     el.textContent = message;
@@ -81,12 +82,12 @@ function startMembership() {
       const current = currentCode === p.code;
       const price = expiredOffer ? "Price pending approval" : p.price;
       const period = expiredOffer ? "standard price not set" : p.period;
-      const button = expiredOffer ? "Unavailable until price is approved" : current ? "Current membership" : p.code === "silver_daily" ? "Buy coins (test mode)" : "Choose " + p.name + " (test mode)";
+      const button = expiredOffer ? "Unavailable until price is approved" : current ? "Current membership" : !checkoutReady ? "Test checkout setup pending" : p.code === "silver_daily" ? "Buy coins (test mode)" : "Choose " + p.name + " (test mode)";
       return "<article class='mem-card" + (current ? " current" : "") + "'>" +
         "<span class='mem-tag'>" + esc(p.tag) + "</span><h3>" + esc(p.name) + "</h3>" +
         "<div class='mem-price'>" + esc(price) + "</div><div>" + esc(period) + "</div>" +
         "<p><strong>" + esc(p.coins) + "</strong></p><ul>" + p.bullets.map((x) => "<li>" + esc(x) + "</li>").join("") + "</ul>" +
-        "<button type='button' data-plan='" + esc(p.code) + "'" + (expiredOffer || current ? " disabled" : "") + ">" + esc(button) + "</button></article>";
+        "<button type='button' data-plan='" + esc(p.code) + "'" + (expiredOffer || current || !checkoutReady ? " disabled" : "") + ">" + esc(button) + "</button></article>";
     }).join("");
     $("memPlans").querySelectorAll("[data-plan]").forEach((button) => {
       button.addEventListener("click", () => checkout(button.dataset.plan, button));
@@ -102,6 +103,10 @@ function startMembership() {
       return;
     }
     const uid = session.user.id;
+    const checkoutStatus = await sb.functions.invoke("payment-checkout", { body: { action: "status" } });
+    checkoutReady = !checkoutStatus.error && checkoutStatus.data && checkoutStatus.data.configured === true && checkoutStatus.data.mode === "test";
+    if (checkoutReady) say("Paystack test checkout is configured. Test transactions only.");
+    else say("Checkout is safely disabled until the Paystack test secret and webhook are configured. No payment was started.", true);
     const [creditResult, subResult, historyResult] = await Promise.all([
       window.musky.credits(),
       sb.from("user_subscriptions").select("plan_code,status,expires_at").eq("user_id", uid).eq("status", "active").gt("expires_at", new Date().toISOString()).order("expires_at", { ascending: false }).limit(1),
