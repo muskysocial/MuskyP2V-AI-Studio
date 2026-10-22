@@ -206,6 +206,7 @@ async function publishTikTokVideo(userId: string, body: any) {
   }
   const { connection, token } = await getTikTokConnection(userId);
   const creator = await tiktokCreatorInfo(token);
+  if (creator.can_post === false) throw new Error("TikTok says this account cannot publish right now. Please try again later.");
   const privacy = String(body.privacy_level || "");
   const options = Array.isArray(creator.privacy_level_options) ? creator.privacy_level_options : [];
   if (!options.includes(privacy)) throw new Error("Choose one of the privacy settings currently allowed by your TikTok account.");
