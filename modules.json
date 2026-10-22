@@ -18,5 +18,5 @@
   "./headswap-limit.js",
   "./paid-access.js",
   "./viral-boost.js",
-  "./messages.js?v=20261022-chat-fullscreen"
+  "./messages.js?v=20261022-chat-syntax-fix"
 ]
