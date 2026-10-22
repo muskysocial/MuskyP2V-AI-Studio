@@ -302,7 +302,7 @@ html.mx-light #studio .ex-card b{color:#050505!important}
     ["librarySection", "📚", "Community Library", "Guides, tutorials and downloads.", "Open", "15,155,142"],
   ];
   const MORE = [["shopSection", "🎁", "Gift shop"], ["socialsSection", "🛍️", "MuskySocials accounts"], ["askazaSection", "💱", "Ask 4 Aza"],
-    ["docsSection", "📄", "My documents"], ["aboutSection", "ℹ️", "About us"], ["contactSection", "📞", "Contact us"], ["privacySection", "🔒", "Privacy"]];
+    ["docsSection", "📄", "My documents"], ["viralBoostSection", "🚀", "Viral Boost Studio"], ["aboutSection", "ℹ️", "About us"], ["contactSection", "📞", "Contact us"], ["privacySection", "🔒", "Privacy"]];
   mkPane("exploreSection",
     "<h2>🧭 Explore</h2><p>Find what you need, all in one place.</p><div class='ex-grid'>" +
     CARDS.map(([id, ic, t, d, tag, rgb]) =>
@@ -313,7 +313,7 @@ html.mx-light #studio .ex-card b{color:#050505!important}
 
   // ---------- Tools page (your existing AI Studio, unchanged)
   const TOOLS = [["videoSection", "🎬", "Photo to video", ""], ["headswapSection", "🪄", "HeadSwap", ""], ["chatSection", "💬", "AI chat", ""],
-    ["voiceSection", "🎙️", "Voice studio", ""], ["cameraSection", "📷", "Camera studio", ""], ["voiceCloneSection", "🗣️", "Voice clone", "soon"],
+    ["voiceSection", "🎙️", "Voice studio", ""], ["cameraSection", "📷", "Camera studio", ""], ["viralBoostSection", "🚀", "Viral Boost Studio", "Prepare captions and campaign drafts"], ["voiceCloneSection", "🗣️", "Voice clone", "soon"],
     ["creditSection", "🪙", "Buy credit", "soon"], ["aitoolsSection", "✨", "AI Tools Library", "soon"]];
   mkPane("toolsHubSection",
     "<h2>✨ Tools</h2><p>Your AI Studio. Everything here works as before.</p><div class='sh-grid'>" +

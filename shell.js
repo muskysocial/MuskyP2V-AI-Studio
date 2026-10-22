@@ -235,7 +235,7 @@ function init() {
     const GROUPS = {
       exploreSection: ["exploreSection", "datingSection", "designSection", "aitoolsSection", "librarySection", "shopSection", "socialsSection", "askazaSection", "aboutSection", "contactSection", "privacySection", "docsSection"],
       jobsSection: ["jobsSection"],
-      toolsHubSection: ["toolsHubSection", "videoSection", "headswapSection", "chatSection", "voiceCloneSection", "voiceSection", "cameraSection", "creditSection"],
+      toolsHubSection: ["toolsHubSection", "videoSection", "headswapSection", "chatSection", "voiceCloneSection", "voiceSection", "cameraSection", "viralBoostSection", "creditSection"],
       profileSection: ["profileSection", "settingsSection", "adminSection", "membershipSection"],
     };
     const active = Object.keys(GROUPS).find((k) => GROUPS[k].includes(id)) || "homeSection";
