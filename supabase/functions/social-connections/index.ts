@@ -180,6 +180,30 @@ async function publishTikTokVideo(userId: string, body: any) {
   if (existing.data && existing.data.status !== "failed") {
     return { status: existing.data.status, publish_id: existing.data.provider_publish_id, message: existing.data.message || "This draft has already been submitted to TikTok. Refresh its status instead of publishing it again." };
   }
+  let jobId = "";
+  if (existing.data) {
+    const claimed = await admin.from("social_publish_jobs")
+      .update({ status: "processing", provider_publish_id: null, message: "Preparing video for TikTok.", updated_at: new Date().toISOString() })
+      .eq("id", existing.data.id).eq("status", "failed").select("id").maybeSingle();
+    if (claimed.error || !claimed.data) {
+      const latest = await admin.from("social_publish_jobs").select("status,provider_publish_id,message")
+        .eq("id", existing.data.id).maybeSingle();
+      return { status: latest.data?.status || "processing", publish_id: latest.data?.provider_publish_id || null, message: latest.data?.message || "This draft is already being processed." };
+    }
+    jobId = claimed.data.id;
+  } else {
+    const reserved = await admin.from("social_publish_jobs").insert({
+      user_id: userId, campaign_id: campaign.id, provider: "tiktok",
+      status: "processing", message: "Preparing video for TikTok."
+    }).select("id").single();
+    if (reserved.error || !reserved.data) {
+      const raced = await admin.from("social_publish_jobs").select("status,provider_publish_id,message")
+        .eq("user_id", userId).eq("campaign_id", campaign.id).eq("provider", "tiktok").maybeSingle();
+      if (raced.data) return { status: raced.data.status, publish_id: raced.data.provider_publish_id, message: raced.data.message || "This draft is already being processed." };
+      throw new Error("Could not reserve a safe publishing request. Please try again.");
+    }
+    jobId = reserved.data.id;
+  }
   const { connection, token } = await getTikTokConnection(userId);
   const creator = await tiktokCreatorInfo(token);
   const privacy = String(body.privacy_level || "");
@@ -211,6 +235,12 @@ async function publishTikTokVideo(userId: string, body: any) {
       : "TikTok could not start this post. Check that the app has the approved video.publish permission.";
     throw new Error(msg);
   }
+  const { error: recordInitError } = await admin.from("social_publish_jobs").update({
+    provider_publish_id: init.data.publish_id, status: "processing",
+    message: "TikTok accepted the publishing request; uploading video.",
+    updated_at: new Date().toISOString()
+  }).eq("id", jobId);
+  if (recordInitError) throw new Error("TikTok started a publishing request, but MuskySocials could not record its ID. Contact support before retrying to avoid a duplicate.");
   const bytes = new Uint8Array(await blob.arrayBuffer());
   for (let start = 0; start < videoSize; start += chunkSize) {
     const part = bytes.slice(start, Math.min(start + chunkSize, videoSize));
@@ -229,13 +259,12 @@ async function publishTikTokVideo(userId: string, body: any) {
       throw new Error("TikTok accepted the post request but the video upload failed. Please check the draft and try again.");
     }
   }
-  const { data: job, error: jobError } = await admin.from("social_publish_jobs").upsert({
-    user_id: userId, campaign_id: campaign.id, provider: "tiktok",
-    provider_publish_id: init.data.publish_id, status: "processing",
+  const { error: completeUploadError } = await admin.from("social_publish_jobs").update({
+    status: "processing",
     message: "Video uploaded; waiting for TikTok to process it.",
     updated_at: new Date().toISOString()
-  }, { onConflict: "user_id,campaign_id,provider" }).select("id").single();
-  if (jobError || !job) throw new Error("TikTok received the video, but MuskySocials could not save its status. Contact support before retrying to avoid a duplicate.");
+  }).eq("id", jobId);
+  if (completeUploadError) throw new Error("TikTok received the video, but MuskySocials could not update its status. Use Check TikTok status before retrying.");
   return {
     status: "processing", publish_id: init.data.publish_id,
     message: "Video sent to TikTok. It may take a few minutes to process; check status before trying again.",
@@ -365,8 +394,19 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === "publish-video") {
-      const result = await publishTikTokVideo(user.id, body);
-      return json(result);
+      try {
+        const result = await publishTikTokVideo(user.id, body);
+        return json(result);
+      } catch (error) {
+        if (body.campaign_id) {
+          await admin.from("social_publish_jobs").update({
+            status: "failed",
+            message: error instanceof Error ? error.message.slice(0, 400) : "Publishing failed.",
+            updated_at: new Date().toISOString()
+          }).eq("user_id", user.id).eq("campaign_id", body.campaign_id).eq("provider", "tiktok").is("provider_publish_id", null);
+        }
+        throw error;
+      }
     }
 
     if (action === "publish-status") {
