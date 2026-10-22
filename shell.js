@@ -187,6 +187,28 @@ body.mx-chat-open #mxBar,body.mx-chat-open>.topbar{display:none!important}
 #settingsSection .sh-settings-version{text-align:center;font-size:11px;margin:0 0 12px}
 #settingsSection .sh-out{padding:13px;border-radius:12px}
 @media(max-width:420px){#settingsSection .sh-settings-row{gap:9px}#settingsSection .sh-settings-row-icon{width:36px;height:36px;flex-basis:36px}#settingsSection .sh-settings-preference .sh-row button{font-size:12px}}
+/* Notification preferences are separate from the activity inbox. */
+#notificationPreferencesSection .sh-notif-settings{max-width:720px;margin:0 auto;padding:4px 0 24px}
+#notificationPreferencesSection .sh-notif-head{margin:4px 0 18px}
+#notificationPreferencesSection .sh-notif-head h2{font-size:clamp(27px,7vw,34px);letter-spacing:-.045em;margin:0 0 5px}
+#notificationPreferencesSection .sh-notif-head p{font-size:13px;line-height:1.5;margin:0}
+#notificationPreferencesSection .sh-notif-card{padding:4px 15px;border:1px solid var(--sh-line);border-radius:16px;background:var(--sh-card);margin:0 0 15px}
+#notificationPreferencesSection .sh-notif-item{display:flex;align-items:center;gap:12px;padding:15px 0;border-bottom:1px solid var(--sh-line)}
+#notificationPreferencesSection .sh-notif-item:last-child{border-bottom:0}
+#notificationPreferencesSection .sh-notif-ico{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:13px;background:color-mix(in srgb,var(--sh-blue) 12%,transparent);font-size:21px}
+#notificationPreferencesSection .sh-notif-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}
+#notificationPreferencesSection .sh-notif-copy strong{font-size:14px;color:var(--sh-text)}
+#notificationPreferencesSection .sh-notif-copy small{font-size:11px;line-height:1.4;color:var(--sh-sub)}
+#notificationPreferencesSection .sh-notif-toggle{position:relative;flex:0 0 48px;width:48px;height:28px;appearance:none;-webkit-appearance:none;border:0;border-radius:999px;background:#9ca3af;cursor:pointer;transition:background .15s}
+#notificationPreferencesSection .sh-notif-toggle:before{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0003;transition:transform .15s}
+#notificationPreferencesSection .sh-notif-toggle:checked{background:#1877f2}
+#notificationPreferencesSection .sh-notif-toggle:checked:before{transform:translateX(20px)}
+#notificationPreferencesSection .sh-notif-toggle:focus-visible{outline:3px solid var(--sh-blue);outline-offset:3px}
+#notificationPreferencesSection .sh-notif-note{padding:13px;border-radius:12px;background:color-mix(in srgb,var(--sh-blue) 8%,var(--sh-card));font-size:12px;line-height:1.5}
+#notificationPreferencesSection .sh-notif-status{min-height:18px;font-size:12px;color:var(--sh-blue)!important;margin:8px 0 0}
+#notificationPreferencesSection .sh-notif-actions{display:flex;gap:9px;flex-wrap:wrap;margin:16px 0}
+#notificationPreferencesSection .sh-notif-actions button{flex:1;min-width:140px;padding:12px;border:1px solid var(--sh-line);border-radius:12px;background:var(--sh-card);color:var(--sh-text);font-weight:700}
+#notificationPreferencesSection .sh-notif-actions button.primary{background:#1877f2;color:#fff;border-color:#1877f2}
 `;
 
 // id, icon, label, note
@@ -387,13 +409,35 @@ function init() {
       "<section class='sh-settings-group'><h3>Account</h3>" +
         "<div class='sh-account-card'><span class='sh-account-avatar'>👤</span><span class='sh-account-copy'><strong id='shEmail'>Signed in</strong><small id='shCred'>Credits: …</small></span><button data-go='profileSection' aria-label='Open profile'>›</button></div>" +
         "<button class='sh-settings-row' data-go='profileSection'><span class='sh-settings-row-icon'>♙</span><span><strong>Personal profile</strong><small>Profile details and account controls</small></span><b>›</b></button>" +
-        "<button class='sh-settings-row' data-go='notifSection'><span class='sh-settings-row-icon'>♧</span><span><strong>Notifications</strong><small>Review your latest account activity</small></span><b>›</b></button>" +
+        "<button class='sh-settings-row' data-go='notificationPreferencesSection'><span class='sh-settings-row-icon'>♧</span><span><strong>Notification preferences</strong><small>Choose which activity updates you want to track</small></span><b>›</b></button>" +
+        "<button class='sh-settings-row' data-go='notifSection'><span class='sh-settings-row-icon'>◉</span><span><strong>Activity inbox</strong><small>Review your latest account activity</small></span><b>›</b></button>" +
         "<button class='sh-settings-row' data-go='contactSection'><span class='sh-settings-row-icon'>？</span><span><strong>Help & contact</strong><small>Get help with MuskySocials</small></span><b>›</b></button>" +
         "<button class='sh-settings-row' data-go='privacySection'><span class='sh-settings-row-icon'>▣</span><span><strong>Privacy & safety</strong><small>Read privacy and safety information</small></span><b>›</b></button>" +
       "</section>" +
       "<section class='sh-settings-group'><h3>Appearance</h3><div class='sh-settings-preference'><div><strong>Theme</strong><small>Choose your preferred look</small></div><div class='sh-row' id='shTheme'><button data-theme='light'>Light</button><button data-theme='dark'>Dark</button></div></div>" +
       "<div class='sh-settings-preference'><div><strong>Text size</strong><small>Make text easier to read</small></div><div class='sh-row' id='shSize'><button data-size='1'>Normal</button><button data-size='1.1'>Comfortable</button><button data-size='1.2'>Large</button></div></div></section>" +
       "<p class='sh-settings-version'>MuskySocials · Account settings</p><button class='sh-out' id='shOut'>↪ &nbsp; Sign out</button>" +
+    "</div>");
+
+  const NOTIF_PREF_KEY = "musky-notification-preferences";
+  const NOTIF_DEFAULTS = { followers: true, socialActivity: true, accountUpdates: true, productNews: false };
+  const readNotifPrefs = () => {
+    try { return { ...NOTIF_DEFAULTS, ...JSON.parse(localStorage.getItem(NOTIF_PREF_KEY) || "{}") }; }
+    catch { return { ...NOTIF_DEFAULTS }; }
+  };
+  const notifPrefs = readNotifPrefs();
+  const notificationPreferences = mk("notificationPreferencesSection",
+    "<div class='sh sh-notif-settings'>" +
+      "<div class='sh-notif-head'><p class='sh-settings-eyebrow'>MAKE IT YOURS</p><h2>Notification preferences</h2><p>Choose the updates you want to keep an eye on. Your choices are saved on this device.</p></div>" +
+      "<div class='sh-notif-card'>" +
+        "<label class='sh-notif-item'><span class='sh-notif-ico'>👥</span><span class='sh-notif-copy'><strong>New followers</strong><small>Updates about people who follow your profile.</small></span><input class='sh-notif-toggle' type='checkbox' data-notif-pref='followers' aria-label='New followers notifications'></label>" +
+        "<label class='sh-notif-item'><span class='sh-notif-ico'>💬</span><span class='sh-notif-copy'><strong>Likes and comments</strong><small>Social activity related to your content.</small></span><input class='sh-notif-toggle' type='checkbox' data-notif-pref='socialActivity' aria-label='Likes and comments notifications'></label>" +
+        "<label class='sh-notif-item'><span class='sh-notif-ico'>🔐</span><span class='sh-notif-copy'><strong>Account and security</strong><small>Important account information and security notices.</small></span><input class='sh-notif-toggle' type='checkbox' data-notif-pref='accountUpdates' aria-label='Account and security notifications'></label>" +
+        "<label class='sh-notif-item'><span class='sh-notif-ico'>✨</span><span class='sh-notif-copy'><strong>Product news</strong><small>New features, tips, and MuskySocials announcements.</small></span><input class='sh-notif-toggle' type='checkbox' data-notif-pref='productNews' aria-label='Product news notifications'></label>" +
+      "</div>" +
+      "<div class='sh-notif-note'>These switches currently save your preferences on this device only. They do not yet change server-side notification delivery, email alerts, or security messages.</div>" +
+      "<p class='sh-notif-status' id='shNotifStatus' role='status' aria-live='polite'></p>" +
+      "<div class='sh-notif-actions'><button type='button' data-go='notifSection'>Open activity inbox&nbsp; ›</button><button type='button' class='primary' id='shNotifReset'>Restore defaults</button></div>" +
     "</div>");
 
   const name = () => (document.querySelector("#welcomeName") || {}).textContent || "creator";
@@ -408,6 +452,15 @@ function init() {
     settings.querySelector("#shCred").textContent = "Credits: " + (credits === null ? "…" : credits);
     settings.querySelectorAll("#shTheme button").forEach((b) => b.classList.toggle("on", b.dataset.theme === S.theme));
     settings.querySelectorAll("#shSize button").forEach((b) => b.classList.toggle("on", +b.dataset.size === S.size));
+  }
+  function renderNotificationPreferences() {
+    notificationPreferences.querySelectorAll("[data-notif-pref]").forEach((input) => {
+      input.checked = Boolean(notifPrefs[input.dataset.notifPref]);
+    });
+  }
+  function saveNotificationPreferences() {
+    try { localStorage.setItem(NOTIF_PREF_KEY, JSON.stringify(notifPrefs)); } catch {}
+    notificationPreferences.querySelector("#shNotifStatus").textContent = "Preferences saved on this device.";
   }
 
   // Bottom bar
@@ -451,6 +504,7 @@ function init() {
     updateBackButton();
     if (id === "homeSection") renderHome();
     if (id === "settingsSection") renderSettings();
+    if (id === "notificationPreferencesSection") renderNotificationPreferences();
     studio.querySelectorAll(".pane").forEach((p) => {
       const hide = p.id !== id;
       if (p.hidden !== hide) p.hidden = hide;
@@ -480,6 +534,17 @@ function init() {
     if (t) S.theme = t.dataset.theme;
     if (z) S.size = +z.dataset.size;
     if (t || z) { save(); apply(); renderSettings(); }
+  });
+  notificationPreferences.addEventListener("change", (e) => {
+    const input = e.target.closest("[data-notif-pref]");
+    if (!input) return;
+    notifPrefs[input.dataset.notifPref] = input.checked;
+    saveNotificationPreferences();
+  });
+  notificationPreferences.querySelector("#shNotifReset").addEventListener("click", () => {
+    Object.assign(notifPrefs, NOTIF_DEFAULTS);
+    saveNotificationPreferences();
+    renderNotificationPreferences();
   });
   settings.querySelector("#shOut").addEventListener("click", async () => {
     try { await window.musky.sb.auth.signOut(); } catch {}
