@@ -1,4 +1,4 @@
-const CACHE_NAME = "musky-p2v-v4";
+const CACHE_NAME = "musky-p2v-v5";
 const APP_SHELL = ["./", "./index.html", "./manifest.json"];
 
 self.addEventListener("install", (event) => {
@@ -36,7 +36,7 @@ self.addEventListener("fetch", (event) => {
   if (isAppDocument) {
     // Network first prevents stale HTML or scripts from resurrecting the old UI.
     event.respondWith(
-      fetch(request).then((response) => {
+      fetch(url.href, { cache: "no-store", credentials: request.credentials, headers: request.headers, redirect: request.redirect }).then((response) => {
         if (response && response.ok && response.type === "basic") {
           const copy = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)).catch(() => {});
