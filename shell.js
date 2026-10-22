@@ -259,12 +259,13 @@ function init() {
     loadingHistory = true;
     try {
       const session = await M.session(); if (!session?.user?.id) return;
-      const {data,error} = await M.sb.from("assistant_messages").select("id,role,content,attachment_path,attachment_name,attachment_type,attachment_size,created_at").eq("user_id",session.user.id).order("created_at",{ascending:true}).order("id",{ascending:true}).limit(200);
+      const {data,error} = await M.sb.from("assistant_messages").select("id,role,content,attachment_path,attachment_name,attachment_type,attachment_size,created_at").eq("user_id",session.user.id).order("created_at",{ascending:false}).order("id",{ascending:false}).limit(200);
       if (error) throw error;
+      const rows=(data || []).slice().reverse();
       chLog.replaceChildren(); hist = [];
-      (data || []).forEach((row) => { bubble(row.role,row.content,row.attachment_path ? row : null); hist.push({role:row.role,content:row.content}); });
+      rows.forEach((row) => { bubble(row.role,row.content,row.attachment_path ? row : null); hist.push({role:row.role,content:row.content}); });
       hist = hist.slice(-12);
-      chWelcome.hidden = (data || []).length > 0; chLog.hidden = (data || []).length === 0;
+      chWelcome.hidden = rows.length > 0; chLog.hidden = rows.length === 0;
     } catch (e) { console.warn("Could not load assistant history", e); }
     finally { loadingHistory = false; }
   }
