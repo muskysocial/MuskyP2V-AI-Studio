@@ -155,6 +155,41 @@ function startMembership() {
     }
   }
 
+  // Gate paid tool panes in the app shell. AI Chat and HeadSwap remain free-access routes.
+  const paidTargets = new Set(["videoSection", "voiceSection", "cameraSection", "voiceCloneSection", "aitoolsSection"]);
+  const originalGo = window.shell.go.bind(window.shell);
+  async function routePaidTool(id) {
+    const session = await window.musky.session();
+    if (!session) {
+      say("Sign in, then choose Gold, Diamond, or Platinum to unlock this tool.", true);
+      originalGo("membershipSection");
+      return;
+    }
+    const { data, error } = await sb.from("user_subscriptions")
+      .select("id")
+      .eq("user_id", session.user.id)
+      .eq("status", "active")
+      .gt("expires_at", new Date().toISOString())
+      .limit(1);
+    if (error || !data || !data.length) {
+      say("This tool requires an active Gold, Diamond, or Platinum membership. AI Chat and your daily free HeadSwap remain available.", true);
+      originalGo("membershipSection");
+      return;
+    }
+    originalGo(id);
+  }
+  window.shell.go = function(id) {
+    if (paidTargets.has(id)) { void routePaidTool(id); return; }
+    return originalGo(id);
+  };
+  document.addEventListener("click", (event) => {
+    const trigger = event.target.closest("[data-go]");
+    if (!trigger || !paidTargets.has(trigger.dataset.go)) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    void routePaidTool(trigger.dataset.go);
+  }, true);
+
   pane.addEventListener("click", (event) => {
     const retry = event.target.closest("[data-mem-refresh]");
     if (retry) load();
