@@ -17,6 +17,11 @@ const PRICES = Object.freeze({
     cost: 20,
     note: "20 coins are charged each time you open the Community Library.",
   },
+  verifiedBadge: {
+    label: "Verified badge",
+    cost: 7000,
+    note: "A verified badge request costs 7,000 coins and waits for admin review.",
+  },
 });
 
 const waitForPaidAccess = (test, ms = 25000) => new Promise((resolve) => {
