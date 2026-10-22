@@ -327,6 +327,10 @@ html.mx-light #studio .ex-card b{color:#050505!important}
     paintFeed();
     fetchFeed(false);
   };
+  // Fix the startup race: shell.js can render its legacy tile grid before this
+  // module finishes loading. Re-render immediately so the new social home is
+  // visible on the first visit, without requiring users to leave and return.
+  if (typeof window.shell.renderHome === "function") window.shell.renderHome();
   window.addEventListener("musky-admin", (e) => {
     isAdmin = !!e.detail;
     if (!home.hidden) window.shell.renderHome();
