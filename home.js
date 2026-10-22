@@ -398,6 +398,7 @@ html.mx-light body{background:#f7f8fc!important}
 
   home.addEventListener("click", async (e) => {
     const t = e.target;
+    if(t.closest("#msSeeShop")||t.closest("[data-picks-open]"))return go("shopSection");
     if (t.closest("#hmMeet")) { loadPeople(true); return go("peopleSection"); }
     if (t.closest("#hmShare")) return compose();
     if (t.closest("#hmAdmin")) return go("adminSection");
@@ -450,12 +451,25 @@ html.mx-light body{background:#f7f8fc!important}
       STORIES.slice(1).map(([id, ic, label, bg]) => '<button class="ms-story" data-go="' + id + '"><span class="ms-story-ring"><span style="background:' + bg + ';color:#fff">' + ic + '</span></span><span>' + label + '</span></button>').join("") + '</div>' +
       '<div class="ms-compose"><div class="hm-av" id="hmAv">?</div><button class="hm-pill" id="hmShare">What would you like to share?</button></div>' +
       '<div class="ms-creditline"><span><strong>MuskySocials</strong> · Connect, discover, create</span><span>🪙 ' + (credits === null || credits === undefined ? "…" : credits) + '</span></div>' +
+      '<section id="msTopPicks"><div class="ms-section-head"><strong>Top Picks for You</strong><button type="button" id="msSeeShop">See all →</button></div><div class="ms-picks-grid" id="msPicksGrid"><div class="ms-pick-card"><div class="ms-pick-copy">Loading marketplace picks…</div></div></div></section>' +
       '<button class="hm-meet" id="hmMeet" type="button"><span class="hm-meet-icon">👥</span><span class="hm-meet-copy"><strong>Discover friends</strong><small>Find people, follow members and grow your circle</small></span><span class="hm-meet-arrow">›</span></button>' +
       '<div id="hmFeed">Loading feed…</div>' +
       '<div class="ms-footer-links"><a href="#" data-go="aboutSection">About</a><a href="#" data-go="aboutSection">Accessibility</a><a href="#" data-go="contactSection">Help Center</a><a href="#" data-go="privacySection">Privacy</a><a href="#" data-go="privacySection">Terms</a><a href="#" data-go="shopSection">Advertising</a></div></div>';
     paintAv(q("#hmAv"));
     paintFeed();
     fetchFeed(false);
+    loadHomePicks();
+    const seeShop=q("#msSeeShop"); if(seeShop) seeShop.addEventListener("click",()=>go("shopSection"));
+    async function loadHomePicks(){
+      const grid=q("#msPicksGrid"); if(!grid)return;
+      try{
+        const {data,error}=await sb.from("products").select("id,name,price,image_path,category,in_stock").order("created_at",{ascending:false}).limit(6);
+        if(error)throw error;
+        if(!data||!data.length){grid.innerHTML='<div class="ms-pick-card"><div class="ms-pick-copy"><strong>Discover the marketplace</strong><small>Browse available items</small><button class="ms-pick-open" type="button" data-picks-open>Explore shop</button></div></div>';return;}
+        const money=v=>"₦"+Number(v||0).toLocaleString("en-NG");
+        grid.innerHTML=data.map(p=>{let url="";try{if(p.image_path)url=sb.storage.from("shop").getPublicUrl(p.image_path).data.publicUrl||"";}catch(_){};return '<article class="ms-pick-card">'+(url?'<img loading="lazy" src="'+esc(url)+'" alt="">':'<div style="aspect-ratio:1.1/1;display:grid;place-items:center;background:#0d1b2e;font-size:32px">🛍️</div>')+'<div class="ms-pick-copy"><strong>'+esc(p.name)+'</strong><small>'+money(p.price)+'</small><button class="ms-pick-open" type="button" data-picks-open>View item</button></div></article>';}).join("");
+      }catch(err){grid.innerHTML='<div class="ms-pick-card"><div class="ms-pick-copy"><strong>Top picks</strong><small>Open the marketplace to explore available items.</small><button class="ms-pick-open" type="button" data-picks-open>Explore shop</button></div></div>';}
+    }
     const search=q("#msSearchInput");
     if(search) search.addEventListener("keydown",e=>{if(e.key==="Enter"&&search.value.trim()){window.shell.go("peopleSection");setTimeout(()=>{const target=q("#mdSearch")||q("#mdSearchInput")||q("#peopleSearch");if(target){target.value=search.value.trim();target.dispatchEvent(new Event("input",{bubbles:true}));}},150);}});
     const voice=q("#msVoiceSearch");
