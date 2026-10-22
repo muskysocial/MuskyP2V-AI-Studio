@@ -294,6 +294,7 @@ html.mx-light #studio .ds-req{color:#d93025!important}
     downloadPending = true;
     buttons.forEach((button) => { button.disabled = true; });
     let objectUrl = "";
+    let chargeAttempted = false;
     let charged = false;
     try {
       const session = await window.musky.session();
@@ -307,6 +308,7 @@ html.mx-light #studio .ds-req{color:#d93025!important}
       });
       objectUrl = URL.createObjectURL(blob);
       msg.textContent = "Checking your balance…";
+      chargeAttempted = true;
       await window.musky.spend(100);
       charged = true;
 
@@ -329,8 +331,10 @@ html.mx-light #studio .ds-req{color:#d93025!important}
         msg.textContent = "You need 100 coins to download this design. No coins were deducted; add coins and try again.";
       } else if (/sign in required|session/i.test(message)) {
         msg.textContent = "Please sign in again before downloading. No coins were deducted.";
+      } else if (chargeAttempted) {
+        msg.textContent = "The coin charge could not be confirmed. Check your balance before trying again so you do not pay twice.";
       } else {
-        msg.textContent = "Could not download this design. No coins were deducted. " + (message || "Please try again.");
+        msg.textContent = "Could not prepare this design. No coins were deducted. " + (message || "Please try again.");
       }
     } finally {
       downloadPending = false;
