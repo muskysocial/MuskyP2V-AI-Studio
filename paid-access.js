@@ -41,6 +41,7 @@ function startPaidAccess() {
   const originalGo = window.shell.go.bind(window.shell);
   const pending = new Set();
   let jobsExpiresAt = 0;
+  try { jobsExpiresAt = Number(localStorage.getItem("mx-paid-jobs-expires") || 0); } catch {}
   let jobsTimer = null;
   let toastTimer = null;
 
@@ -105,6 +106,7 @@ function startPaidAccess() {
       if (remaining <= 0) {
         stopJobsTimer();
         jobsExpiresAt = 0;
+        try { localStorage.removeItem("mx-paid-jobs-expires"); } catch {}
         const jobsPane = getPane("jobsSection");
         if (jobsPane && !jobsPane.hidden) {
           originalGo("membershipSection");
@@ -128,6 +130,7 @@ function startPaidAccess() {
     // A Jobs session is paid once and can be revisited while its 2-minute timer is active.
     if (id === "jobsSection" && jobsExpiresAt > Date.now()) {
       originalGo(id);
+      startJobsTimer();
       setNotice(id, "💼 Jobs access active — " + formatRemaining(jobsExpiresAt - Date.now()) +
         " remaining. " + rule.note);
       pending.delete(id);
@@ -147,6 +150,7 @@ function startPaidAccess() {
 
       if (id === "jobsSection") {
         jobsExpiresAt = Date.now() + rule.sessionMs;
+        try { localStorage.setItem("mx-paid-jobs-expires", String(jobsExpiresAt)); } catch {}
         startJobsTimer();
         toast("40 coins deducted. Jobs is open for 2 minutes.");
       } else {
