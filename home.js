@@ -193,7 +193,7 @@ html.mx-light body{background:#f7f8fc!important}
     const menu=document.createElement("button");menu.id="msMenuButton";menu.className="ms-top-menu";menu.type="button";menu.setAttribute("aria-label","Open navigation menu");menu.textContent="☰";
     const brand=topbar.querySelector(".brand");if(brand)topbar.insertBefore(menu,brand);
     const actions=topbar.querySelector(".top-actions");
-    if(actions){actions.innerHTML='<button id="msTopAvatar" class="ms-top-avatar" type="button" aria-label="Open your profile">M</button>';q("#msTopAvatar").addEventListener("click",()=>window.shell.go("profileSection"));}
+    if(actions&&!q("#msTopAvatar")){const avatar=document.createElement("button");avatar.id="msTopAvatar";avatar.className="ms-top-avatar";avatar.type="button";avatar.setAttribute("aria-label","Open your profile");avatar.textContent="M";actions.appendChild(avatar);avatar.addEventListener("click",()=>window.shell.go("profileSection"));}
     const quick=document.createElement("div");quick.id="msQuickMenu";quick.innerHTML='<button data-msgo="homeSection">🏠 Home</button><button data-msgo="peopleSection">👥 Friends & Discover</button><button data-msgo="notifSection">♡ Activity</button><button data-msgo="profileSection">👤 My profile</button><button data-msgo="shopSection">🛍 Shop</button><button data-msgo="settingsSection">⚙ Settings</button>';
     document.body.appendChild(quick);
     menu.addEventListener("click",()=>quick.classList.toggle("open"));
