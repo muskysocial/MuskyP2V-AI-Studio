@@ -199,7 +199,6 @@ html.mx-light body{background:#f7f8fc!important}
     menu.addEventListener("click",()=>quick.classList.toggle("open"));
     quick.addEventListener("click",e=>{const b=e.target.closest("[data-msgo]");if(!b)return;quick.classList.remove("open");window.shell.go(b.dataset.msgo);});
     document.addEventListener("click",e=>{if(!quick.contains(e.target)&&e.target!==menu)quick.classList.remove("open");});
-    sb.auth.onAuthStateChange(()=>{loadMe().then(()=>{const a=q("#msTopAvatar");if(a){if(avatarPath){a.innerHTML='<img src="'+esc(avUrl(avatarPath))+'" alt="">';}else a.textContent=(myName||"M").charAt(0).toUpperCase();}});});
   }
 
   const toast = (msg) => {
@@ -248,6 +247,8 @@ html.mx-light body{background:#f7f8fc!important}
       avatarPath = data && data.avatar_path;
       const el = q("#hmAv");
       if (el) paintAv(el);
+      const topAvatar=q("#msTopAvatar");
+      if(topAvatar){if(avatarPath)topAvatar.innerHTML='<img src="'+esc(avUrl(avatarPath))+'" alt="">';else topAvatar.textContent=(myName||"M").charAt(0).toUpperCase();}
     } catch {}
   }
   function paintAv(el) {
