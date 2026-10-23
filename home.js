@@ -227,6 +227,19 @@ html.mx-light body{background:#f7f8fc!important}
 .md-profile-note{display:flex;align-items:flex-start;gap:7px;margin-top:15px;padding:11px 12px;border-radius:12px;background:rgba(244,91,154,.07);color:var(--sh-sub);font-size:11px;line-height:1.45}
 @media(max-width:420px){.md-profile-cover{height:94px;padding:14px}.md-profile-main{padding:0 14px 16px}.md-profile-redesign .md-profile-name-row h2{font-size:19px}.md-profile-redesign .md-avatar{width:68px!important;height:68px!important}.md-profile-intro h2{font-size:23px}}
 `;
+  st.textContent += `
+/* Structural home redesign: a real feed column and separate discovery rail. */
+#studio #homeSection .ms-home-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:start;min-width:0}
+#studio #homeSection .ms-home-main,#studio #homeSection .ms-home-aside{min-width:0}
+#studio #homeSection .ms-home-aside{display:grid;gap:12px;align-content:start}
+#studio #homeSection .ms-home-aside .ms-home-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}
+#studio #homeSection .ms-home-aside #msTopPicks{min-width:0}
+#studio #homeSection .ms-home-aside .ms-picks-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+#studio #homeSection #hmFeed{min-width:0}
+@media(min-width:900px){#studio #homeSection{max-width:1180px!important}#studio #homeSection .ms-home-layout{grid-template-columns:minmax(0,1.65fr) minmax(270px,.85fr);gap:22px}#studio #homeSection .ms-home-main{grid-column:1}#studio #homeSection .ms-home-aside{grid-column:2;grid-row:1}#studio #homeSection .ms-home-aside .ms-home-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:899px){#studio #homeSection .ms-home-aside{margin-top:2px}}
+@media(max-width:420px){#studio #homeSection .ms-home-layout{gap:10px}#studio #homeSection .ms-home-aside .ms-picks-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+`;
   document.head.appendChild(st);
 
   // Upgrade the existing header in place; keep the app shell and its auth hooks.
@@ -444,17 +457,18 @@ html.mx-light body{background:#f7f8fc!important}
   ];
   window.shell.homeRenderer = (el, ctx) => {
     credits = ctx && ctx.credits;
-    el.innerHTML = '<div class="sh ms-home">' +
+    el.innerHTML = '<div class="sh ms-home"><div class="ms-home-layout"><div class="ms-home-main">' +
       '<div class="ms-search"><span class="glass">⌕</span><input id="msSearchInput" type="search" placeholder="Search people, posts and more" aria-label="Search MuskySocials"><button id="msVoiceSearch" type="button" aria-label="Voice search">🎙</button></div>' +
       '<div class="ms-section-head"><strong>Stories</strong><button id="msWatchStories" type="button">Watch all →</button></div>' +
       '<div class="ms-story-strip"><button class="ms-story ms-story-add" data-go="profileSection"><span class="ms-story-ring"><span>＋</span></span><span>Add story</span></button>' +
       STORIES.slice(1).map(([id, ic, label, bg]) => '<button class="ms-story" data-go="' + id + '"><span class="ms-story-ring"><span style="background:' + bg + ';color:#fff">' + ic + '</span></span><span>' + label + '</span></button>').join("") + '</div>' +
       '<div class="ms-compose"><div class="hm-av" id="hmAv">?</div><button class="hm-pill" id="hmShare">What would you like to share?</button></div>' +
+      '<div id="hmFeed">Loading feed…</div></div>' +
+      '<aside class="ms-home-aside" aria-label="Marketplace and discovery">' +
       '<div class="ms-home-shortcuts" aria-label="Quick access"><button class="ms-shortcut ms-shortcut-market" data-go="shopSection"><span>🛍</span><strong>Marketplace</strong><small>Buy & sell</small></button><button class="ms-shortcut" data-go="profileSection"><span>▦</span><strong>My Posts</strong><small>Your content</small></button><button class="ms-shortcut" data-go="peopleSection"><span>♧</span><strong>Groups</strong><small>Join & connect</small></button><button class="ms-shortcut" data-go="eventsSection"><span>▣</span><strong>Events</strong><small>What’s happening</small></button></div>' +
       '<div class="ms-creditline"><span><strong>MuskySocials</strong> · Connect, discover, create</span><span>🪙 ' + (credits === null || credits === undefined ? "…" : credits) + '</span></div>' +
       '<section id="msTopPicks"><div class="ms-section-head"><strong>Top Picks for You</strong><button type="button" id="msSeeShop">See all →</button></div><div class="ms-picks-grid" id="msPicksGrid"><div class="ms-pick-card"><div class="ms-pick-copy">Loading marketplace picks…</div></div></div></section>' +
-      '<button class="hm-meet" id="hmMeet" type="button"><span class="hm-meet-icon">👥</span><span class="hm-meet-copy"><strong>Discover friends</strong><small>Find people, follow members and grow your circle</small></span><span class="hm-meet-arrow">›</span></button>' +
-      '<div id="hmFeed">Loading feed…</div>' +
+      '<button class="hm-meet" id="hmMeet" type="button"><span class="hm-meet-icon">👥</span><span class="hm-meet-copy"><strong>Discover friends</strong><small>Find people, follow members and grow your circle</small></span><span class="hm-meet-arrow">›</span></button></aside></div>' +
       '<div class="ms-footer-links"><a href="#" data-go="aboutSection">About</a><a href="#" data-go="aboutSection">Accessibility</a><a href="#" data-go="contactSection">Help Center</a><a href="#" data-go="privacySection">Privacy</a><a href="#" data-go="privacySection">Terms</a><a href="#" data-go="shopSection">Advertising</a></div></div>';
     paintAv(q("#hmAv"));
     paintFeed();
