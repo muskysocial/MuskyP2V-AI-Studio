@@ -1,0 +1,63 @@
+/* MuskySocials approved screenshot redesign. Styling only: keep existing DOM, handlers and Supabase logic. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lobster+Two:wght@700&display=swap');
+@import url('./musky-design-tokens.css');
+html,body{background:var(--ms-bg)!important;color:var(--ms-white)!important;font-family:var(--ms-font)!important}
+body{min-height:100dvh!important;padding-bottom:calc(var(--ms-nav-height) + env(safe-area-inset-bottom,0px))!important;background:radial-gradient(ellipse at 52% -12%,rgba(139,61,255,.13),transparent 42%),var(--ms-bg)!important}
+*{box-sizing:border-box}button,input,textarea,select{font:inherit}
+a{color:var(--ms-purple-bright)}button{transition:transform .16s ease,border-color .16s ease,background .16s ease}
+button:active{transform:scale(.98)}
+.topbar{position:sticky!important;top:0!important;z-index:100!important;height:64px!important;padding:0 16px!important;border-bottom:1px solid var(--ms-border)!important;background:rgba(5,6,15,.94)!important;backdrop-filter:blur(18px)!important}
+.brand{gap:7px!important}.brand-mark{display:none!important}.brand strong{font-family:'Lobster Two',cursive!important;font-size:24px!important;letter-spacing:-.7px!important;color:#fff!important}.brand strong::first-letter{color:#fff}.brand small{display:none!important}.top-actions{font-size:11px!important;color:var(--ms-muted)!important}
+main{width:min(100% - 20px,760px)!important;margin:14px auto 24px!important}
+.pane,.tool-card,.quick-card,.preview-box,.notice,.ai-generator,.tabs,.section-heading,.post-card,.feed-card,.mxmsg,.mxmsg-row,.card,.panel,.settings-card{background:var(--ms-surface)!important;border:1px solid var(--ms-border)!important;border-radius:var(--ms-radius)!important;box-shadow:none!important}
+.pane{padding:16px!important;margin:12px 0!important}
+h1,h2,h3,h4,.section-heading{color:var(--ms-white)!important;letter-spacing:-.025em}
+p,.muted,.small-text,.fineprint{color:var(--ms-muted)!important}
+.primary,.primary-button,.enter-button,.full-button{background:var(--ms-gradient)!important;color:#fff!important;border:0!important;border-radius:14px!important;box-shadow:var(--ms-glow)!important;font-weight:700!important}
+.secondary,.icon-button,.mxmsg-refresh{background:var(--ms-surface-2)!important;color:var(--ms-white)!important;border:1px solid var(--ms-border)!important;border-radius:14px!important}
+input,textarea,select,.entry-form input,.search-input{background:#111528!important;color:var(--ms-white)!important;border:1px solid var(--ms-border)!important;border-radius:14px!important;min-height:44px}
+input::placeholder,textarea::placeholder{color:#858baa!important}
+.tabs{display:flex!important;gap:6px!important;overflow-x:auto!important;padding:5px!important;scrollbar-width:none}
+.tab{flex:0 0 auto!important;border-radius:12px!important;color:var(--ms-muted)!important}
+.tab.active,.tab[aria-selected=true]{background:var(--ms-gradient)!important;color:#fff!important}
+.quick-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+.quick-card,.tool-card{padding:14px!important;min-width:0!important}
+.quick-card:hover,.tool-card:hover{border-color:rgba(168,85,247,.45)!important}
+.tool-icon{border-radius:12px!important}
+.preview-grid{gap:10px!important}
+#appBoot{color:var(--ms-muted)!important}
+.welcome-screen{background:transparent!important;min-height:calc(100dvh - 90px)!important}
+.welcome-content{max-width:440px!important;margin:0 auto!important}
+.mini-logo{border-radius:18px!important;background:var(--ms-gradient)!important;color:white!important}
+.eyebrow{color:#c084fc!important;letter-spacing:.14em!important}
+.entry-form{gap:12px!important}
+#studio{min-width:0!important;width:100%!important}
+#studio>*{max-width:100%}
+#messagesSection{min-width:0!important}
+.mxmsg{padding:14px!important}
+.mxmsg-head h2{font-size:25px!important}
+.mxmsg-sub{color:var(--ms-muted)!important}
+.mxmsg-content,.mxmsg-list,.mxmsg-threads{min-width:0!important}
+.mxmsg-conversation,.mxmsg-thread,.mxmsg-chat{max-width:100%!important;width:100%!important}
+.mxmsg-composer,.mxmsg-input-row{position:sticky!important;bottom:calc(var(--ms-nav-height) + env(safe-area-inset-bottom,0px))!important;background:var(--ms-bg-elevated)!important;z-index:20!important}
+img{max-width:100%}
+@media(min-width:680px){
+ main{width:min(100% - 36px,920px)!important;margin:22px auto 40px!important}
+ .quick-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+ .pane{padding:20px!important}
+}
+@media(max-width:480px){
+ .topbar{height:58px!important;padding-inline:14px!important}
+ main{width:calc(100% - 16px)!important;margin:8px auto 18px!important}
+ .brand strong{font-size:22px!important}
+ .pane{padding:13px!important;border-radius:17px!important}
+ h1{font-size:clamp(27px,7vw,36px)!important}
+ .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ button,.primary,.secondary{min-height:42px}
+ .mxmsg{padding:10px!important}
+}
+/* Keep every existing route and feature reachable; only decorate the app's existing nav. */
+nav,.bottom-nav,.bottom-navigation,[class*="bottom-nav"],[class*="bottomNavigation"]{background:rgba(8,9,22,.97)!important;border-top:1px solid var(--ms-border)!important;backdrop-filter:blur(20px)!important}
+nav a,nav button,.bottom-nav a,.bottom-nav button{color:var(--ms-muted)!important}
+nav .active,nav [aria-current=page],.bottom-nav .active,.bottom-nav [aria-current=page]{color:var(--ms-purple-bright)!important}
+[hidden]{display:none!important}
