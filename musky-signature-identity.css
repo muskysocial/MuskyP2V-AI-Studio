@@ -105,3 +105,24 @@ body.mx-messages-open #mxBar,body.mx-chat-fullscreen #mxBar{display:none!importa
 #msMenuButton,#msTopAvatar{border:1px solid var(--ms-border)!important;background:var(--ms-surface-2)!important;color:var(--ms-white)!important;border-radius:14px!important}
 @media(min-width:900px){#studio .pane{padding:26px 30px!important}#studio #homeSection{max-width:980px!important}}
 @media(max-width:520px){.topbar{padding-inline:12px!important}.brand strong{font-size:21px!important}#studio .pane{margin:8px auto!important;padding:15px!important}#studio .pane .ex-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#studio .pane .pt-row{flex-wrap:wrap}}
+
+/* Explicit alternate light theme; respects the existing Settings theme switch. */
+html.mx-light{color-scheme:light}
+html.mx-light,html.mx-light body{background:#f4f3fb!important;color:#171329!important}
+html.mx-light body{background:radial-gradient(ellipse at 12% -8%,rgba(139,61,255,.08),transparent 35%),#f4f3fb!important}
+html.mx-light .topbar{background:rgba(255,255,255,.94)!important;border-bottom:1px solid rgba(43,32,73,.10)!important}
+html.mx-light .brand strong{color:#27134c!important}
+html.mx-light #studio .pane{background:linear-gradient(155deg,#fff,#faf8ff)!important;border-color:rgba(43,32,73,.10)!important;box-shadow:0 14px 40px rgba(48,27,88,.07)!important;color:#171329!important}
+html.mx-light #studio .pane h1,html.mx-light #studio .pane h2,html.mx-light #studio .pane h3,html.mx-light #studio .pane h4,html.mx-light #studio .pane strong,html.mx-light #studio .pane label{color:#171329!important}
+html.mx-light #studio .pane p,html.mx-light #studio .pane small,html.mx-light #studio .pane .muted,html.mx-light #studio .pane .status{color:#6c6680!important}
+html.mx-light #studio .pane input:not([type=checkbox]):not([type=radio]):not([type=range]),html.mx-light #studio .pane textarea,html.mx-light #studio .pane select{background:#fff!important;color:#171329!important;border-color:rgba(43,32,73,.16)!important}
+html.mx-light #studio .pane .pt-card,html.mx-light #studio .pane .ex-card,html.mx-light #studio .pane .sh-tile,html.mx-light #studio .pane .plan,html.mx-light #studio .pane .ps-info-card,html.mx-light #studio .pane .ps-action{background:linear-gradient(145deg,#fff,#f8f5ff)!important;border-color:rgba(43,32,73,.11)!important;color:#171329!important}
+html.mx-light #studio .pane .hm-pill{background:#f0edf8!important;color:#6c6680!important;border-color:rgba(43,32,73,.1)!important}
+html.mx-light #studio .pane .hm-actions button{color:#6c6680!important}
+html.mx-light #mxBar{background:rgba(255,255,255,.96)!important;border-color:rgba(43,32,73,.12)!important;box-shadow:0 12px 38px rgba(48,27,88,.12)!important}
+html.mx-light #mxBar button{color:#77718a!important}
+html.mx-light #mxBar button.on{color:#712ee8!important;background:rgba(139,61,255,.10)!important}
+html.mx-light #mxBar button[data-go="createPostSection"]{color:#fff!important;box-shadow:0 0 0 5px #f4f3fb,0 7px 24px rgba(139,61,255,.25)!important}
+html.mx-light #mxBackButton{background:#fff!important;color:#5121a5!important;border-color:rgba(43,32,73,.13)!important}
+html.mx-light #msQuickMenu{background:rgba(255,255,255,.98)!important}
+html.mx-light #msQuickMenu button{color:#171329!important}
