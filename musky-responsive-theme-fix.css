@@ -1,0 +1,125 @@
+/* MuskySocials responsive sizing + dependable light/dark contrast. Last-loaded compatibility layer. */
+:root{
+  --ms-bg:#18191a;--ms-bg-elevated:#242526;--ms-surface:#242526;--ms-surface-2:#303133;
+  --ms-border:#3e4042;--ms-white:#f5f6f7;--ms-muted:#b0b3b8;
+  --ms-text:#f5f6f7;--ms-input-bg:#3a3b3c;--ms-input-text:#f5f6f7;
+  --ms-radius-sm:8px;--ms-radius:12px;--ms-radius-lg:16px;
+  color-scheme:dark;
+}
+html.mx-light{--ms-bg:#f0f2f5;--ms-bg-elevated:#fff;--ms-surface:#fff;--ms-surface-2:#f7f8fa;--ms-border:#d8dde5;--ms-white:#1c1e21;--ms-muted:#65676b;--ms-text:#1c1e21;--ms-input-bg:#fff;--ms-input-text:#1c1e21;color-scheme:light}
+/* Default is a clear Facebook-style light surface; dark mode is opt-in via html:not(.mx-light). */
+html.mx-light{color-scheme:light}
+html.mx-light,html.mx-light body{background:#f0f2f5!important;color:#1c1e21!important}
+html.mx-light body{background:#f0f2f5!important}
+html.mx-light .topbar{background:rgba(255,255,255,.97)!important;border-bottom:1px solid #d8dde5!important}
+html.mx-light .brand strong,html.mx-light .top-actions{color:#1c1e21!important}
+html.mx-light #studio .pane,
+html.mx-light #studio .sh,
+html.mx-light #studio .ms-card,
+html.mx-light #studio .ms-post,
+html.mx-light #studio .ms-story,
+html.mx-light #studio .ms-shortcut,
+html.mx-light #studio .gs-card,
+html.mx-light #studio .pf-hero,
+html.mx-light #studio .jb-card,
+html.mx-light #studio .dt-card,
+html.mx-light #studio .ds-card,
+html.mx-light #studio .mem-card,
+html.mx-light #studio .sh-bal,
+html.mx-light #studio .sh-premium,
+html.mx-light #studio .sh-account-card,
+html.mx-light #studio .sh-settings-row,
+html.mx-light #studio .sh-settings-preference,
+html.mx-light #studio .sh-notif-card,
+html.mx-light #studio .sh-account-detail-card{
+ background:#fff!important;background-image:none!important;border-color:#d8dde5!important;color:#1c1e21!important;box-shadow:0 1px 2px rgba(0,0,0,.06)!important
+}
+html.mx-light #studio .pane h1,html.mx-light #studio .pane h2,
+html.mx-light #studio .pane h3,html.mx-light #studio .pane h4,
+html.mx-light #studio .pane strong,html.mx-light #studio .pane label,
+html.mx-light #studio .sh,html.mx-light #studio .gs-name,
+html.mx-light #studio .pf-identity-copy strong,html.mx-light #studio .jb-card strong,
+html.mx-light #studio .dt-name,html.mx-light #studio .ds-t{color:#1c1e21!important}
+html.mx-light #studio .pane p,html.mx-light #studio .pane small,
+html.mx-light #studio .pane .muted,html.mx-light #studio .pane .status,
+html.mx-light #studio .gs-sub,html.mx-light #studio .jb-sub,
+html.mx-light #studio .dt-sub,html.mx-light #studio .dt-desc,
+html.mx-light #studio .ds-s,html.mx-light #studio .pf-profile-email{color:#65676b!important}
+html.mx-light #studio input:not([type=checkbox]):not([type=radio]):not([type=range]),
+html.mx-light #studio textarea,html.mx-light #studio select,
+html.mx-light #studio .pane input:not([type=checkbox]):not([type=radio]):not([type=range]){
+ background:#fff!important;color:#1c1e21!important;border:1px solid #ccd0d5!important
+}
+html.mx-light #studio input::placeholder,html.mx-light #studio textarea::placeholder{color:#65676b!important;opacity:1}
+html.mx-light #studio a{color:#0866ff}
+html.mx-light #studio .gs-price,html.mx-light #studio .mem-price{color:#5b35a5!important}
+html.mx-light #studio .gs-chip,html.mx-light #studio .hm-pill,
+html.mx-light #studio .pf-tag,html.mx-light #studio .pf-meta-pill,
+html.mx-light #studio .dt-pill,html.mx-light #studio .jb-badge{
+ background:#f0f2f5!important;color:#3f3f46!important;border-color:#d8dde5!important
+}
+html.mx-light #mxBar{background:rgba(255,255,255,.98)!important;border-color:#d8dde5!important}
+html.mx-light #mxBar button{color:#65676b!important}
+html.mx-light #mxBar button.on{color:#0866ff!important;background:#e7f3ff!important}
+html.mx-light #mxBackButton{background:#fff!important;color:#1c1e21!important;border-color:#d8dde5!important}
+/* Explicit dark theme: force readable foregrounds across cards, labels, controls and placeholders. */
+html:not(.mx-light){color-scheme:dark;--ms-bg:#18191a;--ms-bg-elevated:#242526;--ms-surface:#242526;--ms-surface-2:#303133;--ms-border:#3e4042;--ms-white:#f5f6f7;--ms-muted:#b0b3b8;--ms-text:#f5f6f7;--ms-input-bg:#3a3b3c;--ms-input-text:#f5f6f7}
+html:not(.mx-light),html:not(.mx-light) body{background:#18191a!important;color:#f5f6f7!important}
+html:not(.mx-light) .topbar{background:rgba(36,37,38,.97)!important;border-color:#3e4042!important}
+html:not(.mx-light) .brand strong,html:not(.mx-light) .top-actions{color:#f5f6f7!important}
+html:not(.mx-light) #studio .pane,html:not(.mx-light) #studio .sh,
+html:not(.mx-light) #studio .ms-card,html:not(.mx-light) #studio .ms-post,html:not(.mx-light) #studio .ms-story,
+html:not(.mx-light) #studio .ms-shortcut,html:not(.mx-light) #studio .gs-card,html:not(.mx-light) #studio .pf-hero,
+html:not(.mx-light) #studio .jb-card,html:not(.mx-light) #studio .dt-card,html:not(.mx-light) #studio .ds-card,
+html:not(.mx-light) #studio .mem-card,html:not(.mx-light) #studio .sh-bal,html:not(.mx-light) #studio .sh-premium,
+html:not(.mx-light) #studio .sh-account-card,html:not(.mx-light) #studio .sh-settings-row,
+html:not(.mx-light) #studio .sh-settings-preference,html:not(.mx-light) #studio .sh-notif-card,
+html:not(.mx-light) #studio .sh-account-detail-card{background:#242526!important;background-image:none!important;border-color:#3e4042!important;color:#f5f6f7!important}
+html:not(.mx-light) #studio .pane h1,html:not(.mx-light) #studio .pane h2,html:not(.mx-light) #studio .pane h3,
+html:not(.mx-light) #studio .pane h4,html:not(.mx-light) #studio .pane strong,html:not(.mx-light) #studio .pane label,
+html:not(.mx-light) #studio .sh,html:not(.mx-light) #studio .gs-name,html:not(.mx-light) #studio .pf-identity-copy strong,
+html:not(.mx-light) #studio .jb-card strong,html:not(.mx-light) #studio .dt-name,html:not(.mx-light) #studio .ds-t{color:#f5f6f7!important}
+html:not(.mx-light) #studio .pane p,html:not(.mx-light) #studio .pane small,html:not(.mx-light) #studio .pane .muted,
+html:not(.mx-light) #studio .pane .status,html:not(.mx-light) #studio .gs-sub,html:not(.mx-light) #studio .jb-sub,
+html:not(.mx-light) #studio .dt-sub,html:not(.mx-light) #studio .dt-desc,html:not(.mx-light) #studio .ds-s,
+html:not(.mx-light) #studio .pf-profile-email{color:#b0b3b8!important}
+html:not(.mx-light) #studio input:not([type=checkbox]):not([type=radio]):not([type=range]),
+html:not(.mx-light) #studio textarea,html:not(.mx-light) #studio select{background:#3a3b3c!important;color:#f5f6f7!important;border-color:#55585c!important}
+html:not(.mx-light) #studio input::placeholder,html:not(.mx-light) #studio textarea::placeholder{color:#b0b3b8!important;opacity:1}
+html:not(.mx-light) #studio a{color:#8ab4ff}
+html:not(.mx-light) #mxBar{background:rgba(36,37,38,.98)!important;border-color:#3e4042!important}
+html:not(.mx-light) #mxBar button{color:#b0b3b8!important}
+html:not(.mx-light) #mxBar button.on{color:#8ab4ff!important;background:#263951!important}
+html:not(.mx-light) #mxBackButton{background:#242526!important;color:#f5f6f7!important;border-color:#3e4042!important}
+/* Balanced, adaptive scale: avoids tiny labels and oversized headings across narrow and wide phones. */
+html{font-size:16px!important;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{font-size:clamp(14px,1rem,17px)!important;line-height:1.5!important;overflow-x:hidden!important}
+#studio{width:100%!important;max-width:1440px!important;margin-inline:auto!important;padding-inline:clamp(10px,2.5vw,28px)!important}
+#studio .pane{width:100%!important;max-width:1040px!important;margin:clamp(8px,1.6vw,18px) auto!important;padding:clamp(14px,2.2vw,26px)!important}
+#studio #homeSection{width:100%!important;max-width:1100px!important;margin-inline:auto!important;padding-inline:clamp(8px,2vw,22px)!important}
+#studio h1{font-size:clamp(1.35rem,2.5vw,1.9rem)!important;line-height:1.2!important}
+#studio h2{font-size:clamp(1.18rem,2.1vw,1.55rem)!important;line-height:1.25!important}
+#studio h3{font-size:clamp(1.04rem,1.7vw,1.25rem)!important;line-height:1.3!important}
+#studio p,#studio label,#studio input,#studio textarea,#studio select,#studio button{font-size:clamp(14px,1rem,16px)}
+#studio button,#studio input,#studio select{min-height:42px}
+#studio img, #studio video, #studio canvas{max-width:100%}
+#studio .ms-home-layout{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:16px!important;width:100%!important}
+#studio .ms-home-main,#studio .ms-home-aside{min-width:0!important;width:100%!important}
+#studio .sh-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))!important}
+#studio .gs-grid,#studio .market-grid,#studio .ms-market-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,145px),1fr))!important}
+#studio .pane *,#studio .sh *,#studio .ms-post *,#studio .gs-card *{min-width:0}
+#studio .pane p,#studio .pane a,#studio .pane button,#studio .pane label{overflow-wrap:anywhere}
+@media(min-width:760px){
+ #studio .ms-home-layout{grid-template-columns:minmax(0,1fr) minmax(240px,300px)!important;align-items:start!important}
+ #studio .ms-home-aside{position:sticky;top:82px}
+}
+@media(max-width:380px){
+ .topbar{height:58px!important;padding-inline:10px!important}
+ .brand strong{font-size:20px!important}
+ #studio{padding-inline:8px!important}
+ #studio .pane{padding:12px!important;border-radius:12px!important}
+ #mxBar button{font-size:11px!important}
+ #mxBar button span{font-size:20px!important}
+}
+@media(min-width:381px) and (max-width:600px){#studio .pane{padding:15px!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
