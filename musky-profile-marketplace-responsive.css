@@ -1,0 +1,67 @@
+/* MuskySocials profile + Marketplace responsive finishing pass.
+   Layout-only rules: preserve existing Supabase, checkout, and account handlers. */
+#studio #shopSection .ms-market-head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin:0 0 16px;min-width:0
+}
+#studio #shopSection .ms-market-head h2{
+  margin:0;font-size:clamp(22px,4vw,30px);letter-spacing:-.035em;line-height:1.15
+}
+#studio #shopSection .ms-market-head p{
+  margin:6px 0 0;color:var(--sh-sub,#65676b);font-size:14px;line-height:1.45
+}
+#studio #shopSection .ms-market-hero{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:clamp(14px,3vw,22px);margin:0 0 20px;border:1px solid rgba(24,119,242,.18);
+  border-radius:20px;background:linear-gradient(125deg,rgba(24,119,242,.13),rgba(244,91,154,.12));
+  min-width:0
+}
+#studio #shopSection .ms-market-hero>div{min-width:0}
+#studio #shopSection .ms-market-hero strong{display:block;font-size:clamp(16px,2.8vw,21px);line-height:1.3}
+#studio #shopSection .ms-market-hero p{margin:6px 0 0;color:var(--sh-sub,#65676b);font-size:13px;line-height:1.5}
+#studio #shopSection .ms-market-art{
+  display:grid;place-items:center;flex:none;width:clamp(52px,12vw,76px);height:clamp(52px,12vw,76px);
+  border-radius:20px;background:rgba(255,255,255,.65);font-size:clamp(27px,6vw,40px)
+}
+#studio #shopSection .ms-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:16px 0 10px}
+#studio #shopSection .ms-section-head strong{font-size:15px;letter-spacing:-.01em}
+#studio #shopSection .gs-chips{scrollbar-width:thin;max-width:100%;padding-bottom:12px}
+#studio #shopSection #gsGrid{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;
+  align-items:stretch;min-width:0
+}
+#studio #shopSection #gsGrid>.gs-card{
+  display:flex;flex-direction:column;min-width:0;overflow:hidden;
+  padding:9px!important;border:1px solid var(--sh-line,#e4e6eb);border-radius:16px;
+  background:var(--sh-card,#fff);box-shadow:0 5px 18px rgba(20,40,80,.055)
+}
+#studio #shopSection #gsGrid .gs-card img{aspect-ratio:1/1;width:100%;object-fit:cover;border-radius:11px}
+#studio #shopSection #gsGrid .gs-name{font-size:14px;line-height:1.35;overflow-wrap:anywhere}
+#studio #shopSection #gsGrid .gs-sub{font-size:12px;line-height:1.4;overflow-wrap:anywhere}
+#studio #shopSection #gsGrid .gs-price{font-size:15px;margin:7px 0 10px}
+#studio #shopSection #gsGrid .gs-card [data-buy]{margin-top:auto;min-height:40px;padding:9px 7px;border-radius:11px;white-space:normal;line-height:1.25}
+#studio #shopSection #gsGrid:empty{display:block!important}
+#studio #profileSection .pf-hero,#studio #profileSection .pf-highlight-card,#studio #profileSection .pf-content-preview{min-width:0}
+#studio #profileSection .pf-identity-copy{overflow-wrap:anywhere}
+#studio #profileSection .pf-profile-email{overflow-wrap:anywhere}
+#studio #profileSection .pf-hero-actions{flex-wrap:wrap}
+#studio #profileSection .pf-hero-actions button{min-width:0}
+#studio #profileSection .pf-d input,#studio #profileSection .pf-d textarea{box-sizing:border-box;width:100%;max-width:100%;min-width:0}
+#studio #profileSection .pf-row{gap:12px;line-height:1.4;overflow-wrap:anywhere}
+#studio #profileSection .pf-row>span:first-child{min-width:0}
+@media(min-width:560px){
+  #studio #shopSection #gsGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #studio #shopSection .ms-market-hero{padding:22px 24px}
+}
+@media(min-width:900px){
+  #studio #shopSection{max-width:1180px!important;margin-inline:auto}
+  #studio #shopSection #gsGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+  #studio #shopSection #gsGrid>.gs-card{padding:11px!important}
+}
+@media(max-width:360px){
+  #studio #shopSection #gsGrid{gap:7px}
+  #studio #shopSection #gsGrid>.gs-card{padding:6px!important}
+  #studio #shopSection #gsGrid .gs-name{font-size:13px}
+  #studio #shopSection #gsGrid .gs-card [data-buy]{font-size:12px}
+  #studio #profileSection .pf-hero-actions button{flex-basis:100%}
+}
