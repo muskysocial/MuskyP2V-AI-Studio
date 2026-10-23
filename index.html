@@ -7,6 +7,7 @@
   <title>MuskySocials</title><link rel="stylesheet" href="style.css?v=20261022-privacy-safety">
   <link rel="stylesheet" href="musky-reference-ui.css?v=20261022-fresh-reference-layout1">
   <link rel="stylesheet" href="musky-approved-redesign.css?v=20261023-2">
+  <link rel="stylesheet" href="musky-signature-identity.css?v=20261023-6">
 </head>
 <body>
   <header class="topbar">
@@ -106,16 +107,16 @@
         <p class="ps-footnote">Privacy settings can vary by feature. Notification preferences currently save on this device and do not yet control server-side delivery.</p>
       </section>
     </section>
-  </main><script>window.setTimeout(function(){document.documentElement.classList.remove("app-booting");},10000);</script><script src="script.js?v=20261022-ui10"></script>
+  </main><script>window.setTimeout(function(){document.documentElement.classList.remove("app-booting");},10000);</script><script src="script.js?v=20261023-signature"></script>
   <script type="module" src="headswap.js?v=20261022-ui10"></script>
-  <script type="module" src="auth.js?v=20261022-ui10"></script>
-  <script type="module" src="shell.js?v=20261022-account-details"></script>
-  <script type="module" src="portal.js?v=20261022-ui10"></script>
+  <script type="module" src="auth.js?v=20261023-signature"></script>
+  <script type="module" src="shell.js?v=20261023-signature"></script>
+  <script type="module" src="portal.js?v=20261023-signature"></script>
 
 <script>
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js?v=20261022-ui10", { updateViaCache: "none" })
+      navigator.serviceWorker.register("./sw.js?v=20261023-redesign", { updateViaCache: "none" })
         .then(registration => registration.update())
         .catch(error => console.error(
           "Service worker registration failed:", error
@@ -125,8 +126,8 @@
         if (reloadedForController) return;
         reloadedForController = true;
         try {
-          if (sessionStorage.getItem("musky-sw-reloaded-v10") === "1") return;
-          sessionStorage.setItem("musky-sw-reloaded-v5", "1");
+          if (sessionStorage.getItem("musky-sw-reloaded-v11") === "1") return;
+          sessionStorage.setItem("musky-sw-reloaded-v11", "1");
         } catch {}
         location.reload();
       });

@@ -520,7 +520,7 @@ function init() {
   // Bottom bar
   const bar = document.createElement("nav");
   bar.id = "mxBar";
-  bar.innerHTML = [["homeSection", "⌂", "Home"], ["shopSection", "▣", "Marketplace"], ["createPostSection", "＋", "Create"], ["messagesSection", "☏", "Messages"], ["profileSection", "♙", "Profile"]]
+  bar.innerHTML = [["homeSection", "⌂", "Home"], ["shopSection", "▣", "Marketplace"], ["createPostSection", "＋", "Create"], ["profileSection", "♙", "Profile"]]
     .map(([id, i, l]) => '<button data-go="' + id + '" aria-label="' + l + '"><span>' + i + "</span>" + l + "</button>").join("");
   document.body.appendChild(bar);
 
@@ -570,7 +570,6 @@ function init() {
       jobsSection: ["jobsSection"],
       toolsHubSection: ["toolsHubSection", "videoSection", "headswapSection", "chatSection", "voiceCloneSection", "voiceSection", "cameraSection", "viralBoostSection", "creditSection"],
       profileSection: ["profileSection", "settingsSection", "adminSection", "membershipSection"],
-      messagesSection: ["messagesSection"],
       createPostSection: ["createPostSection", "eventsSection"],
     };
     chat.classList.toggle("mx-chat-fullscreen", id === "chatSection");
