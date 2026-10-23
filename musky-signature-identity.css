@@ -126,3 +126,42 @@ html.mx-light #mxBar button[data-go="createPostSection"]{color:#fff!important;bo
 html.mx-light #mxBackButton{background:#fff!important;color:#5121a5!important;border-color:rgba(43,32,73,.13)!important}
 html.mx-light #msQuickMenu{background:rgba(255,255,255,.98)!important}
 html.mx-light #msQuickMenu button{color:#171329!important}
+
+/* Final surface pass for Marketplace, profile, jobs, dating, library and design tools. */
+#studio .ms-market-head{margin:0 0 16px!important}
+#studio .ms-market-hero{position:relative!important;overflow:hidden!important;border-radius:22px!important;padding:clamp(18px,4vw,28px)!important;background:radial-gradient(circle at 85% 10%,rgba(34,211,238,.24),transparent 32%),var(--ms-gradient)!important;color:#fff!important}
+#studio .ms-market-hero *{color:#fff!important}
+#studio .ms-market-art{border-radius:18px!important;border:1px solid var(--ms-border)!important;background:var(--ms-surface-2)!important}
+#studio .gs-chips{display:flex!important;gap:8px!important;flex-wrap:wrap!important;margin:12px 0 16px!important}
+#studio .gs-chip{border:1px solid var(--ms-border)!important;border-radius:999px!important;background:var(--ms-surface-2)!important;color:#d8c4ff!important;padding:8px 12px!important}
+#studio .gs-chip.active,#studio .gs-chip.on{background:rgba(139,61,255,.22)!important;border-color:rgba(168,85,247,.5)!important;color:#fff!important}
+#studio .gs-card,#studio .pf-hero,#studio .jb-card,#studio .dt-card,#studio .ds-card{overflow:hidden!important;border-radius:18px!important;border:1px solid var(--ms-border)!important;background:linear-gradient(150deg,#151730,#0b0d20)!important;color:var(--ms-white)!important}
+#studio .gs-name,#studio .pf-identity-copy strong,#studio .jb-card strong,#studio .dt-name,#studio .ds-t{color:var(--ms-white)!important;font-weight:800!important}
+#studio .gs-price,#studio .mem-price{color:#d8b4ff!important;font-weight:850!important}
+#studio .gs-sub,#studio .jb-sub,#studio .dt-sub,#studio .dt-desc,#studio .ds-s,#studio .pf-profile-email{color:var(--ms-muted)!important}
+#studio .pf-cover{background:radial-gradient(circle at 80% 0,rgba(34,211,238,.24),transparent 30%),var(--ms-gradient)!important}
+#studio .pf-cover-mark{background:rgba(255,255,255,.2)!important;color:#fff!important;border:1px solid rgba(255,255,255,.3)!important}
+#studio .pf-hero-body{padding:0 16px 18px!important}
+#studio .pf-av{border:4px solid #111127!important;box-shadow:0 0 0 2px rgba(168,85,247,.55)!important}
+#studio .pf-tag,#studio .pf-meta-pill,#studio .dt-pill,#studio .jb-badge{border-radius:999px!important;background:rgba(139,61,255,.13)!important;border:1px solid rgba(168,85,247,.25)!important;color:#d8c4ff!important}
+#studio .mem-grid{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))!important;gap:12px!important}
+#studio .mem-card{border:1px solid var(--ms-border)!important;border-radius:18px!important;background:linear-gradient(145deg,#171832,#0b0d20)!important;padding:18px!important}
+#studio .mem-card .mem-price{font-size:clamp(22px,5vw,30px)!important}
+#studio .mem-status{border-radius:12px!important;background:rgba(34,211,238,.08)!important;border:1px solid rgba(34,211,238,.18)!important;padding:12px!important}
+#studio .ds-grid{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))!important;gap:12px!important}
+#studio .ds-canvas{max-width:100%!important;border-radius:16px!important;border:1px solid var(--ms-border)!important;overflow:hidden!important}
+#studio .ds-lbl{color:#d4b5ff!important;font-weight:750!important}
+#studio .ds-req{border-radius:13px!important;background:rgba(34,211,238,.07)!important;border:1px solid rgba(34,211,238,.16)!important;padding:12px!important}
+#studio .fd-pin{border-radius:10px!important;background:rgba(139,61,255,.16)!important;color:#d8c4ff!important}
+#studio .mx-notifications{color:var(--ms-white)!important}
+#studio .mx-notifications-head{border-bottom:1px solid var(--ms-border)!important;padding-bottom:14px!important}
+#studio .mx-notif-welcome{border-radius:18px!important;background:linear-gradient(145deg,#171832,#0b0d20)!important;border:1px solid var(--ms-border)!important}
+#studio .mx-notif-filters{display:flex!important;gap:8px!important;flex-wrap:wrap!important}
+#studio .mx-notif-filter{border-radius:999px!important;border:1px solid var(--ms-border)!important;background:var(--ms-surface-2)!important;color:var(--ms-muted)!important;padding:8px 12px!important}
+#studio .mx-notif-filter.active{background:rgba(139,61,255,.2)!important;color:#e2ceff!important;border-color:rgba(168,85,247,.45)!important}
+#studio .mx-notif-card{border-radius:15px!important;border:1px solid var(--ms-border)!important;background:var(--ms-surface)!important;margin:8px 0!important}
+html.mx-light #studio .gs-card,html.mx-light #studio .pf-hero,html.mx-light #studio .jb-card,html.mx-light #studio .dt-card,html.mx-light #studio .ds-card,html.mx-light #studio .mem-card{background:linear-gradient(150deg,#fff,#f8f5ff)!important;border-color:rgba(43,32,73,.12)!important;color:#171329!important}
+html.mx-light #studio .gs-name,html.mx-light #studio .pf-identity-copy strong,html.mx-light #studio .jb-card strong,html.mx-light #studio .dt-name,html.mx-light #studio .ds-t{color:#171329!important}
+html.mx-light #studio .gs-sub,html.mx-light #studio .jb-sub,html.mx-light #studio .dt-sub,html.mx-light #studio .dt-desc,html.mx-light #studio .ds-s,html.mx-light #studio .pf-profile-email{color:#6c6680!important}
+html.mx-light #studio .pf-av{border-color:#fff!important}
+@media(max-width:440px){#studio .mem-grid,#studio .ds-grid{grid-template-columns:minmax(0,1fr)!important}#studio .gs-chips{overflow-x:auto;flex-wrap:nowrap!important;padding-bottom:4px}#studio .gs-chip{flex:none!important}}
