@@ -123,3 +123,87 @@ body{font-size:clamp(14px,1rem,17px)!important;line-height:1.5!important;overflo
 }
 @media(min-width:381px) and (max-width:600px){#studio .pane{padding:15px!important}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+
+/* Facebook-app mobile-first correction: theme tokens and navigation must follow the selected mode. */
+html:not(.mx-light){
+ color-scheme:dark!important;
+ --sh-card:#242526!important;--sh-text:#f5f6f7!important;--sh-sub:#b0b3b8!important;
+ --sh-line:#3e4042!important;--sh-blue:#8ab4ff!important;
+}
+html.mx-light{
+ color-scheme:light!important;
+ --sh-card:#fff!important;--sh-text:#1c1e21!important;--sh-sub:#65676b!important;
+ --sh-line:#dadde1!important;--sh-blue:#0866ff!important;
+}
+html:not(.mx-light) body,html:not(.mx-light) #studio{color:#f5f6f7!important;background:#18191a!important}
+html:not(.mx-light) #studio .pane,
+html:not(.mx-light) #studio .pane *,
+html:not(.mx-light) #studio .sh,
+html:not(.mx-light) #studio .sh *,
+html:not(.mx-light) #studio .ms-home-layout,
+html:not(.mx-light) #studio .ms-home-layout *{color:inherit}
+html:not(.mx-light) #studio .pane,
+html:not(.mx-light) #studio .sh,
+html:not(.mx-light) #studio .sh-tile,
+html:not(.mx-light) #studio .sh-settings-row,
+html:not(.mx-light) #studio .sh-settings-preference,
+html:not(.mx-light) #studio .sh-account-card,
+html:not(.mx-light) #studio .sh-notif-card{background:#242526!important;color:#f5f6f7!important;border-color:#3e4042!important}
+html:not(.mx-light) #studio .pane :is(h1,h2,h3,h4,strong,label,p,span,small,li,div),
+html:not(.mx-light) #studio .sh :is(h1,h2,h3,h4,strong,label,p,span,small,li,div){color:inherit}
+html:not(.mx-light) #studio .pane :is(.muted,.status,small,.sub,.hint),
+html:not(.mx-light) #studio .sh :is(.muted,.status,small,.sub,.hint){color:#b0b3b8!important}
+html:not(.mx-light) #studio input:not([type=checkbox]):not([type=radio]):not([type=range]),
+html:not(.mx-light) #studio textarea,html:not(.mx-light) #studio select{
+ background:#3a3b3c!important;color:#f5f6f7!important;border-color:#55585c!important
+}
+html:not(.mx-light) #studio input::placeholder,html:not(.mx-light) #studio textarea::placeholder{color:#b0b3b8!important;opacity:1}
+html:not(.mx-light) #msQuickMenu,html:not(.mx-light) #msQuickMenu *,
+html:not(.mx-light) .ms-quick-menu,html:not(.mx-light) .ms-quick-menu *,
+html:not(.mx-light) .menu-panel,html:not(.mx-light) .menu-panel *,
+html:not(.mx-light) [role=menu],html:not(.mx-light) [role=menu] *{
+ background-color:#242526!important;color:#f5f6f7!important;border-color:#3e4042!important
+}
+html:not(.mx-light) #msQuickMenu button,html:not(.mx-light) [role=menu] button{background:#303133!important;color:#f5f6f7!important}
+html.mx-light #msQuickMenu,html.mx-light #msQuickMenu *,
+html.mx-light .ms-quick-menu,html.mx-light .ms-quick-menu *,
+html.mx-light .menu-panel,html.mx-light .menu-panel *,
+html.mx-light [role=menu],html.mx-light [role=menu] *{background-color:#fff!important;color:#1c1e21!important;border-color:#dadde1!important}
+html.mx-light #msQuickMenu button,html.mx-light [role=menu] button{background:#f0f2f5!important;color:#1c1e21!important}
+
+/* Native mobile-first sizing: phone is the baseline, not a shrunk desktop canvas. */
+html,body{width:100%;max-width:100%;min-width:0!important;overflow-x:clip!important}
+#studio{width:100%!important;max-width:none!important;margin:0!important;padding:0 0 calc(72px + env(safe-area-inset-bottom,0px))!important}
+#studio .pane{width:100%!important;max-width:none!important;margin:0!important;padding:16px!important;border-radius:0!important;box-shadow:none!important}
+#studio #homeSection{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
+#studio .ms-home-layout{display:flex!important;flex-direction:column!important;gap:12px!important;width:100%!important}
+#studio .ms-home-main,#studio .ms-home-aside{width:100%!important;max-width:none!important}
+#studio .ms-home-aside{position:static!important}
+#studio :is(.ms-post,.ms-card,.ms-story,.ms-shortcut,.gs-card,.pf-hero,.jb-card,.dt-card,.ds-card){max-width:100%!important}
+#studio :is(h1,h2,h3){letter-spacing:normal!important}
+#studio h1{font-size:clamp(22px,5.8vw,28px)!important}
+#studio h2{font-size:clamp(20px,5.2vw,24px)!important}
+#studio h3{font-size:clamp(17px,4.6vw,20px)!important}
+#studio :is(p,label,button,input,textarea,select){font-size:16px}
+#studio button,#studio input,#studio select{min-height:44px}
+#mxBar{left:0!important;right:0!important;bottom:0!important;transform:none!important;width:100%!important;border-radius:0!important}
+#mxBar button{font-size:12px!important;gap:4px!important;padding:9px 2px calc(7px + env(safe-area-inset-bottom,0px))!important}
+#mxBar button span{font-size:22px!important}
+@media(min-width:600px){
+ #studio{max-width:100%!important;padding-inline:12px!important}
+ #studio .pane{max-width:100%!important;margin:12px auto!important;border-radius:12px!important;padding:20px!important}
+ #studio .ms-home-layout{display:grid!important;grid-template-columns:minmax(0,1fr) 260px!important;gap:16px!important}
+ #studio .ms-home-aside{position:static!important}
+}
+@media(min-width:1000px){
+ #studio{max-width:1200px!important;margin-inline:auto!important;padding-inline:20px!important}
+ #studio .pane{padding:24px!important}
+ #studio .ms-home-layout{grid-template-columns:minmax(0,1fr) 300px!important}
+}
+@media(max-width:380px){
+ #studio{padding-inline:0!important}
+ #studio .pane{padding:12px!important}
+ #studio .ms-home-layout{gap:10px!important}
+ #mxBar button{font-size:10px!important}
+}
