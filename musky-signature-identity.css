@@ -77,3 +77,6 @@ body.mx-chat-open #mxBar{display:none!important}
 /* The bottom bar is created by shell.js with nav#mxBar and data-go pane IDs. */
 #mxBar button[aria-current="page"],#mxBar button.active{color:#d5b5ff!important;background:rgba(139,61,255,.13)!important}
 body.mx-messages-open #mxBar,body.mx-chat-fullscreen #mxBar{display:none!important}
+
+/* Private member messaging is intentionally removed from the MuskySocials interface. */
+#messagesSection,#mxBar [data-go="messagesSection"],[data-go="messagesSection"]{display:none!important;}
