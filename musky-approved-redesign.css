@@ -57,9 +57,9 @@ img{max-width:100%}
  .mxmsg{padding:10px!important}
 }
 /* Keep every existing route and feature reachable; only decorate the app's existing nav. */
-nav,.bottom-nav,.bottom-navigation,[class*="bottom-nav"],[class*="bottomNavigation"]{background:rgba(8,9,22,.97)!important;border-top:1px solid var(--ms-border)!important;backdrop-filter:blur(20px)!important}
-nav a,nav button,.bottom-nav a,.bottom-nav button{color:var(--ms-muted)!important}
-nav .active,nav [aria-current=page],.bottom-nav .active,.bottom-nav [aria-current=page]{color:var(--ms-purple-bright)!important}
+ .bottom-nav,.bottom-navigation,[class*="bottom-nav"],[class*="bottomNavigation"]{background:rgba(8,9,22,.97)!important;border-top:1px solid var(--ms-border)!important;backdrop-filter:blur(20px)!important}
+.bottom-nav a,.bottom-nav button,.bottom-navigation a,.bottom-navigation button{color:var(--ms-muted)!important}
+.bottom-nav .active,.bottom-nav [aria-current=page],.bottom-navigation .active,.bottom-navigation [aria-current=page]{color:var(--ms-purple-bright)!important}
 [hidden]{display:none!important}
 
 /* Native MuskySocials home/profile/discover components */
