@@ -17,5 +17,5 @@
   "./membership.js",
   "./headswap-limit.js",
   "./paid-access.js",
-  "./viral-boost.js",
+  "./viral-boost.js"
 ]
