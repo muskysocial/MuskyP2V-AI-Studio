@@ -1,0 +1,30 @@
+/* MuskySocials approved reference design tokens — dark mobile-first system. */
+:root {
+  --ms-bg:#05060f;
+  --ms-bg-elevated:#0a0b1a;
+  --ms-surface:#0f1124;
+  --ms-surface-2:#14172b;
+  --ms-border:rgba(255,255,255,.08);
+  --ms-white:#f8f7ff;
+  --ms-muted:#9ca3c7;
+  --ms-purple:#8b3dff;
+  --ms-purple-bright:#a855f7;
+  --ms-pink:#f044b8;
+  --ms-cyan:#22d3ee;
+  --ms-red:#ff375f;
+  --ms-green:#22c55e;
+  --ms-gradient:linear-gradient(125deg,#8b3dff 0%,#a855f7 52%,#f044b8 100%);
+  --ms-ring:linear-gradient(135deg,#8b3dff,#f044b8,#a855f7);
+  --ms-radius-sm:10px;
+  --ms-radius:16px;
+  --ms-radius-lg:20px;
+  --ms-space-1:4px;
+  --ms-space-2:8px;
+  --ms-space-3:12px;
+  --ms-space-4:16px;
+  --ms-space-5:20px;
+  --ms-space-6:24px;
+  --ms-nav-height:72px;
+  --ms-glow:0 0 22px rgba(139,61,255,.28);
+  --ms-font:Inter,Poppins,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
