@@ -87,28 +87,54 @@ let publicCampaigns = [];
 let publicCampaignsLoaded = false;
 let welcomeCampaignShown = (()=>{try{return sessionStorage.getItem("mh_welcome_campaign_seen")==="1";}catch{return false;}})();
 
-try {
-  const {data,error} = await supabase.auth.getSession();
-  sessionState = error ? "unknown" : (data.session ? "signed-in" : "signed-out");
-  currentUser = data.session?.user || null;
-  if (currentUser) { await loadAccountData(); restoreWorkspaceState(); render(); await verifyReturnedPayment(); }
-  if (error) console.warn("Auth session check:",error.message);
-} catch (error) {
-  sessionState = "offline";
-  console.warn("Supabase session unavailable:",error);
+// Do not block module startup on Supabase session recovery. The old top-level
+// await left the HTML boot screen visible indefinitely when auth was slow/offline.
+async function initializeAppAuth(){
+  app.dataset.backend = "configured";
+  app.dataset.auth = "checking";
+  supabase.auth.onAuthStateChange((_event, session) => {
+    currentUser = session?.user || null;
+    if (currentUser) {
+      restoreWorkspaceState();
+      render();
+      loadAccountData().then(()=>verifyReturnedPayment()).catch(error=>console.warn("Account startup:",error));
+      refreshAdminAccess().then(()=>{sendVisitorHeartbeat();render();});
+    } else {
+      isAdmin=false;
+      adminDashboardData=null;
+      sendVisitorHeartbeat();
+      sessionState = "signed-out";
+      app.dataset.auth = sessionState;
+      render();
+    }
+  });
+  try {
+    const timeout = new Promise(resolve=>setTimeout(()=>resolve({timedOut:true}),8000));
+    const result = await Promise.race([supabase.auth.getSession(),timeout]);
+    if(result?.timedOut){
+      sessionState = "unknown";
+      app.dataset.auth = sessionState;
+      console.warn("Supabase session check timed out; showing sign-in instead of blocking startup.");
+    } else {
+      const {data,error} = result;
+      sessionState = error ? "unknown" : (data.session ? "signed-in" : "signed-out");
+      currentUser = data.session?.user || null;
+      app.dataset.auth = sessionState;
+      if(currentUser){
+        restoreWorkspaceState();
+        render();
+        loadAccountData().then(()=>verifyReturnedPayment()).catch(error=>console.warn("Account startup:",error));
+      }
+      if(error) console.warn("Auth session check:",error.message);
+    }
+  } catch(error) {
+    sessionState = "offline";
+    app.dataset.auth = sessionState;
+    console.warn("Supabase session unavailable:",error);
+  }
+  refreshAdminAccess().then(()=>{sendVisitorHeartbeat();render();});
+  setInterval(sendVisitorHeartbeat,60000);
 }
-app.dataset.backend = "configured";
-app.dataset.auth = sessionState;
-supabase.auth.onAuthStateChange((_event, session) => {
-  currentUser = session?.user || null;
-  if (currentUser) { loadAccountData().then(()=>verifyReturnedPayment()); refreshAdminAccess().then(()=>{sendVisitorHeartbeat();render();}); }
-  else { isAdmin=false; adminDashboardData=null; sendVisitorHeartbeat(); }
-  sessionState = currentUser ? "signed-in" : "signed-out";
-  app.dataset.auth = sessionState;
-  render();
-});
-refreshAdminAccess().then(()=>{sendVisitorHeartbeat();render();});
-setInterval(sendVisitorHeartbeat,60000);
 
 const iconSvg = (name,size=20) => {
   const paths = {
@@ -1038,3 +1064,4 @@ function renderCampaignPublicPlacements(){
 render();
 loadPublicSiteConfig();
 loadPublicCampaigns();
+initializeAppAuth();
